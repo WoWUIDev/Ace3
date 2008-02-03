@@ -1,1 +1,9 @@
 * text=auto !eol
+Ace3/LICENSE.txt svneol=native#text/plain
+Ace3/benchs/Bench-AceTimer-3.0/Bench-AceTimer-3.0.toc svneol=native#text/plain
+Ace3/benchs/Bench-AceTimer-3.0/bench1.lua svneol=native#text/plain
+Ace3/tests/AceAddon-3.0.lua svneol=native#text/plain
+Ace3/tests/AceDB-3.0.lua svneol=native#text/plain
+Ace3/tests/AceEvent-3.0.lua svneol=native#text/plain
+Ace3/tests/LibStub.lua svneol=native#text/plain
+Ace3/tests/wow_api.lua svneol=native#text/plain
