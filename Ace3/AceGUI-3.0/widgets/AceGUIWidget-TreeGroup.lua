@@ -51,7 +51,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 1
+	local Version = 2
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -98,6 +98,7 @@ do
 	
 	local function ButtonOnClick(this)
 		local self = this.obj
+		self:Fire("OnClick",this.uniquevalue, this.selected)
 		if not this.selected then
 			self:SetSelected(this.uniquevalue)
 			this.selected = true

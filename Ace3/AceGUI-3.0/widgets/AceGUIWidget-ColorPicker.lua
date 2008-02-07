@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 1
+	local Version = 2
 	
 	local function Aquire(self)
 	end
@@ -47,7 +47,7 @@ do
 	local function ColorSwatch_OnClick(this)
 		local self = this.obj
 		if not self.disabled then
-			ColorPickerFrame:SetFrameStrata("DIALOG")
+			ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 			
 			ColorPickerFrame.func = function()
 				local r,g,b = ColorPickerFrame:GetColorRGB()

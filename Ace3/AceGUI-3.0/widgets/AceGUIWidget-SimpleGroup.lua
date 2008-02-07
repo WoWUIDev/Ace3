@@ -35,7 +35,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "SimpleGroup"
-	local Version = 1
+	local Version = 2
 	
 	local function Aquire(self)
 		self:SetWidth(300)
@@ -79,7 +79,7 @@ do
 		
 		frame:SetHeight(100)
 		frame:SetWidth(100)
-		frame:SetFrameStrata("DIALOG")
+		frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		
 		--Container Support
 		local content = CreateFrame("Frame",nil,frame)

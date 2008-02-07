@@ -40,7 +40,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 1
+	local Version = 2
 	
 	local function Aquire(self)
 
@@ -136,7 +136,7 @@ do
 		
 		frame:SetHeight(100)
 		frame:SetWidth(100)
-		frame:SetFrameStrata("DIALOG")
+		frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		
 		local titletext = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 		titletext:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)

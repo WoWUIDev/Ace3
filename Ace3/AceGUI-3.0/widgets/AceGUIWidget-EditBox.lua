@@ -11,7 +11,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 1
+	local Version = 2
 	
 	local function Aquire(self)
 		self:SetDisabled(false)
@@ -105,9 +105,11 @@ do
 			self.editbox:EnableMouse(false)
 			self.editbox:ClearFocus()
 			self.editbox:SetTextColor(0.5,0.5,0.5)
+			self.label:SetTextColor(0.5,0.5,0.5)
 		else
 			self.editbox:EnableMouse(true)
 			self.editbox:SetTextColor(1,1,1)
+			self.label:SetTextColor(1,.82,0)
 		end
 	end
 	

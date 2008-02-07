@@ -3,7 +3,7 @@ AceConfigDialog-3.0
 
 ]]
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 1
+local MAJOR, MINOR = "AceConfigDialog-3.0", 2
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -487,12 +487,19 @@ local function confirmPopup(appName, rootframe, info, message, func, ...)
 	t.text = message
 	t.button1 = ACCEPT
 	t.button2 = CANCEL
+	local dialog, oldstrata
 	t.OnAccept = function()
 		safecall(func, unpack(t))
+		if dialog and oldstrata then
+			dialog:SetFrameStrata(oldstrata)
+		end
 		lib:Open(appName, rootframe)
 		del(info)
 	end
 	t.OnCancel = function()
+		if dialog and oldstrata then
+			dialog:SetFrameStrata(oldstrata)
+		end
 		del(info)
 	end
 	for i = 1, select('#', ...) do
@@ -502,7 +509,11 @@ local function confirmPopup(appName, rootframe, info, message, func, ...)
 	t.whileDead = 1
 	t.hideOnEscape = 1
 
-	StaticPopup_Show("ACECONFIGDIALOG30_CONFIRM_DIALOG")
+	dialog = StaticPopup_Show("ACECONFIGDIALOG30_CONFIRM_DIALOG")
+	if dialog then
+		oldstrata = dialog:GetFrameStrata()
+		dialog:SetFrameStrata("TOOLTIP")
+	end
 end
 
 local function ActivateControl(widget, event, ...)
@@ -610,6 +621,7 @@ local function ActivateControl(widget, event, ...)
 		del(info)
 		return true
 	else
+		
 		local confirmText = option.confirmText
 		--call confirm func/method
 		if type(confirm) == "string" then
@@ -650,6 +662,7 @@ local function ActivateControl(widget, event, ...)
 						confirmText = confirmText.." - "..desc
 					end
 				end
+				
 				local iscustom = user.rootframe.userdata.iscustom
 				local rootframe
 				if iscustom then

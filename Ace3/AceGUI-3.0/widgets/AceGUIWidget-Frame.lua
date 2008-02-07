@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Frame"
-	local Version = 1
+	local Version = 2
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -92,7 +92,7 @@ do
 	
 	local function Aquire(self)
 		self.frame:SetParent(UIParent)
-		self.frame:SetFrameStrata("DIALOG")
+		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
 	end
 	
@@ -171,13 +171,14 @@ do
 		frame:EnableMouse()
 		frame:SetMovable(true)
 		frame:SetResizable(true)
-		frame:SetFrameStrata("DIALOG")
+		frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		
 		frame:SetBackdrop(FrameBackdrop)
 		frame:SetBackdropColor(0,0,0,1)
 		frame:SetScript("OnHide",frameOnClose)
 		frame:SetMinResize(400,200)
 		frame:SetScript("OnSizeChanged", frameOnSizeChanged)
+		frame:SetToplevel(true)
 		
 		local closebutton = CreateFrame("Button",nil,frame,"UIPanelButtonTemplate")
 		closebutton:SetScript("OnClick", closeOnClick)
