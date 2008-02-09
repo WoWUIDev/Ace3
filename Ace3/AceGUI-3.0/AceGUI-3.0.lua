@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 1
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 2
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -459,9 +459,12 @@ AceGUI:RegisterLayout("Flow",
 				-- put the control on the current row, adding it to the width and checking if the height needs to be increased
 				else
 					--handles cases where the new height is higher than either control because of the offsets
-					rowheight = math.max(rowheight-rowoffset+frameoffset, frameheight-frameoffset+rowoffset)
+					--math.max(rowheight-rowoffset+frameoffset, frameheight-frameoffset+rowoffset)
+					
 					--offset is always the larger of the two offsets
 					rowoffset = math.max(rowoffset, frameoffset)
+					
+					rowheight = math.max(rowheight,rowoffset+(frameheight/2))
 					frame:SetPoint("TOPLEFT",children[i-1].frame,"TOPRIGHT",0,frameoffset-lastframeoffset)
 					usedwidth = framewidth + usedwidth
 				end

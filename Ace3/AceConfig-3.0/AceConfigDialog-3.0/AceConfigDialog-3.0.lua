@@ -3,7 +3,7 @@ AceConfigDialog-3.0
 
 ]]
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 2
+local MAJOR, MINOR = "AceConfigDialog-3.0", 7
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -14,7 +14,6 @@ lib.frame = lib.frame or CreateFrame("Frame")
 
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
-local con = LibStub("AceConsole-3.0")
 
 local select = select
 local pairs = pairs
@@ -394,9 +393,7 @@ local function CleanUserData(widget, event)
 
 	if widget.type == "TabGroup" then
 		del(widget.tablist)
-		del(widget.text)
 		widget.tablist = nil
-		widget.text = nil
 	end
 
 	if widget.type == "DropdownGroup" then
@@ -765,7 +762,7 @@ local function CheckOptionDisabled(option, options, path, appName)
 
 	return GetOptionsMemberValue("disabled", option, options, path, appName)
 end
-
+--[[
 local function BuildTabs(group, options, path, appName)
 	local tabs = new()
 	local text = new()
@@ -794,7 +791,7 @@ local function BuildTabs(group, options, path, appName)
 
 	return tabs, text
 end
-
+]]
 local function BuildSelect(group, options, path, appName)
 	local groups = new()
 	local keySort = new()
@@ -822,7 +819,7 @@ local function BuildSelect(group, options, path, appName)
 	return groups
 end
 
-local function BuildSubTree(group, tree, options, path, appName)
+local function BuildSubGroups(group, tree, options, path, appName)
 	local keySort = new()
 	local opts = new()
 
@@ -843,7 +840,7 @@ local function BuildSubTree(group, tree, options, path, appName)
 				if not tree.children then tree.children = new() end
 				tinsert(tree.children,entry)
 				if (v.childGroups or "tree") == "tree" then
-					BuildSubTree(v,entry, options, path, appName)
+					BuildSubGroups(v,entry, options, path, appName)
 				end
 			end
 			path[#path] = nil
@@ -854,7 +851,7 @@ local function BuildSubTree(group, tree, options, path, appName)
 	del(opts)
 end
 
-local function BuildTree(group, options, path, appName)
+local function BuildGroups(group, options, path, appName, recurse)
 	local tree = new()
 	local keySort = new()
 	local opts = new()
@@ -874,8 +871,8 @@ local function BuildTree(group, options, path, appName)
 				entry.text = GetOptionsMemberValue("name", v, options, path, appName)
 				entry.disabled = CheckOptionDisabled(v, options, path, appName)
 				tinsert(tree,entry)
-				if (v.childGroups or "tree") == "tree" then
-					BuildSubTree(v,entry, options, path, appName)
+				if recurse and (v.childGroups or "tree") == "tree" then
+					BuildSubGroups(v,entry, options, path, appName)
 				end
 			end
 			path[#path] = nil
@@ -950,7 +947,15 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control:SetCallback("OnClick",ActivateControl)
 
 				elseif v.type == "input" then
-					control = gui:Create("EditBox")
+					local controlType = v.dialogControl or v.control or (v.multiline and "MultiLineEditBox") or "EditBox"
+					control = gui:Create(controlType)
+					if not control then
+						error(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+					end
+					
+					if v.multiline then
+						control:SetHeight(115)
+					end
 					control:SetLabel(name)
 					control:SetCallback("OnEnterPressed",ActivateControl)
 					control:SetText(GetOptionsMemberValue("get",v, options, path, appName))
@@ -973,8 +978,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 
 				elseif v.type == "select" then
 					local values = GetOptionsMemberValue("values", v, options, path, appName)
-					
-					control = gui:Create("Dropdown")
+					local controlType = v.dialogControl or v.control or "Dropdown"
+					control = gui:Create(controlType)
+					if not control then
+						error(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+					end
 					control:SetLabel(name)
 					control:SetList(values)
 					control:SetValue(GetOptionsMemberValue("get",v, options, path, appName))
@@ -1049,6 +1057,16 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 				elseif v.type == "description" then
 					control = gui:Create("Label")
 					control:SetText(name)
+					local iconCoords = GetOptionsMemberValue("iconCoords",v, options, path, appName)
+					local icon = GetOptionsMemberValue("icon",v, options, path, appName)
+					
+					if type(icon) == 'string' then
+						if type(iconCoords) == 'table' then
+							control:SetImage(icon, unpack(iconCoords))
+						else
+							control:SetImage(icon)
+						end
+					end
 					control.width = "fill"					
 				end
 
@@ -1244,9 +1262,17 @@ function lib:FeedGroup(appName,options,container,rootframe,path)
 			tab.width = "fill"
 			tab.height = "fill"
 
-			local tabs, text = BuildTabs(group, options, path, appName)
-			tab:SetTabs(tabs, text)
+			local tabs = BuildGroups(group, options, path, appName)
+			tab:SetTabs(tabs)
 
+			for i = 1, #tabs do
+				local entry = tabs[i]
+				if not entry.disabled then
+					tab:SelectTab((GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or entry.value)
+					break
+				end
+			end
+			
 			container:AddChild(tab)
 
 		elseif grouptype == "select" then
@@ -1267,9 +1293,11 @@ function lib:FeedGroup(appName,options,container,rootframe,path)
 					firstgroup = k
 				end
 			end
-
-			select:SetGroup( (GroupExists(appName, options, path,status.groups.selectedgroup) and status.groups.selectedgroup) or firstgroup)
-
+			
+			if firstgroup then
+				select:SetGroup( (GroupExists(appName, options, path,status.groups.selectedgroup) and status.groups.selectedgroup) or firstgroup)
+			end
+			
 			select.width = "fill"
 			select.height = "fill"
 
@@ -1291,7 +1319,7 @@ function lib:FeedGroup(appName,options,container,rootframe,path)
 			if not status.groups then
 				status.groups = {}
 			end
-			local treedefinition = BuildTree(group, options, path, appName)
+			local treedefinition = BuildGroups(group, options, path, appName, true)
 			tree:SetStatusTable(status.groups)
 
 			tree:SetTree(treedefinition)
@@ -1393,8 +1421,6 @@ function lib:Open(appName, container)
 		local status = lib:GetStatusTable(appName)
 		f:SetStatusTable(status)
 	end
-
-	
 
 	self:FeedGroup(appName,options,f,f,path)
 	if f.Show then

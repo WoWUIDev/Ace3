@@ -40,10 +40,10 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 2
+	local Version = 3
 	
 	local function Aquire(self)
-
+		self.dropdown:SetText("")
 	end
 	
 	local function Release(self)

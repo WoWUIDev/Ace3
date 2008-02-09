@@ -29,7 +29,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "TabGroup"
-	local Version = 2
+	local Version = 3
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -61,9 +61,8 @@ do
 		self:SetScript("OnUpdate",Tab_FixWidth)
 	end
 	
-	local function Tab_SetSelected(self, selected)
-		self.selected = selected
-		if selected then
+	local function UpdateTabLook(self)
+		if self.selected then
 			self.left:SetAlpha(1)
 			self.right:SetAlpha(1)
 			self.middle:SetAlpha(1)
@@ -76,15 +75,28 @@ do
 			self.text:SetTextColor(1,0.82,0)
 			self:GetHighlightTexture():Show()
 		end
-	end
-	
-	local function Tab_OnClick(self)
-		if not self.selected then
-			self.obj:SelectTab(self.id)
+		
+		if self.disabled then
+			self.text:SetTextColor(0.5,0.5,0.5)
+			self:GetHighlightTexture():Hide()
 		end
 	end
 	
-
+	local function Tab_SetSelected(self, selected)
+		self.selected = selected
+		UpdateTabLook(self)
+	end
+	
+	local function Tab_OnClick(self)
+		if not (self.selected or self.disabled) then
+			self.obj:SelectTab(self.value)
+		end
+	end
+	
+	local function Tab_SetDisabled(self, disabled)
+		self.disabled = disabled
+		UpdateTabLook(self)
+	end
 	
 	local function CreateTab(self, id)
 		local tab = CreateFrame("Button",nil,self.border)
@@ -110,11 +122,12 @@ do
 		tab.middle = middle
 		tab.SetText = Tab_SetText
 		tab.SetSelected = Tab_SetSelected
+		tab.SetDisabled = Tab_SetDisabled
 		
 		text:SetPoint("LEFT",tab,"LEFT",5,-4)
 		text:SetPoint("RIGHT",tab,"RIGHT",-5,-4)
 		text:SetHeight(18)
-		text:SetText("Test")
+		text:SetText("")
 		
 		left:SetTexture("Interface\\ChatFrame\\ChatFrameTab")
 		middle:SetTexture("Interface\\ChatFrame\\ChatFrameTab")
@@ -150,32 +163,33 @@ do
 		self.status = status
 	end
 	
-	local function SelectTab(self, id)
+	local function SelectTab(self, value)
 		local status = self.status or self.localstatus
-		if not self.tablist[id] then
-			if id == 1 then
-				return
+
+		local found
+		for i, v in ipairs(self.tabs) do
+			if v.value == value then
+				v:SetSelected(true)
+				found = true
 			else
-				id = 1
+				v:SetSelected(false)	
 			end
 		end
-		for i, v in ipairs(self.tabs) do
-			v:SetSelected(v.id == id)
+		status.selected = value
+		if found then
+			self:Fire("OnGroupSelected",value)
 		end
-		status.selected = id
-		self:Fire("OnGroupSelected",self.tablist[id])
 	end
 		
-	local function SetTabs(self, tabs, text)
+	local function SetTabs(self, tabs)
 		self.tablist = tabs
-		self.text = text
 		self:BuildTabs()
 	end
 	
 	local function BuildTabs(self)
 		local status = self.status or self.localstatus
 		local tablist = self.tablist
-		local text = self.text
+
 		local tabs = self.tabs
 		
 		for i, v in ipairs(tabs) do
@@ -193,10 +207,13 @@ do
 				end					
 			end
 			tab:Show()
-			tab:SetText(text[v])
+			tab:SetText(v.text)
+			tab:SetDisabled(v.disabled)
+			tab.value = v.value
 		end
-		
-		self:SelectTab(status.selected or 1)
+		if #tablist > 1 then
+			self:SelectTab(status.selected or tablist[1].value)
+		end
 	end
 	
 	local function OnWidthSet(self, width)

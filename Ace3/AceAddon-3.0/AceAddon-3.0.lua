@@ -376,18 +376,18 @@ function AceAddon:IterateModulesOfAddon(addon) return pairs(addon.modules) end
 -- Event Handling
 local function onEvent(this, event, arg1)
 	if event == "ADDON_LOADED" or event == "PLAYER_LOGIN" then
-		for i = 1, #AceAddon.initializequeue do
-			local addon = AceAddon.initializequeue[i]
+		-- if a addon loads another addon, recursion could happen here, so we need to validate the table on every iteration
+		while(#AceAddon.initializequeue > 0) do
+			local addon = tremove(AceAddon.initializequeue, 1)
+			-- this might be an issue with recursion - TODO: validate
 			if event == "ADDON_LOADED" then addon.baseName = arg1 end
-			AceAddon.initializequeue[i] = nil
 			AceAddon:InitializeAddon(addon)
 			tinsert(AceAddon.enablequeue, addon)
 		end
 		
 		if IsLoggedIn() then
-			for i = 1, #AceAddon.enablequeue do
-				local addon = AceAddon.enablequeue[i]
-				AceAddon.enablequeue[i] = nil
+			while(#AceAddon.enablequeue > 0) do
+				local addon = tremove(AceAddon.enablequeue, 1)
 				AceAddon:EnableAddon(addon)
 			end
 		end

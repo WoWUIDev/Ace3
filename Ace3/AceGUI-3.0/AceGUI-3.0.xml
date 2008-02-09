@@ -17,4 +17,5 @@
 	<Script file="widgets\AceGUIWidget-TabGroup.lua"/>	
 	<Script file="widgets\AceGUIWidget-TreeGroup.lua"/>
 	<Script file="widgets\AceGUIWidget-Label.lua"/>
+	<Script file="widgets\AceGUIWidget-MultiLineEditBox.lua"/>
 </Ui>

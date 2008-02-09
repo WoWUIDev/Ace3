@@ -5,10 +5,11 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Label"
-	local Version = 1
+	local Version = 2
 	
 	local function Aquire(self)
 		self:SetText("")
+		self:SetImage(nil)
 	end
 	
 	local function Release(self)
@@ -16,24 +17,74 @@ do
 		self.frame:Hide()
 	end
 	
+	local function UpdateImageAnchor(self)
+		local width = self.frame.width or self.frame:GetWidth() or 0
+		local image = self.image
+		local label = self.label
+		local frame = self.frame
+		local height
+		
+		label:ClearAllPoints()
+		image:ClearAllPoints()
+		
+		if self.imageshown then
+			local imagewidth = image:GetWidth()
+			if (width - imagewidth) < 200 then
+				--image goes on top when less than 200 width for the text
+				image:SetPoint("TOP",frame,"TOP",0,0)
+				label:SetPoint("TOP",image,"BOTTOM",0,0)
+				label:SetPoint("LEFT",frame,"LEFT",0,0)
+				label:SetWidth(width)
+				height = image:GetHeight() + label:GetHeight()
+			else
+				--image on the left
+				image:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
+				label:SetPoint("TOPLEFT",image,"TOPRIGHT",0,0)
+				label:SetWidth(width - imagewidth)
+				height = math.max(image:GetHeight(), label:GetHeight())
+			end
+		else
+			--no image shown
+			label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
+			label:SetWidth(width)
+			height = self.label:GetHeight()
+		end
+		
+		frame.resizing = true
+		self.frame:SetHeight(height)
+		self.frame.height = height
+		frame.resizing = nil
+	end
+	
 	local function SetText(self, text)
 		self.label:SetText(text or "")
-		self.frame:SetHeight(self.label:GetHeight())
+		UpdateImageAnchor(self)
 	end
 	
 	local function OnWidthSet(self, width)
-		local frame, label = self.frame, self.label
-		label:SetWidth(width)
-		frame.resizing = true
-		self.frame:SetHeight(self.label:GetHeight())
-		self.frame.height = self.label:GetHeight()
-		frame.resizing = nil
+		UpdateImageAnchor(self)
 	end
 	
 	local function OnFrameResize(this)
 		if this.resizing then return end
 		local self = this.obj
 		OnWidthSet(self, this:GetWidth())
+	end
+	
+	local function SetImage(self, path, ...)
+		local image = self.image
+		image:SetTexture(path)
+		
+		if image:GetTexture() then
+			self.imageshown = true
+			local n = select('#', ...)
+			if n == 4 or n == 8 then
+				image:SetTexCoord(...)
+			end
+		else
+			self.imageshown = nil
+		end
+		UpdateImageAnchor(self)
 	end
 
 	local function Constructor()
@@ -46,6 +97,7 @@ do
 		self.SetText = SetText
 		self.frame = frame
 		self.OnWidthSet = OnWidthSet
+		self.SetImage = SetImage
 		frame.obj = self
 		
 		frame:SetHeight(18)
@@ -57,6 +109,9 @@ do
 		label:SetJustifyH("LEFT")
 		label:SetJustifyV("TOP")
 		self.label = label
+		
+		local image = frame:CreateTexture(nil,"BACKGROUND")
+		self.image = image
 		
 		AceGUI:RegisterAsWidget(self)
 		return self

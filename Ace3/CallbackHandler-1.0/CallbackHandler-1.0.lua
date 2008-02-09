@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR, MINOR = "CallbackHandler-1.0", 2
+local MAJOR, MINOR = "CallbackHandler-1.0", 3
 local CallbackHandler = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not CallbackHandler then return end -- No upgrade needed
@@ -84,6 +84,7 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 	-- registry:Fire() - fires the given event/message into the registry
 	function registry:Fire(eventname, ...)
+		if not rawget(events, eventname) or not next(events[eventname]) then return end
 		local oldrecurse = registry.recurse
 		registry.recurse = oldrecurse + 1
 
@@ -94,12 +95,13 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 		if registry.insertQueue and oldrecurse==0 then
 			-- Something in one of our callbacks wanted to register more callbacks; they got queued
 			for eventname,callbacks in pairs(registry.insertQueue) do
+				local first = not rawget(events, eventname) or not next(events[eventname])	-- test for empty before. not test for one member after. that one member may have been overwritten.
 				for self,func in pairs(callbacks) do
-					local first = not rawget(events, eventname) or not next(events[eventname])	-- test for empty before. not test for one member after. that one member may have been overwritten.
 					events[eventname][self] = func
 					-- fire OnUsed callback?
 					if first and registry.OnUsed then
 						registry.OnUsed(registry, target, eventname)
+						first = nil
 					end
 				end
 			end
