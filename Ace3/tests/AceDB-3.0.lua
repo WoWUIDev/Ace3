@@ -206,3 +206,11 @@ do
 	assert(testdb.profile.test2 == 4) --true 
 	assert(testdb.profile.test3.a == 1)
 end
+
+do
+	local testdb = LibStub("AceDB-3.0"):New({})
+	testdb:SetProfile("testprofile")
+	testdb:SetProfile("testprofile2")
+	testdb:SetProfile("testprofile")
+	assert(#testdb:GetProfiles() == 3)
+end

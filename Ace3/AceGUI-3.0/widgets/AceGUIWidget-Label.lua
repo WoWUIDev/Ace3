@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Label"
-	local Version = 2
+	local Version = 3
 	
 	local function Aquire(self)
 		self:SetText("")
@@ -29,8 +29,8 @@ do
 		
 		if self.imageshown then
 			local imagewidth = image:GetWidth()
-			if (width - imagewidth) < 200 then
-				--image goes on top when less than 200 width for the text
+			if (width - imagewidth) < 200 or (label:GetText() or "") == "" then
+				--image goes on top centered when less than 200 width for the text, or if there is no text
 				image:SetPoint("TOP",frame,"TOP",0,0)
 				label:SetPoint("TOP",image,"BOTTOM",0,0)
 				label:SetPoint("LEFT",frame,"LEFT",0,0)
@@ -86,6 +86,12 @@ do
 		end
 		UpdateImageAnchor(self)
 	end
+	
+	local function SetImageSize(self, width, height)
+		self.image:SetWidth(width)
+		self.image:SetHeight(height)
+		UpdateImageAnchor(self)
+	end
 
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
@@ -98,6 +104,7 @@ do
 		self.frame = frame
 		self.OnWidthSet = OnWidthSet
 		self.SetImage = SetImage
+		self.SetImageSize = SetImageSize
 		frame.obj = self
 		
 		frame:SetHeight(18)

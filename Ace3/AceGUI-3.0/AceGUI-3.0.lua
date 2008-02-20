@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 2
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 3
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -136,9 +136,37 @@ function AceGUI:Release(widget)
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()
 	widget.frame:SetParent(nil)
+	if widget.content then
+		widget.content.width = nil
+		widget.content.height = nil
+	end
 	del(widget,widget.type)
 end
 
+
+-------------
+-- Widgets --
+-------------
+--[[
+	Widgets must provide the following functions
+		Aquire() - Called when the object is aquired, should set everything to a default hidden state
+		Release() - Called when the object is Released, should remove any anchors and hide the Widget
+		
+	And the following members
+		frame - the frame or derivitive object that will be treated as the widget for size and anchoring purposes
+		type - the type of the object, same as the name given to :RegisterWidget()
+		
+	Widgets contain a table called userdata, this is a safe place to store data associated with the wigdet
+	It will be cleared automatically when a widget is released
+	Placing values directly into a widget object should be avoided
+	
+	If the Widget can act as a container for other Widgets the following
+		content - frame or derivitive that children will be anchored to
+		
+	The Widget can supply the following Optional Members
+
+
+]]
 
 --------------------------
 -- Widget Base Template --
@@ -248,6 +276,8 @@ do
 	
 	local function ContentResize(this)
 		if this.lastwidth ~= this:GetWidth() then
+			this.width = this:GetWidth()
+			this.height = this:GetHeight()
 			this.obj:DoLayout()
 		end
 	end
@@ -472,6 +502,7 @@ AceGUI:RegisterLayout("Flow",
 
 			if child.width == "fill" then
 				child:SetWidth(width)
+				frame:SetPoint("RIGHT",content,"RIGHT",0,0)
 				
 				usedwidth = 0
 				rowstart = frame

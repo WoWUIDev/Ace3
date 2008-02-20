@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Keybinding"
-	local Version = 3
+	local Version = 4
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -125,11 +125,12 @@ do
 		self.label:SetText(label or "")
 	end
 
+	local count = 0
 	local function Constructor()
-	
+		count = count + 1
 		local frame = CreateFrame("Frame",nil,UIParent)
 		
-		local button = CreateFrame("Button",nil,frame,"UIPanelButtonTemplate")
+		local button = CreateFrame("Button","AceGUI-3.0 KeybindingButton"..count,frame,"UIPanelButtonTemplate2")
 		
 		local self = {}
 		self.type = Type

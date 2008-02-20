@@ -64,9 +64,8 @@ do
 	
 	assert(db.profile.singleEntry == nil)
 	assert(db.profile.tableEntry == nil)
-	assert(db.profile.starTest.randomkey.starDefault == nil)
-	assert(db.profile.starTest.sibling == nil)
-	assert(db.profile.doubleStarTest.randomkey.doubleStarDefault == nil)
+	assert(db.profile.starTest == nil)
+	assert(db.profile.doubleStarTest.randomkey	== nil)
 	assert(db.profile.doubleStarTest.siblingDeriv.doubleStarDefault == "doubleStarDefault")
 	assert(db.profile.starTest2.randomkey == "notfun")
 	assert(db.profile.starTest2.randomkey2 == nil)

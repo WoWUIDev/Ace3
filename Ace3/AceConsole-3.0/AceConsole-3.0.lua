@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR,MINOR = "AceConsole-3.0", 1
+local MAJOR,MINOR = "AceConsole-3.0", 2
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -71,6 +71,7 @@ function AceConsole:RegisterChatCommand( command, func, persist, silent )
 	AceConsole.commands[command] = name
 	-- non-persisting commands are registered for enabling disabling
 	if not persist then
+		if not AceConsole.weakcommands[self] then AceConsole.weakcommands[self] = {} end
 		AceConsole.weakcommands[self][command] = func
 	end
 	return true

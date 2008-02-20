@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 2
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 3
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -23,7 +23,7 @@ local DBObjectLib = {}
 
 -- Simple shallow copy for copying defaults
 local function copyTable(src, dest)
-	if not type(dest) == "table" then dest = {} end
+	if type(dest) ~= "table" then dest = {} end
 	for k,v in pairs(src) do
 		if type(v) == "table" then
 			-- try to index the key first so that the metatable creates the defaults, if set, and use that table
@@ -49,6 +49,7 @@ local function copyDefaults(dest, src)
 				local mt = {
 					-- This handles the lookup and creation of new subtables
 					__index = function(t,k)
+							if k == nil then return nil end
 							local tbl = {}
 							copyDefaults(tbl, v)
 							rawset(t, k, tbl)
@@ -64,7 +65,7 @@ local function copyDefaults(dest, src)
 				end
 			else
 				-- Values are not tables, so this is just a simple return
-				local mt = {__index = function() return v end}
+				local mt = {__index = function(t,k) return k~=nil and v or nil end}
 				setmetatable(dest, mt)
 			end
 		elseif type(v) == "table" then
@@ -94,6 +95,10 @@ local function removeDefaults(db, defaults, blocker)
 						-- if the key was not explicitly specified in the defaults table, just strip everything from * and ** tables
 						if defaults[key] == nil then
 							removeDefaults(value, v)
+							-- if the table is empty afterwards, remove it
+							if not next(value) then
+								db[key] = nil
+							end
 						-- if it was specified, only strip ** content, but block values which were set in the key table
 						elseif k == "**" then 
 							removeDefaults(value, v, defaults[key])
@@ -340,6 +345,9 @@ function DBObjectLib:SetProfile(name)
 		error("Usage: AceDBObject:SetProfile(name): 'name' - string expected.", 2)
 	end
 	
+	-- changing to the same profile, dont do anything
+	if name == self.keys.profile then return end
+	
 	local oldProfile = self.profile
 	local defaults = self.defaults and self.defaults.profile
 	
@@ -380,16 +388,19 @@ function DBObjectLib:GetProfiles(tbl)
 		tbl = {}
 	end
 
+	local curProfile = self.keys.profile
+	
 	local i = 0
 	for profileKey in pairs(self.profiles) do
 		i = i + 1
 		tbl[i] = profileKey
+		if curProfile and profileKey == curProfile then curProfile = nil end
 	end
 
 	-- Add the current profile, if it hasn't been created yet
-	if rawget(self, "profile") == nil then
+	if curProfile then
 		i = i + 1
-		tbl[i] = self.keys.profile
+		tbl[i] = curProfile
 	end
 	
 	return tbl, i

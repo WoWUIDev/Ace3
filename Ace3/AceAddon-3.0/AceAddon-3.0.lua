@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR, MINOR = "AceAddon-3.0", 1
+local MAJOR, MINOR = "AceAddon-3.0", 2
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -65,7 +65,7 @@ local function safecall(func, ...)
 end
 
 -- local functions that will be implemented further down
-local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule, SetDefaultModuleState, SetDefaultModuleLibraries, SetEnabledState, SetDefaultModulePrototype
+local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule, GetName, SetDefaultModuleState, SetDefaultModuleLibraries, SetEnabledState, SetDefaultModulePrototype
 
 -- used in the addon metatable
 local function addontostring( self ) return self.name end 
@@ -166,6 +166,7 @@ function NewModule(self, name, prototype, ...)
 	
 	module.IsModule = IsModuleTrue
 	module:SetEnabledState(self.defaultModuleState)
+	module.moduleName = name
 
 	if type(prototype) == "string" then
 		AceAddon:EmbedLibraries(module, prototype, ...)
@@ -188,6 +189,12 @@ function NewModule(self, name, prototype, ...)
 	self.modules[name] = module
 	
 	return module
+end
+
+--addon:GetName()
+-- Returns the real name of the addon or module, without any prefix
+function GetName(self)
+	return self.moduleName or self.name
 end
 
 --addon:Enable()
@@ -278,6 +285,7 @@ local mixins = {
 	SetEnabledState = SetEnabledState,
 	IterateModules = IterateModules,
 	IterateEmbeds = IterateEmbeds,
+	GetName = GetName,
 }
 local function IsModule(self) return false end
 local pmixins = {
