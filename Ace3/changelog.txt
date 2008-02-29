@@ -1,0 +1,53 @@
+Ace3 Beta - Revision 63220 (Feb 29th, 2008)
+-------------------------------------------
+- AceTimer-3.0: CancelAllTimers() now cancels silent (elkano)
+- AceConfigDialog: Add :SetDefaultSize(appName, width, height), sets the size the dialog will open to. Does not effect already open windows.  (nargiddley)
+- AceConfigDialog: Fix typo in type check for range values (nargiddley)
+- AceGUI: ColorPicker widget will correctly fire OnValueChanged for the cancel event of the colorpicker popup.  Reset ColorPicker's color on Acquire.  (nargiddley)
+- AceGUI: Fix Spelling of Aquire -> Acquire for widgets, all custom widgets will need to be updated.  A warning will be printed for widgets not upgraded yet.  (nargiddley)
+- AceConfigCmd-3.0: add simple coloring to slashcommand output. (ammo)
+- AceConsole-3.0: add some color to :Print (ammo)
+- AceAddon-3.0: set error level on library embedding to point to the :NewAddon call (nevcairiel)
+
+Ace3 Beta - Revision 62182 (Feb 20th, 2008)
+-------------------------------------------
+- Ace3 StandAlone: Add a page to the Blizzard 2.4 Interface Options with icons to open dialogs for configs registered when installed standalone (nargiddley)
+- AceConfigDialog: type = 'description' now uses the fields image and imageCoords instead of icon and iconCoords, add imageWidth and imageHeight (nargiddley)
+- AceConfigDialog: Add :AddToBlizzardOptions(appName, name), this will add the specified config to the Blizzard Options pane new in 2.4.  This will only be available if running on the 2.4 PTR (nargiddley)
+- AceDB: fix GetProfiles() when setting the same profile twice (nevcairiel)
+- AceDB: bail out of :SetProfile early when trying to set to the same profile (nevcairiel)
+- AceDB: add nil checks to metatable handling (nevcairiel)
+- AceDB: clear tables that are empty after defaults removal (nevcairiel)
+- AceGUI: Fix a couple of layout bugs causing the width of groups to be wrong (nargiddley)
+- AceGUI: Add Icon widget (nargiddley)
+- AceGUI: Allow room for the border in the BlizOptionsGroup widget (nargiddley)
+- AceGUI: Button and Keybinding use UIPanelButtonTemplate2 (nargiddley)
+- AceConsole-3.0: Fix bug where no table for [self] was created when registering weak commands (ammo)
+- AceTimer-3.0: add missing :OnEmbedDisable (ammo)
+- AceAddon-3.0: added :GetName() that will always return the "real" name of a addon or module object without any prefixes (nevcairiel)
+
+Ace3 Beta - Revision 60697 (Feb 9th, 2008)
+-------------------------------------------
+- CallbackHandler-1.0: remove unnecessary table creation if a event is fired thats not registered (nevcairiel)
+- AceAddon-3.0: fixed a bug with recursive addon loading (nevcairiel)
+- AceGUI: Update TabGroup's tablist format, tabs are selected by value not index (nargiddley)
+- AceGUI: Add MultiLineEditBox widget (nargiddley, originally by bam)
+- AceGUI: Small fix to the flow layout preventing controls overlapping in some cases (nargiddley)
+- AceConfigDialog: Implement control and dialogControl for types 'input' and 'select' (nargiddley)
+- AceConfigDialog: Add support for multiline = true on type = 'input' (nargiddley)
+- AceConfigDialog: Fix an error when all groups are hidden in a group with childGroups = 'select' (nargiddley)
+- AceConfigDialog: type = 'description' will now show .icon as an image with its text (nargiddley)
+- AceConfigDialog: multiline inputs are no longer forced to width = "full" (nargiddley)
+- AceConfigDialog: bug fix when loading without AceConsole present (nevcairiel)
+
+Ace3 Beta - Revision 60545 (Feb 7th, 2008)
+-------------------------------------------
+- AceGUI: SetToplevel(true) for the Frame widget, multiple open windows should play nice together now (nargiddley)
+- AceGUI: Move Frames to the FULLSCREEN_DIALOG strata (nargiddley)
+- AceGUI: Dropdown, Editbox and Keybinding labels grey out when disabled (nargiddley)
+- AceGUI: Add OnClick callback to the TreeGroup widget (nargiddley)
+- AceConfigDialog: Confirm popups will be above the config window (nargiddley)
+
+Ace3 Beta - Revision 60163 (Feb 3rd, 2008)
+-------------------------------------------
+- Initial Beta release
