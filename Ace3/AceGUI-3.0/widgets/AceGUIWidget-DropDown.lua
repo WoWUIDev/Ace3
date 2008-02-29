@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Dropdown"
-	local Version = 3
+	local Version = 4
 	
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -19,7 +19,7 @@ do
 		insets = { left = 3, right = 3, top = 3, bottom = 3 }
 	}
 
-	local function Aquire(self)
+	local function Acquire(self)
 		self:SetStrict(true)
 		self:SetLabel("")
 	end
@@ -266,7 +266,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 
 		self.CreateLine = CreateLine
 		self.ClearPullout = ClearPullout

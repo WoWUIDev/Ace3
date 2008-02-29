@@ -18,7 +18,7 @@
 	- ALLOWS unscheduling ANY timer (including the current running one) at any time, including during OnUpdate processing
 ]]
 
-local MAJOR, MINOR = "AceTimer-3.0", 2
+local MAJOR, MINOR = "AceTimer-3.0", 3
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -308,7 +308,7 @@ function AceTimer:CancelAllTimers()
 	if selftimers then
 		for handle,v in pairs(selftimers) do
 			if type(v)=="table" then	-- avoid __ops, etc
-				AceTimer.CancelTimer(self, handle)
+				AceTimer.CancelTimer(self, handle, true)
 			end
 		end
 	end

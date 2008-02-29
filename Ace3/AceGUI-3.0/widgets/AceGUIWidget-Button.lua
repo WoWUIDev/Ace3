@@ -5,9 +5,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 2
+	local Version = 3
 	
-	local function Aquire(self)
+	local function Acquire(self)
 	end
 	
 	local function Release(self)
@@ -67,7 +67,7 @@ do
 		frame:SetWidth(200)
 	
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.frame = frame
 		frame.obj = self

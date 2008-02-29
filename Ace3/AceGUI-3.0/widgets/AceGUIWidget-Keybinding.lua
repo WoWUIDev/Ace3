@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Keybinding"
-	local Version = 4
+	local Version = 5
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -96,7 +96,7 @@ do
 		Keybinding_OnKeyDown(this, button)
 	end
 	
-	local function Aquire(self)
+	local function Acquire(self)
 	end
 	
 	local function Release(self)
@@ -182,7 +182,7 @@ do
 		msgframe:Hide()
 	
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		self.SetLabel = SetLabel
 		self.SetDisabled = SetDisabled
 		self.SetKey = SetKey

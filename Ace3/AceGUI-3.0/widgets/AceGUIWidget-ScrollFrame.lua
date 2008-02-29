@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 -------------
 --[[
 	Widgets must provide the following functions
-		Aquire() - Called when the object is aquired, should set everything to a default hidden state
+		Acquire() - Called when the object is aquired, should set everything to a default hidden state
 		Release() - Called when the object is Released, should remove any anchors and hide the Widget
 		
 	And the following members
@@ -29,9 +29,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ScrollFrame"
-	local Version = 1
+	local Version = 2
 	
-	local function Aquire(self)
+	local function Acquire(self)
 
 	end
 	
@@ -162,7 +162,7 @@ do
 		self.type = Type
 	
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.MoveScroll = MoveScroll
 		self.FixScroll = FixScroll

@@ -11,9 +11,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 2
+	local Version = 3
 	
-	local function Aquire(self)
+	local function Acquire(self)
 		self:SetDisabled(false)
 		self.showbutton = true
 	end
@@ -146,7 +146,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 
 		self.SetDisabled = SetDisabled
 		self.SetText = SetText

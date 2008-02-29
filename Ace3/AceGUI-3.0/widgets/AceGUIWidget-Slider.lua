@@ -5,9 +5,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 1
+	local Version = 2
 	
-	local function Aquire(self)
+	local function Acquire(self)
 		self:SetDisabled(false)
 		self:SetSliderValues(0,100,1)
 		self:SetIsPercent(nil)
@@ -153,7 +153,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.frame = frame
 		frame.obj = self

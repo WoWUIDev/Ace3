@@ -323,7 +323,7 @@ end
 do
 	local Type = "DragTarget"
 	local Version = 1
-	local function Aquire(self)
+	local function Acquire(self)
 
 	end
 	
@@ -443,7 +443,7 @@ do
 		
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		self.SetLabel = SetLabel
 		self.SetText = SetText
 		self.SetDisabled = SetDisabled

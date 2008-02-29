@@ -10,9 +10,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 1
+	local Version = 2
 	
-	local function Aquire(self)
+	local function Acquire(self)
 		self:SetValue(false)
 		self.tristate = nil
 	end
@@ -160,7 +160,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 
 		self.SetValue = SetValue
 		self.GetValue = GetValue

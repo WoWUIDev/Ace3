@@ -26,7 +26,7 @@ end
 -------------
 --[[
 	Widgets must provide the following functions
-		Aquire() - Called when the object is aquired, should set everything to a default hidden state
+		Acquire() - Called when the object is aquired, should set everything to a default hidden state
 		Release() - Called when the object is Released, should remove any anchors and hide the Widget
 		
 	And the following members
@@ -51,7 +51,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 2
+	local Version = 3
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -60,7 +60,7 @@ do
 		insets = { left = 3, right = 3, top = 5, bottom = 3 }
 	}
 
-	local function Aquire(self)
+	local function Acquire(self)
 
 	end
 	
@@ -548,7 +548,7 @@ do
 		
 		self.treeframe = treeframe
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.SetTree = SetTree
 		self.RefreshTree = RefreshTree

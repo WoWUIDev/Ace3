@@ -13,7 +13,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 2
+local MAJOR, MINOR = "AceConfigCmd-3.0", 3
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -163,7 +163,7 @@ end
 
 local function showhelp(info, inputpos, tab, noHead)
 	if not noHead then
-		print(info.appName..": arguments to /"..info[0].." "..strsub(info.input,1,inputpos-1)..":")
+		print("|cff33ff99"..info.appName.."|r: Arguments to |cffffff78/"..info[0].."|r "..strsub(info.input,1,inputpos-1)..":")
 	end
 	
 	local sortTbl = {}	-- [1..n]=name
@@ -214,7 +214,7 @@ local function showhelp(info, inputpos, tab, noHead)
 			print("  "..(desc or name)..":")
 			showhelp(info, inputpos, v, true)
 		else
-			print("  "..k.." - "..(desc or name or ""))
+			print("  |cffffff78"..k.."|r - "..(desc or name or ""))
 		end
 	end
 end

@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 3
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 4
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -109,11 +109,24 @@ end
 -------------------
 
 -- Gets a widget Object
+
+local warned = {}
 function AceGUI:Create(type)
 	local reg = WidgetRegistry
 	if reg[type] then
 		local widget = new(type,reg[type])
-		widget:Aquire()
+		if widget.Acquire then
+			widget:Acquire()
+		elseif widget.Aquire then
+			if not warned[type] then
+				DEFAULT_CHAT_FRAME:AddMessage(("AceGUI: Warning, Widget type %s uses the depreciated Aquire, this should be updated to Acquire"):format(type))
+				warned[type] = true
+			end
+			widget.Acquire = widget.Aquire
+			widget:Acquire()
+		else
+			error(("Widget type %s doesn't supply an Acquire Function"):format(type))
+		end		
 		safecall(widget.ResumeLayout, widget)
 		return widget
 	end
@@ -149,7 +162,7 @@ end
 -------------
 --[[
 	Widgets must provide the following functions
-		Aquire() - Called when the object is aquired, should set everything to a default hidden state
+		Acquire() - Called when the object is acquired, should set everything to a default hidden state
 		Release() - Called when the object is Released, should remove any anchors and hide the Widget
 		
 	And the following members
@@ -346,7 +359,7 @@ end
 do
 	local Type = "Type"
 	
-	local function Aquire(self)
+	local function Acquire(self)
 
 	end
 	
@@ -362,7 +375,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.frame = frame
 		frame.obj = self

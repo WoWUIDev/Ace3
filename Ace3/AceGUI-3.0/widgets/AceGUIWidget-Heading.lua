@@ -5,9 +5,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Heading"
-	local Version = 1
+	local Version = 2
 	
-	local function Aquire(self)
+	local function Acquire(self)
 		self:SetText("")
 	end
 	
@@ -33,7 +33,7 @@ do
 		self.type = Type
 		
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		self.SetText = SetText
 		self.frame = frame
 		frame.obj = self

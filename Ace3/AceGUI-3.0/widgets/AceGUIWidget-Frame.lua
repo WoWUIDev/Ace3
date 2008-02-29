@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Frame"
-	local Version = 2
+	local Version = 3
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -90,7 +90,7 @@ do
 		self.frame:Show()
 	end
 	
-	local function Aquire(self)
+	local function Acquire(self)
 		self.frame:SetParent(UIParent)
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
@@ -154,7 +154,7 @@ do
 		self.Show = Show
 		self.SetTitle =  SetTitle
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		self.SetStatusText = SetStatusText
 		self.SetStatusTable = SetStatusTable
 		self.ApplyStatus = ApplyStatus

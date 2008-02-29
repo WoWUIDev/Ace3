@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 2
+local Version = 3
 ---------------------
 -- Common Elements --
 ---------------------
@@ -104,7 +104,7 @@ do
 		self.button:Disable()
 	end
 	
-	function MultiLineEditBox:Aquire()
+	function MultiLineEditBox:Acquire()
 		self:SetDisabled(false)
 		self:ShowButton(true)
 	end

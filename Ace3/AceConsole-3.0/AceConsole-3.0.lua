@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR,MINOR = "AceConsole-3.0", 2
+local MAJOR,MINOR = "AceConsole-3.0", 3
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -25,7 +25,7 @@ local max = math.max
 function AceConsole:Print(...)
 	local text = ""
 	if self ~= AceConsole then
-		text = tostring( self )..": "
+		text = "|cff33ff99"..tostring( self ).."|r: "
 	end
 
 	local frame = select(1, ...)

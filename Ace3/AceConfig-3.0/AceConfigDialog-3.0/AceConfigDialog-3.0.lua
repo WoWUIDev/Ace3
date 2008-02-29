@@ -3,7 +3,7 @@ AceConfigDialog-3.0
 
 ]]
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 10
+local MAJOR, MINOR = "AceConfigDialog-3.0", 11
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -961,13 +961,18 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					end
 					control:SetLabel(name)
 					control:SetCallback("OnEnterPressed",ActivateControl)
-					control:SetText(GetOptionsMemberValue("get",v, options, path, appName))
+					local text = GetOptionsMemberValue("get",v, options, path, appName)
+					if type(text) ~= "string" then
+						text = ""
+					end
+					control:SetText(text)
 
 				elseif v.type == "toggle" then
 					control = gui:Create("CheckBox")
 					control:SetLabel(name)
 					control:SetTriState(v.tristate)
-					control:SetValue(GetOptionsMemberValue("get",v, options, path, appName))
+					local value = GetOptionsMemberValue("get",v, options, path, appName)
+					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateControl)
 
 				elseif v.type == "range" then
@@ -975,7 +980,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control:SetLabel(name)
 					control:SetSliderValues(v.min or 0,v.max or 100, v.bigStep or v.step or 0)
 					control:SetIsPercent(v.isPercent)
-					control:SetValue(GetOptionsMemberValue("get",v, options, path, appName) or 0)
+					local value = GetOptionsMemberValue("get",v, options, path, appName)
+					if type(value) ~= "number" then
+						value = 0
+					end
+					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateSlider)
 					control:SetCallback("OnMouseUp",ActivateSlider)
 
@@ -988,7 +997,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					end
 					control:SetLabel(name)
 					control:SetList(values)
-					control:SetValue(GetOptionsMemberValue("get",v, options, path, appName))
+					local value = GetOptionsMemberValue("get",v, options, path, appName)
+					if not values[value] then
+						value = nil
+					end
+					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateControl)
 
 				elseif v.type == "multiselect" then
@@ -1396,6 +1409,14 @@ function lib:ConfigTableChanged(event, appName)
 end
 
 reg.RegisterCallback(lib, "ConfigTableChange", "ConfigTableChanged")
+
+function lib:SetDefaultSize(appName, width, height)
+	local status = lib:GetStatusTable(appName)
+	if type(width) == "number" and type(height) == "number" then
+		status.width = width
+		status.height = height
+	end
+end
 
 function lib:Open(appName, container)
 	if not old_CloseSpecialWindows then
