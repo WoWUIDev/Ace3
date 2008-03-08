@@ -139,7 +139,7 @@ creg:RegisterOptionsTable("testapp", opts)
 
 
 local output = {
-	"arguments to", -- header
+	"Arguments to", -- header
 	"first",
 	"second",
 	"plugcmd.*50",

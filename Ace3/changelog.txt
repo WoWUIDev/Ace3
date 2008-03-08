@@ -1,5 +1,16 @@
+Ace3 Beta - Revision 63886 (March 8th, 2008)
+---------------------------------------------
+- AceDBOptions-3.0: new library to provide a Ace3Options table to control the AceDB-3.0 profiles (nevcairiel)
+- AceDB-3.0: add "silent" option to DeleteProfile and CopyProfile when we deal with namespaces (nevcairiel)
+- AceDB-3.0: implement library upgrade path (nevcairiel)
+- AceDB-3.0: ACE-146: fix problem with non-table values overruling ['*']-type defaults (nevcairiel)
+- AceConsole-3.0: treat |T|t texture links similar to |H|h|h links. (ammo)
+- AceGUI-3.0: Use Blizzard Templates for the EditBox and DropDown widget (nevcairiel)
+- AceBucket-3.0: ACE-150: callback is now optional, if not supplied will use the eventname as method name (only possible if one event is supplied, and not a event table) (nevcairiel)
+- tests: adjust tests for AceGUI and AceConsole changes (nevcairiel)
+
 Ace3 Beta - Revision 63220 (Feb 29th, 2008)
--------------------------------------------
+---------------------------------------------
 - AceTimer-3.0: CancelAllTimers() now cancels silent (elkano)
 - AceConfigDialog: Add :SetDefaultSize(appName, width, height), sets the size the dialog will open to. Does not effect already open windows.  (nargiddley)
 - AceConfigDialog: Fix typo in type check for range values (nargiddley)
@@ -10,7 +21,7 @@ Ace3 Beta - Revision 63220 (Feb 29th, 2008)
 - AceAddon-3.0: set error level on library embedding to point to the :NewAddon call (nevcairiel)
 
 Ace3 Beta - Revision 62182 (Feb 20th, 2008)
--------------------------------------------
+---------------------------------------------
 - Ace3 StandAlone: Add a page to the Blizzard 2.4 Interface Options with icons to open dialogs for configs registered when installed standalone (nargiddley)
 - AceConfigDialog: type = 'description' now uses the fields image and imageCoords instead of icon and iconCoords, add imageWidth and imageHeight (nargiddley)
 - AceConfigDialog: Add :AddToBlizzardOptions(appName, name), this will add the specified config to the Blizzard Options pane new in 2.4.  This will only be available if running on the 2.4 PTR (nargiddley)
@@ -27,7 +38,7 @@ Ace3 Beta - Revision 62182 (Feb 20th, 2008)
 - AceAddon-3.0: added :GetName() that will always return the "real" name of a addon or module object without any prefixes (nevcairiel)
 
 Ace3 Beta - Revision 60697 (Feb 9th, 2008)
--------------------------------------------
+---------------------------------------------
 - CallbackHandler-1.0: remove unnecessary table creation if a event is fired thats not registered (nevcairiel)
 - AceAddon-3.0: fixed a bug with recursive addon loading (nevcairiel)
 - AceGUI: Update TabGroup's tablist format, tabs are selected by value not index (nargiddley)
@@ -41,7 +52,7 @@ Ace3 Beta - Revision 60697 (Feb 9th, 2008)
 - AceConfigDialog: bug fix when loading without AceConsole present (nevcairiel)
 
 Ace3 Beta - Revision 60545 (Feb 7th, 2008)
--------------------------------------------
+---------------------------------------------
 - AceGUI: SetToplevel(true) for the Frame widget, multiple open windows should play nice together now (nargiddley)
 - AceGUI: Move Frames to the FULLSCREEN_DIALOG strata (nargiddley)
 - AceGUI: Dropdown, Editbox and Keybinding labels grey out when disabled (nargiddley)
@@ -49,5 +60,5 @@ Ace3 Beta - Revision 60545 (Feb 7th, 2008)
 - AceConfigDialog: Confirm popups will be above the config window (nargiddley)
 
 Ace3 Beta - Revision 60163 (Feb 3rd, 2008)
--------------------------------------------
+---------------------------------------------
 - Initial Beta release

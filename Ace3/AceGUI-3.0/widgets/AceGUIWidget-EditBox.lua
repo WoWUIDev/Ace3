@@ -11,7 +11,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 3
+	local Version = 4
 	
 	local function Acquire(self)
 		self:SetDisabled(false)
@@ -23,13 +23,6 @@ do
 		self.frame:Hide()
 		self:SetDisabled(false)
 	end
-
-	local ControlBackdrop  = {
-		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tile = true, tileSize = 16, edgeSize = 16,
-		insets = { left = 3, right = 3, top = 3, bottom = 3 }
-	}
 	
 	local function Control_OnEnter(this)
 		this.obj:Fire("OnEnter")
@@ -46,13 +39,13 @@ do
 	local function ShowButton(self)
 		if self.showbutton then
 			self.button:Show()
-			self.editbox:SetTextInsets(5,25,3,3)
+			self.editbox:SetTextInsets(0,20,3,3)
 		end
 	end
 	
 	local function HideButton(self)
 		self.button:Hide()
-		self.editbox:SetTextInsets(5,5,3,3)
+		self.editbox:SetTextInsets(0,0,3,3)
 	end
 	
 	local function EditBox_OnEnterPressed(this)
@@ -128,19 +121,21 @@ do
 		if text and text ~= "" then
 			self.label:SetText(text)
 			self.label:Show()
-			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,-18)
+			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",7,-18)
 			self.frame:SetHeight(44)
 		else
 			self.label:SetText("")
 			self.label:Hide()
-			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,0)
+			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",7,0)
 			self.frame:SetHeight(26)
 		end
 	end
-
+	
+	local count = 0
 	local function Constructor()
+		count = count + 1
 		local frame = CreateFrame("Frame",nil,UIParent)
-		local editbox = CreateFrame("EditBox",nil,frame)
+		local editbox = CreateFrame("EditBox","AceGUI-3.0EditBox"..count,frame,"InputBoxTemplate")
 		
 		local self = {}
 		self.type = Type
@@ -173,17 +168,12 @@ do
 		editbox:SetScript("OnTextChanged",EditBox_OnTextChanged)
 		editbox:SetScript("OnReceiveDrag", EditBox_OnReceiveDrag)
 		editbox:SetScript("OnMouseDown", EditBox_OnReceiveDrag)
-		editbox:SetTextInsets(5,5,3,3)
+		editbox:SetTextInsets(0,0,3,3)
 		editbox:SetMaxLetters(256)
 		
-
-		editbox:SetBackdrop(ControlBackdrop)
-		editbox:SetBackdropColor(0,0,0)
-		editbox:SetBackdropBorderColor(0.4,0.4,0.4)
-		
-		editbox:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
+		editbox:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",6,0)
 		editbox:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
-		editbox:SetHeight(26)
+		editbox:SetHeight(19)
 		
 		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
@@ -195,7 +185,7 @@ do
 		local button = CreateFrame("Button",nil,editbox,"UIPanelButtonTemplate")
 		button:SetWidth(20)
 		button:SetHeight(20)
-		button:SetPoint("RIGHT",editbox,"RIGHT",-4,0)
+		button:SetPoint("RIGHT",editbox,"RIGHT",-2,0)
 		button:SetText("OK")
 		button:SetScript("OnClick", Button_OnClick)
 		button:Hide()

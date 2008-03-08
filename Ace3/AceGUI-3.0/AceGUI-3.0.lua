@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 4
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 5
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -119,7 +119,7 @@ function AceGUI:Create(type)
 			widget:Acquire()
 		elseif widget.Aquire then
 			if not warned[type] then
-				DEFAULT_CHAT_FRAME:AddMessage(("AceGUI: Warning, Widget type %s uses the depreciated Aquire, this should be updated to Acquire"):format(type))
+				DEFAULT_CHAT_FRAME:AddMessage(("AceGUI: Warning, Widget type %s uses the deprecated Aquire, this should be updated to Acquire"):format(type))
 				warned[type] = true
 			end
 			widget.Acquire = widget.Aquire

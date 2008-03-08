@@ -9,7 +9,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 do
 	local Type = "Example"
 	
-	local function Aquire(self)
+	local function Acquire(self)
 
 	end
 	
@@ -24,7 +24,7 @@ do
 		self.type = Type
 
 		self.Release = Release
-		self.Aquire = Aquire
+		self.Acquire = Acquire
 		
 		self.frame = frame
 		frame.obj = self

@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Dropdown"
-	local Version = 4
+	local Version = 5
 	
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -20,7 +20,6 @@ do
 	}
 
 	local function Acquire(self)
-		self:SetStrict(true)
 		self:SetLabel("")
 	end
 	
@@ -41,16 +40,14 @@ do
 	end
 	
 	local function SetText(self, text)
-		self.editbox:SetText(text or "")
-		self.editbox:SetCursorPosition(0)
+		self.text:SetText(text or "")
 	end
 	
 	local function SetValue(self, value)
 		if self.list then
-			self.editbox:SetText(self.list[value] or "")
+			self.text:SetText(self.list[value] or "")
 		end
-		self.editbox.value = value
-		self.editbox:SetCursorPosition(0)
+		self.text.value = value
 	end
 	
 	local function SetList(self, list)
@@ -63,19 +60,10 @@ do
 		end
 	end
 	
-	local function Dropdown_OnEscapePressed(this)
-		this:ClearFocus()
-	end
-	
 	local function Dropdown_OnEnterPressed(this)
 		local self = this.obj
 		if not self.disabled then
-			local ret
-			if self.strict and this.value then
-				ret = this.value
-			else
-				ret = this:GetText()
-			end
+			local ret = this.value or this:GetText()
 			self:Fire("OnValueChanged",ret)
 		end
 	end
@@ -102,9 +90,9 @@ do
 		local self = this.obj
 		self.open = false
 		self.pullout:Hide()
-		self.editbox:SetText(this.text:GetText())
-		self.editbox.value = this.value
-		Dropdown_OnEnterPressed(self.editbox)
+		self.text:SetText(this.text:GetText())
+		self.text.value = this.value
+		Dropdown_OnEnterPressed(self.text)
 	end
 	
 	local function Dropdown_LineEnter(this)
@@ -115,37 +103,16 @@ do
 		this.highlight:Hide()
 	end	
 	
-	local function SetStrict(self, strict)
-		self.strict = strict
-		if strict then
-			self.editbox:EnableMouse(false)
-			self.editbox:ClearFocus()
-			self.editbox:SetTextColor(1,1,1)
-		else
-			self.editbox:EnableMouse(true)
-			self.editbox:SetTextColor(1,1,1)
-		end
-	end
-	
 	local function SetDisabled(self, disabled)
 		self.disabled = disabled
 		if disabled then
-			self.editbox:EnableMouse(false)
-			self.editbox:ClearFocus()
-			self.editbox:SetTextColor(0.5,0.5,0.5)
+			self.text:SetTextColor(0.5,0.5,0.5)
 			self.button:Disable()
 			self.label:SetTextColor(0.5,0.5,0.5)
 		else
 			self.button:Enable()
 			self.label:SetTextColor(1,.82,0)
-			if self.strict then
-				self.editbox:EnableMouse(false)
-				self.editbox:ClearFocus()
-				self.editbox:SetTextColor(1,1,1)
-			else
-				self.editbox:EnableMouse(true)
-				self.editbox:SetTextColor(1,1,1)
-			end
+			self.text:SetTextColor(1,1,1)
 		end
 	end
 	
@@ -185,7 +152,7 @@ do
 				lines[i].text:SetText(text)
 				lines[i]:SetFrameLevel(self.frame:GetFrameLevel()+1001)
 				lines[i].value = value
-				if lines[i].value == self.editbox.value then
+				if lines[i].value == self.text.value then
 					lines[i].check:Show()
 				else
 					lines[i].check:Hide()
@@ -217,12 +184,12 @@ do
 		if text and text ~= "" then
 			self.label:SetText(text)
 			self.label:Show()
-			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,-18)
+			self.dropdown:SetPoint("TOPLEFT",self.frame,"TOPLEFT",-15,-18)
 			self.frame:SetHeight(44)
 		else
 			self.label:SetText("")
 			self.label:Hide()
-			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,0)
+			self.dropdown:SetPoint("TOPLEFT",self.frame,"TOPLEFT",-15,0)
 			self.frame:SetHeight(26)
 		end
 	end
@@ -260,9 +227,13 @@ do
 		return frame
 	end
 	
+	local count = 0
 	local function Constructor()
-		local frame = CreateFrame("Frame",nil,UIParent)
+		count = count + 1 
 		local self = {}
+		local frame = CreateFrame("Frame",nil,UIParent)
+		local dropdown = CreateFrame("Frame","AceGUI30DropDown" .. count,frame, "UIDropDownMenuTemplate")
+		self.dropdown = dropdown
 		self.type = Type
 
 		self.Release = Release
@@ -275,7 +246,6 @@ do
 		self.SetValue = SetValue
 		self.SetList = SetList
 		self.AddItem = AddItem
-		self.SetStrict = SetStrict
 		self.SetLabel = SetLabel
 		self.SetDisabled = SetDisabled
 		
@@ -284,46 +254,38 @@ do
 		
 		self.alignoffset = 30
 		
-		local editbox = CreateFrame("EditBox",nil,frame)
-		self.editbox = editbox
-		editbox.obj = self
-		editbox:SetFontObject(ChatFontNormal)
-		editbox:SetScript("OnEscapePressed",Dropdown_OnEscapePressed)
-		editbox:SetScript("OnEnterPressed",Dropdown_OnEnterPressed)
-		frame:SetScript("OnEnter",Control_OnEnter)
-		frame:SetScript("OnLeave",Control_OnLeave)
-		editbox:SetScript("OnEnter",Control_OnEnter)
-		editbox:SetScript("OnLeave",Control_OnLeave)
-		editbox:SetTextInsets(5,5,3,3)
-		editbox:SetMaxLetters(256)
-		editbox:SetAutoFocus(false)
-		
-		editbox:SetBackdrop(ControlBackdrop)
-		editbox:SetBackdropColor(0,0,0)
-		editbox:SetBackdropBorderColor(0.4,0.4,0.4)
-	
-		editbox:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
-		editbox:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-20,0)
-		local button = CreateFrame("Button",nil,frame)
-		self.button = button
-		button.obj = self
-		button:SetWidth(24)
-		button:SetHeight(24)
-		button:SetScript("OnEnter",Control_OnEnter)
-		button:SetScript("OnLeave",Control_OnLeave)
-		button:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
-		button:GetNormalTexture():SetTexCoord(.09,.91,.09,.91)
-		button:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down")
-		button:GetPushedTexture():SetTexCoord(.09,.91,.09,.91)
-		button:SetDisabledTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Disabled")
-		button:GetDisabledTexture():SetTexCoord(.09,.91,.09,.91)
-		button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
-		button:GetHighlightTexture():SetTexCoord(.09,.91,.09,.91)
-		button:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
-		button:SetScript("OnClick",Dropdown_TogglePullout)
 		frame:SetHeight(44)
 		frame:SetWidth(200)
 		frame:SetScript("OnHide",Dropdown_OnHide)
+		
+		dropdown:ClearAllPoints()
+		dropdown:SetPoint("TOPLEFT",frame,"TOPLEFT",-15,0)
+		dropdown:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",17,0)
+		dropdown:SetScript("OnHide", nil)
+		
+		-- fix anchoring of the dropdown
+		local left = _G[dropdown:GetName() .. "Left"]
+		local middle = _G[dropdown:GetName() .. "Middle"]
+		local right = _G[dropdown:GetName() .. "Right"]
+		
+		middle:ClearAllPoints()
+		right:ClearAllPoints()
+		
+		middle:SetPoint("LEFT", left, "RIGHT", 0, 0)
+		middle:SetPoint("RIGHT", right, "LEFT", 0, 0)
+		right:SetPoint("TOPRIGHT", dropdown, "TOPRIGHT", 0, 17)
+
+		local button = _G[dropdown:GetName() .. "Button"]
+		self.button = button
+		button.obj = self
+		button:SetScript("OnEnter",Control_OnEnter)
+		button:SetScript("OnLeave",Control_OnLeave)
+		button:SetScript("OnClick",Dropdown_TogglePullout)
+		
+		local text = _G[dropdown:GetName() .. "Text"]
+		self.text = text
+		text.obj = self
+		
 		local pullout = CreateFrame("Frame",nil,UIParent)
 		self.pullout = pullout
 		frame:EnableMouse()

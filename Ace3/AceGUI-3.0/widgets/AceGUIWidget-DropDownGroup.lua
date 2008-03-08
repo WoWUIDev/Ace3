@@ -40,7 +40,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 4
+	local Version = 5
 	
 	local function Acquire(self)
 		self.dropdown:SetText("")
@@ -149,7 +149,6 @@ do
 		
 		local dropdown = AceGUI:Create("Dropdown")
 		self.dropdown = dropdown
-		dropdown:SetStrict(true)
 		dropdown.frame:SetParent(frame)
 		dropdown.parentgroup = self
 		dropdown:SetCallback("OnValueChanged",SelectedGroup)

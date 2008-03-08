@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR,MINOR = "AceConsole-3.0", 3
+local MAJOR,MINOR = "AceConsole-3.0", 4
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -164,6 +164,10 @@ function AceConsole:GetArgs(str, numargs, startpos)
 				if not pos then break end
 				
 				pos=strfind(str, "|h", pos+2)	-- second |h
+				if not pos then break end
+			elseif strsub(str,pos, pos+1) == "|T" then
+				-- It's a |T....|t  texture
+				pos=strfind(str, "|t", pos+2)
 				if not pos then break end
 			end
 			

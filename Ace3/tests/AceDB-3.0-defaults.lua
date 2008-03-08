@@ -154,3 +154,33 @@ do
 	assert(data.profile.units["pet"].test == 2)
 	assert(data.profile.units["focus"].test == 2)
 end
+
+do
+	local defaultTest = {
+		profile = {
+			foo = {
+				["*"] = {
+					plyf = true,
+			},
+			}     
+		}
+	}
+
+
+	local bugdb = {
+		["profileKeys"] = {
+			["player - Realm Name"] = "player - Realm Name",
+		},
+		["profiles"] = {
+			["player - Realm Name"] = {
+				["foo"] = {
+					hopla = 42,
+				},
+			},
+		},
+	}
+
+	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+
+	assert(data.profile.foo.hopla == 42)
+end 
