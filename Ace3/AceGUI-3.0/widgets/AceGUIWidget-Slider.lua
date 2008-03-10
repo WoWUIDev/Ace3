@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 2
+	local Version = 3
 	
 	local function Acquire(self)
 		self:SetDisabled(false)
@@ -17,6 +17,7 @@ do
 	local function Release(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
+		self.slider:EnableMouseWheel(false)
 		self:SetDisabled(false)
 	end
 
@@ -140,6 +141,10 @@ do
 		self.ispercent = value
 	end
 	
+	local function FrameOnMouseDown(this)
+		this.obj.slider:EnableMouseWheel(true)
+	end
+	
 	local SliderBackdrop  = {
 		bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
 		edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
@@ -166,6 +171,8 @@ do
 		
 		self.alignoffset = 25
 		
+		frame:EnableMouse(true)
+		frame:SetScript("OnMouseDown",FrameOnMouseDown)
 		self.slider = CreateFrame("Slider",nil,frame)
 		local slider = self.slider
 		slider:SetScript("OnEnter",Control_OnEnter)
@@ -176,7 +183,7 @@ do
 		slider:SetHeight(15)
 		slider:SetHitRectInsets(0,0,-10,0)
 		slider:SetBackdrop(SliderBackdrop)
-		slider:EnableMouseWheel(true)
+		--slider:EnableMouseWheel(true)
 		slider:SetScript("OnMouseWheel", Slider_OnMouseWheel)
 			
 		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")

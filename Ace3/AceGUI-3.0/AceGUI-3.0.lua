@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 5
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 6
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -203,7 +203,7 @@ do
 		frame:SetParent(nil)
 		frame:SetParent(parent.content)
 		self.parent = parent
-		fixlevels(frame,frame:GetChildren())
+		fixlevels(parent.frame,parent.frame:GetChildren())
 	end
 	
 	WidgetBase.SetCallback = function(self, name, func)

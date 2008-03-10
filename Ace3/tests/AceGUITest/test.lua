@@ -523,6 +523,13 @@ local function Hide(info)
   testgroups.args[info.arg].hidden = true
 end
 
+local function Replace(info)
+	testgroups.args[info.arg] = {
+		type = "execute",
+		name = "Replaced"..info.arg
+	}
+end
+
 groups.description = {
 	type = 'description',
 	name = 'This is a test Description Icon + Width and height from a function, no coords',
@@ -596,6 +603,13 @@ for i = 1, 5 do
         type = "execute", 
         arg = "group"..i, 
         func = Hide, 
+      }, 
+		replace = { 
+        name = "Replace", 
+        desc = "Replace this group", 
+        type = "execute", 
+        arg = "group"..i, 
+        func = Replace, 
       }, 
     } 
   } 

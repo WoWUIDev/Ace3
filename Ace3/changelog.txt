@@ -1,3 +1,13 @@
+Ace3 Beta - Revision 64176 (March 10th, 2008)
+---------------------------------------------
+- AceGUI-3.0: Improve Alpha handling for the ColorPicker widget, ColorPicker widget closes the ColorPickerFrame before opening to prevent values getting carried over (nargiddley)
+- AceGUI-3.0: The Slider widget will only react to the mousewheel after it has been clicked (anywhere including the label) to prevent accidental changes to the value when trying to scroll the container it is in (nargiddley)
+- AceGUI-3.0: The TreeGroup widget is scrollable with the mousewheel (nargiddley)
+- AceGUI-3.0: ACE-154: Fix frame levels in more cases to prevent widgets ending up behind their containers (nargiddley)
+- AceConfigDialog: Color picker obeys hasAlpha on the color type (nargiddley)
+- AceConfigDialog-3.0: ACE-155: Make sure that the selected group is type='group' when checking if it exists (nargiddley)
+- AceDBOptions-3.0: added frFR locale (nevcairiel)
+
 Ace3 Beta - Revision 63886 (March 8th, 2008)
 ---------------------------------------------
 - AceDBOptions-3.0: new library to provide a Ace3Options table to control the AceDB-3.0 profiles (nevcairiel)

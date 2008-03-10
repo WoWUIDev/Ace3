@@ -51,7 +51,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 3
+	local Version = 4
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -521,6 +521,18 @@ do
 	end
 	
 
+	local function TreeOnMouseWheel(this, delta)
+		local self = this.obj
+		if self.showscroll then
+			local scrollbar = self.scrollbar
+			local min, max = scrollbar:GetMinMaxValues()
+			local value = scrollbar:GetValue()
+			local newvalue = math.min(max,math.max(min,value - delta))
+			if value ~= newvalue then
+				scrollbar:SetValue(newvalue)
+			end
+		end
+	end
 	
 	local createdcount = 0
 	local function Constructor()
@@ -542,6 +554,8 @@ do
 		treeframe:SetScript("OnUpdate",FirstFrameUpdate)
 		treeframe:SetScript("OnSizeChanged",ResizeUpdate)
 		
+		treeframe:EnableMouseWheel(true)
+		treeframe:SetScript("OnMouseWheel", TreeOnMouseWheel)
 		treeframe:SetBackdrop(PaneBackdrop)
 		treeframe:SetBackdropColor(0.1,0.1,0.1,0.5)
 		treeframe:SetBackdropBorderColor(0.4,0.4,0.4)

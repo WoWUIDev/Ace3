@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 2
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 3
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -53,7 +53,24 @@ if LOCALE == "deDE" then
 	L["profiles"] = "Profile"
 	L["profiles_sub"] = "Profile verwalten"
 elseif LOCALE == "frFR" then
-	
+	L["default"] = "D\195\169faut"
+	L["intro"] = "Vous pouvez changer le profil actuel afin d'avoir des param\195\168tres diff\195\169rents pour chaque personnage, permettant ainsi d'avoir une configuration tr\195\168s flexible."
+	L["reset_desc"] = "R\195\169initialise le profil actuel au cas o\195\185 votre configuration est corrompue ou si vous voulez tout simplement faire table rase."
+	L["reset"] = "R\195\169initialiser le profil"
+	L["reset_sub"] = "R\195\169initialise le profil actuel avec les param\195\168tres par d\195\169faut."
+	L["choose_desc"] = "Vous pouvez cr\195\169er un nouveau profil en entrant un nouveau nom dans la bo\195\174te de saisie, ou en choississant un des profils d\195\169j\195\160 existants."
+	L["new"] = "Nouveau"
+	L["new_sub"] = "Cr\195\169\195\169e un nouveau profil vierge."
+	L["choose"] = "Profils existants"
+	L["choose_sub"] = "Permet de choisir un des profils d\195\169j\195\160 disponibles."
+	L["copy_desc"] = "Copie les param\195\168tres d'un profil d\195\169j\195\160 existant dans le profil actuellement actif."
+	L["copy"] = "Copier \195\160 partir de"
+	L["delete_desc"] = "Supprime les profils existants inutilis\195\169s de la base de donn\195\169es afin de gagner de la place et de nettoyer le fichier SavedVariables."
+	L["delete"] = "Supprimer un profil"
+	L["delete_sub"] = "Supprime un profil de la base de donn\195\169es."
+	L["delete_confirm"] = "Etes-vous s\195\187r de vouloir supprimer le profil s\195\169lectionn\195\169 ?"
+	L["profiles"] = "Profils"
+	L["profiles_sub"] = "Gestion des profils"
 elseif LOCALE == "esES" then
 	
 elseif LOCALE == "koKR" then

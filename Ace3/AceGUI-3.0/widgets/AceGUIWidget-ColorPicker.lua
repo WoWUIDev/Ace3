@@ -5,9 +5,10 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 4
+	local Version = 5
 	
 	local function Acquire(self)
+		self.HasAlpha = false
 		self:SetColor(0,0,0,1)
 	end
 	
@@ -30,11 +31,19 @@ do
 	local function Control_OnLeave(this)
 		this.obj:Fire("OnLeave")
 	end
+	
+	local function SetHasAlpha(self, HasAlpha)
+		self.HasAlpha = HasAlpha
+	end
 
 	local function ColorCallback(self,r,g,b,a,isAlpha)
+		if not self.HasAlpha then
+			a = 1
+		end
 		self:SetColor(r,g,b,a)
 		if ColorPickerFrame:IsVisible() then
 			--colorpicker is still open
+
 			self:Fire("OnValueChanged",r,g,b,a)
 		else
 			--colorpicker is closed, color callback is first, ignore it,
@@ -46,6 +55,7 @@ do
 	end
 	
 	local function ColorSwatch_OnClick(this)
+		HideUIPanel(ColorPickerFrame)
 		local self = this.obj
 		if not self.disabled then
 			ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -56,14 +66,16 @@ do
 				ColorCallback(self,r,g,b,a)
 			end
 			
-			ColorPickerFrame.hasOpacity = 1
+			ColorPickerFrame.hasOpacity = self.HasAlpha
 			ColorPickerFrame.opacityFunc = function()
 				local r,g,b = ColorPickerFrame:GetColorRGB()
 				local a = 1 - OpacitySliderFrame:GetValue()
 				ColorCallback(self,r,g,b,a,true)
 			end
 			local r, g, b, a = self.r, self.g, self.b, self.a
-			ColorPickerFrame.opacity = 1 - (a or 0)
+			if self.HasAlpha then
+				ColorPickerFrame.opacity = 1 - (a or 0)
+			end
 			ColorPickerFrame:SetColorRGB(r, g, b)
 			
 			ColorPickerFrame.cancelFunc = function()
@@ -98,6 +110,7 @@ do
 		self.SetLabel = SetLabel
 		self.SetColor = SetColor
 		self.SetDisabled = SetDisabled
+		self.SetHasAlpha = SetHasAlpha
 		
 		self.frame = frame
 		frame.obj = self
