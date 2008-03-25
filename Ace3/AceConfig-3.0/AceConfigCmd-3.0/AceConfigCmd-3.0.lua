@@ -13,7 +13,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 3
+local MAJOR, MINOR = "AceConfigCmd-3.0", 4
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -73,6 +73,8 @@ local function callmethod(info, inputpos, tab, methodtype, ...)
 	end
 
 	info.arg = tab.arg
+	info.option = tab
+	info.type = tab.type
 
 	if type(method)=="function" then
 		return method(info, ...)
@@ -92,6 +94,8 @@ local function callfunction(info, tab, methodtype, ...)
 	local method = tab[methodtype]
 
 	info.arg = tab.arg
+	info.option = tab
+	info.type = tab.type
 	
 	if type(method)=="function" then
 		return method(info, ...)
@@ -202,19 +206,21 @@ local function showhelp(info, inputpos, tab, noHead)
 	
 	for _,k in ipairs(sortTbl) do
 		local v = refTbl[k]
-		-- recursively show all inline groups
-		local name, desc = v.name, v.desc
-		if type(name) == "function" then
-			name = callfunction(info, v, 'name')
-		end
-		if type(desc) == "function" then
-			desc = callfunction(info, v, 'desc')
-		end
-		if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
-			print("  "..(desc or name)..":")
-			showhelp(info, inputpos, v, true)
-		else
-			print("  |cffffff78"..k.."|r - "..(desc or name or ""))
+		if not pickfirstset(v.cmdHidden, v.hidden, false) then
+			-- recursively show all inline groups
+			local name, desc = v.name, v.desc
+			if type(name) == "function" then
+				name = callfunction(info, v, 'name')
+			end
+			if type(desc) == "function" then
+				desc = callfunction(info, v, 'desc')
+			end
+			if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
+				print("  "..(desc or name)..":")
+				showhelp(info, inputpos, v, true)
+			else
+				print("  |cffffff78"..k.."|r - "..(desc or name or ""))
+			end
 		end
 	end
 end
@@ -679,7 +685,9 @@ function lib:HandleCommand(slashcmd, appName, input)
 		options = options,
 		input = input,
 		self = self,
-		handler = self
+		handler = self,
+		uiType = "cmd",
+		uiName = MAJOR,
 	}
 	
 	handle(info, 1, options, 0)  -- (info, inputpos, table, depth)

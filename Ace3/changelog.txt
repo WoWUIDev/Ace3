@@ -1,3 +1,20 @@
+Ace3 Beta - Revision 65665 (March 25th, 2008)
+---------------------------------------------
+- AceGUI-3.0: ACE-139: Changed all Widgets to resemble the Blizzard 2.4 Options Style (nevcairiel)
+- AceGUI-3.0: Fixed "List"-Layout not reporting new width to "fill"-mode widgets (mikk)
+- AceGUI-3.0: added :SetColor to the Label widget (nevcairiel)
+- AceGUI-3.0: ACE-132: ColorPicker: added checkers texture for better alpha channel display, and fixed "white"-texture bug (nevcairiel,nargiddley,ammo)
+- AceConfig-3.0: ACE-113: Added uiName, uiType, handler, option, type to the info table (nevcairiel,nargiddley)
+- AceConfigDialog-3.0: ACE-139: Adjusted for 2.4 options panels (nevcairiel)
+- AceConfigDialog-3.0: Use "width" parameter for the description widget (if present) (nevcairiel)
+- AceConfigDialog-3.0: ACE-135: Add support for specifying a rowcount for multiline editboxes (nargiddley)
+- AceConfigDialog-3.0: :AddToBlizOptions will return the frame registered so you can use it in InterfaceOptionsFrame_OpenToFrame (nevcairiel)
+- AceConfigCmd-3.0: handle "hidden" in help-output (nevcairiel)
+- AceHook-3.0: fix unhooking of secure hooks (nevcairiel)
+- AceDBOptions-3.0: add optional argument to GetOptionsTable(db[, noDefaultProfiles]) - if set to true will not show the default profiles in the profile selection (nevcairiel)
+- AceDBOptions-3.0: added koKR locale (nevcairiel)
+- Ace3 Standalone: Removed the "Ace3" Category from the 2.4 options panel (nevcairiel)
+
 Ace3 Beta - Revision 64176 (March 10th, 2008)
 ---------------------------------------------
 - AceGUI-3.0: Improve Alpha handling for the ColorPicker widget, ColorPicker widget closes the ColorPickerFrame before opening to prevent values getting carried over (nargiddley)

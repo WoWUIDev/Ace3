@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 4
+	local Version = 5
 	
 	local function Acquire(self)
 	end
@@ -51,8 +51,8 @@ do
 
 		local text = frame:GetFontString()
 		self.text = text
-		text:SetPoint("LEFT",frame,"LEFT",15,-1)
-		text:SetPoint("RIGHT",frame,"RIGHT",-15,-1)
+		text:SetPoint("LEFT",frame,"LEFT",15,0)
+		text:SetPoint("RIGHT",frame,"RIGHT",-15,0)
 
 		frame:SetScript("OnClick",Button_OnClick)
 		frame:SetScript("OnEnter",Button_OnEnter)

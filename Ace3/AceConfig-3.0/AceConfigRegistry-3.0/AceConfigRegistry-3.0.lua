@@ -11,7 +11,7 @@ These functions receive two arguments: "uiType" and "uiName".
 :IterateOptionsTables() and :GetOptionsTable() always return a function reference that the requesting config handling addon must call with the above arguments.
 ]]
 
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 4
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 5
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -61,6 +61,7 @@ local optmethodtable={["nil"]=true,["string"]=true,["function"]=true,["table"]=t
 local optmethodbool={["nil"]=true,["string"]=true,["function"]=true,["boolean"]=true,  _="methodname, funcref or boolean"}
 local opttable={["nil"]=true,["table"]=true,  _="table"}
 local optbool={["nil"]=true,["boolean"]=true,  _="boolean"}
+local optboolnumber={["nil"]=true,["boolean"]=true,["number"]=true,  _="boolean or number"}
 
 local basekeys={
 	type=isstring,
@@ -117,7 +118,7 @@ local typedkeys={
 		control=optstring,
 		dialogControl=optstring,
 		dropdownControl=optstring,
-		multiline=optbool,
+		multiline=optboolnumber,
 	},
 	toggle={
 		tristate=optbool,

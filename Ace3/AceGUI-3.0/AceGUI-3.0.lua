@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 6
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 7
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -425,6 +425,9 @@ AceGUI:RegisterLayout("List",
 			
 			if child.width == "fill" then
 				frame:SetPoint("RIGHT",content,"RIGHT")
+				if child.OnWidthSet then
+					child:OnWidthSet(content.width or content:GetWidth())
+				end
 				if child.DoLayout then
 					child:DoLayout()
 				end

@@ -11,7 +11,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 4
+	local Version = 5
 	
 	local function Acquire(self)
 		self:SetDisabled(false)
@@ -175,10 +175,10 @@ do
 		editbox:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 		editbox:SetHeight(19)
 		
-		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
-		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
-		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,0)
-		label:SetJustifyH("CENTER")
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,-2)
+		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,-2)
+		label:SetJustifyH("LEFT")
 		label:SetHeight(18)
 		self.label = label
 		

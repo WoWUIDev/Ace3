@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 2
+	local Version = 3
 	
 	local function Acquire(self)
 		self:SetText("")
@@ -67,7 +67,7 @@ do
 		frame:SetScript("OnClick", OnClick)
 		frame:SetScript("OnLeave", OnLeave)
 		frame:SetScript("OnEnter", OnEnter)
-		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontNormal")
+		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontHighlight")
 		label:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,10)
 		label:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,10)
 		label:SetJustifyH("CENTER")

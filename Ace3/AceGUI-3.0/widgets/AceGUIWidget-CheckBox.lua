@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 2
+	local Version = 3
 	
 	local function Acquire(self)
 		self:SetValue(false)
@@ -68,7 +68,7 @@ do
 			self.text:SetTextColor(0.5,0.5,0.5)
 			SetDesaturation(self.check, true)
 		else
-			self.text:SetTextColor(1,.82,0)
+			self.text:SetTextColor(1,1,1)
 			if self.tristate and self.checked == nil then
 				SetDesaturation(self.check, true)
 			else
@@ -173,7 +173,7 @@ do
 		self.frame = frame
 		frame.obj = self
 	
-		local text = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+		local text = frame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
 		self.text = text
 	
 		frame:SetScript("OnEnter",CheckBox_OnEnter)

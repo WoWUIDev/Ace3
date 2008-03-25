@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 3
+local Version = 4
 ---------------------
 -- Common Elements --
 ---------------------
@@ -192,7 +192,7 @@ do
 		scrollchild:SetHeight(2)
 		scrollchild:SetWidth(2)
 	
-		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)
 		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-14,0)
 		label:SetJustifyH("LEFT")

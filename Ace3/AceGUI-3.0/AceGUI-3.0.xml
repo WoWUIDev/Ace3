@@ -4,6 +4,7 @@
 	<Script file="widgets\AceGUIWidget-Button.lua"/>
 	<Script file="widgets\AceGUIWidget-CheckBox.lua"/>
 	<Script file="widgets\AceGUIWidget-ColorPicker.lua"/>
+	<Include file="widgets\AceGUIWidget-DropDown-Templates.xml"/>
 	<Script file="widgets\AceGUIWidget-DropDownGroup.lua"/>
 	<Script file="widgets\AceGUIWidget-DropDown.lua"/>
 	<Script file="widgets\AceGUIWidget-EditBox.lua"/>

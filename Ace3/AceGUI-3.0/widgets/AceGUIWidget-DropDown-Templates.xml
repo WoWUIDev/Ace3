@@ -1,0 +1,66 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Button name="Ace3InterfaceOptionsButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="175" y="18"/>
+		</Size>
+
+		<Scripts>
+			<OnLoad>
+				self.text = getglobal(self:GetName() .. "Text");
+				self.highlight = self:GetHighlightTexture();
+				self.highlight:SetVertexColor(.196, .388, .8);
+				self.text:SetPoint("RIGHT", "$parentToggle", "LEFT", -2, 0);
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Button name="$parentToggle">
+				<Size>
+					<AbsDimension x="14" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:GetParent().toggle = this;
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-MinusButton-UP"/>
+				<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-MinusButton-DOWN"/>
+				<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+		<ButtonText name="$parentText" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentToggle" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal"/>
+		<HighlightFont inherits="GameFontHighlight"/>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestLogTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT">	
+					<Offset>
+						<AbsDimension x="0" y="1"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT">	
+					<Offset>
+						<AbsDimension x="0" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+</Ui>

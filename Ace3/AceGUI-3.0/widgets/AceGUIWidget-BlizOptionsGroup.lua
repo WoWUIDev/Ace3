@@ -34,7 +34,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "BlizOptionsGroup"
-	local Version = 3
+	local Version = 4
 	
 	local function Acquire(self)
 
@@ -92,6 +92,19 @@ do
 		content.height = contentheight
 	end
 	
+	local function SetTitle(self, title)
+		local content = self.content
+		content:ClearAllPoints()
+		if not title or title == "" then
+			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",15,-10)
+			self.label:SetText("")
+		else
+			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",15,-40)
+			self.label:SetText(title)
+		end
+		content:SetPoint("BOTTOMRIGHT",self.frame,"BOTTOMRIGHT",-10,10)
+	end
+	
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
@@ -104,6 +117,7 @@ do
 		
 		self.OnWidthSet = OnWidthSet
 		self.OnHeightSet = OnHeightSet
+		self.SetTitle = SetTitle
 		
 		frame.obj = self
 		frame.okay = okay
@@ -113,11 +127,18 @@ do
 		frame:SetScript("OnHide",OnHide)
 		frame:SetScript("OnShow",OnShow)
 		
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalLarge")
+		self.label = label
+		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -15)
+		label:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 10, -45)
+		label:SetJustifyH("LEFT")
+		label:SetJustifyV("TOP")
+		
 		--Container Support
 		local content = CreateFrame("Frame",nil,frame)
 		self.content = content
 		content.obj = self
-		content:SetPoint("TOPLEFT",frame,"TOPLEFT",10,-10)
+		content:SetPoint("TOPLEFT",frame,"TOPLEFT",15,-10)
 		content:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-10,10)
 		
 		AceGUI:RegisterAsContainer(self)

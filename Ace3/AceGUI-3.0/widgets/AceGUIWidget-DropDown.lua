@@ -10,13 +10,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Dropdown"
-	local Version = 5
-	
+	local Version = 10
 	local ControlBackdrop  = {
-		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tile = true, tileSize = 16, edgeSize = 16,
-		insets = { left = 3, right = 3, top = 3, bottom = 3 }
+		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+		edgeSize = 32,
+		tileSize = 32,
+		tile = true,
+		insets = { left = 11, right = 12, top = 12, bottom = 11 },
 	}
 
 	local function Acquire(self)
@@ -131,7 +132,7 @@ do
 	local function BuildPullout(self)
 		local list = self.list
 		local lines = self.lines
-		local totalheight = 10
+		local totalheight = 22
 		self:ClearPullout()
 		self.pullout:SetFrameLevel(self.frame:GetFrameLevel()+1000)
 		if type(list) == "table" then
@@ -144,9 +145,9 @@ do
 				if not lines[i] then
 					lines[i] = self:CreateLine()
 					if i == 1 then
-						lines[i]:SetPoint("TOP",self.pullout,"TOP",0,-5)
+						lines[i]:SetPoint("TOP",self.pullout,"TOP",0,-10)
 					else
-						lines[i]:SetPoint("TOP",lines[i-1],"BOTTOM",0,0)
+						lines[i]:SetPoint("TOP",lines[i-1],"BOTTOM",0,1)
 					end
 				end
 				lines[i].text:SetText(text)
@@ -158,7 +159,7 @@ do
 					lines[i].check:Hide()
 				end
 				lines[i]:Show()
-				totalheight = totalheight + 17
+				totalheight = totalheight + 16
 				i = i + 1
 			end
 			for k in pairs(ddsort) do
@@ -208,7 +209,10 @@ do
 		local highlight = frame:CreateTexture(nil, "OVERLAY")
 		highlight:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
 		highlight:SetBlendMode("ADD")
-		highlight:SetAllPoints(frame)
+		highlight:SetHeight(14)
+		highlight:ClearAllPoints()
+		highlight:SetPoint("RIGHT",frame,"RIGHT",-3,0)
+		highlight:SetPoint("LEFT",frame,"LEFT",5,0)
 		highlight:Hide()
 		frame.highlight = highlight
 	
@@ -216,10 +220,10 @@ do
 		frame.check = check
 		check:SetWidth(16)
 		check:SetHeight(16)
-		check:SetPoint("LEFT",frame,"LEFT",0,0)
+		check:SetPoint("LEFT",frame,"LEFT",3,-1)
 		check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
-		frame.text:SetPoint("TOPLEFT",frame,"TOPLEFT",16,0)
-		frame.text:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
+		frame.text:SetPoint("TOPLEFT",frame,"TOPLEFT",18,0)
+		frame.text:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-8,0)
 	
 		frame:SetScript("OnClick",Dropdown_LineClicked)
 		frame:SetScript("OnEnter",Dropdown_LineEnter)
@@ -285,6 +289,9 @@ do
 		local text = _G[dropdown:GetName() .. "Text"]
 		self.text = text
 		text.obj = self
+		text:ClearAllPoints()
+		text:SetPoint("RIGHT", right, "RIGHT" ,-43, 2)
+		text:SetPoint("LEFT", left, "LEFT", 25, 2)
 		
 		local pullout = CreateFrame("Frame",nil,UIParent)
 		self.pullout = pullout
@@ -293,14 +300,14 @@ do
 		pullout:SetBackdropColor(0,0,0)
 		pullout:SetFrameStrata("FULLSCREEN_DIALOG")
 		pullout:SetPoint("TOPLEFT",frame,"BOTTOMLEFT",0,0)
-		pullout:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",-24,0)
+		pullout:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,0)
 		pullout:SetClampedToScreen(true)
 		pullout:Hide()
 	
-		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,0)
-		label:SetJustifyH("CENTER")
+		label:SetJustifyH("LEFT")
 		label:SetHeight(18)
 		label:Hide()
 		self.label = label

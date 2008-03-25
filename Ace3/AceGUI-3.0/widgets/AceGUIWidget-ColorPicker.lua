@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 5
+	local Version = 8
 	
 	local function Acquire(self)
 		self.HasAlpha = false
@@ -21,7 +21,7 @@ do
 		self.g = g
 		self.b = b
 		self.a = a or 1
-		self.colorSwatch.texture:SetTexture(r,g,b)
+		self.colorSwatch:SetVertexColor(r,g,b,a)
 	end
 
 	local function Control_OnEnter(this)
@@ -95,7 +95,7 @@ do
 		if self.disabled then
 			self.text:SetTextColor(0.5,0.5,0.5)
 		else
-			self.text:SetTextColor(1,.82,0)
+			self.text:SetTextColor(1,1,1)
 		end
 	end
 
@@ -115,10 +115,10 @@ do
 		self.frame = frame
 		frame.obj = self
 		
-		local text = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+		local text = frame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
 		self.text = text
 		text:SetJustifyH("LEFT")
-		text:SetTextColor(1,.82,0)
+		text:SetTextColor(1,1,1)
 		frame:SetHeight(24)
 		frame:SetWidth(200)
 		text:SetHeight(24)
@@ -128,15 +128,25 @@ do
 	
 		local colorSwatch = frame:CreateTexture(nil, "OVERLAY")
 		self.colorSwatch = colorSwatch
-		colorSwatch:SetWidth(24)
-		colorSwatch:SetHeight(24)
+		colorSwatch:SetWidth(19)
+		colorSwatch:SetHeight(19)
 		colorSwatch:SetTexture("Interface\\ChatFrame\\ChatFrameColorSwatch")
-		local texture = frame:CreateTexture(nil, "OVERLAY")
+		local texture = frame:CreateTexture(nil, "BACKGROUND")
 		colorSwatch.texture = texture
-		texture:SetTexture(1, 1, 1, 1)
-		texture:SetWidth(13.8)
-		texture:SetHeight(13.8)
+		texture:SetWidth(16)
+		texture:SetHeight(16)
+		texture:SetTexture(1,1,1)
 		texture:Show()
+		
+		local checkers = frame:CreateTexture(nil, "BACKGROUND")
+		colorSwatch.checkers = checkers
+		checkers:SetTexture("Tileset\\Generic\\Checkers")
+		checkers:SetDesaturated(true)
+		checkers:SetVertexColor(1,1,1,0.75)
+		checkers:SetTexCoord(.25,0,0.5,.25)
+		checkers:SetWidth(14)
+		checkers:SetHeight(14)
+		checkers:Show()
 	
 		local highlight = frame:CreateTexture(nil, "BACKGROUND")
 		self.highlight = highlight
@@ -146,6 +156,7 @@ do
 		highlight:Hide()
 	
 		texture:SetPoint("CENTER", colorSwatch, "CENTER")
+		checkers:SetPoint("CENTER", colorSwatch, "CENTER")
 		colorSwatch:SetPoint("LEFT", frame, "LEFT", 0, 0)
 		text:SetPoint("LEFT",colorSwatch,"RIGHT",2,0)
 		text:SetPoint("RIGHT",frame,"RIGHT")

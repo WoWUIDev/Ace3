@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 3
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 4
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -17,7 +17,7 @@ local L = {
 	reset_desc = "Reset the current profile back to its default values, in case your configuration is broken, or you simply want to start over.",
 	reset = "Reset Profile",
 	reset_sub = "Reset the current profile to the default",
-	choose_desc = "You can create a new profile by entering a new name in the editbox, or choosing one of the already exisiting profiles.",
+	choose_desc = "You can either create a new profile by entering a name in the editbox, or choose one of the already exisiting profiles.",
 	new = "New",
 	new_sub = "Create a new empty profile.",
 	choose = "Existing Profiles",
@@ -71,9 +71,26 @@ elseif LOCALE == "frFR" then
 	L["delete_confirm"] = "Etes-vous s\195\187r de vouloir supprimer le profil s\195\169lectionn\195\169 ?"
 	L["profiles"] = "Profils"
 	L["profiles_sub"] = "Gestion des profils"
-elseif LOCALE == "esES" then
-	
 elseif LOCALE == "koKR" then
+	L["default"] = "기본값"
+	L["intro"] = "모든 캐릭터의 다양한 설정과 사용중인 데이터베이스 프로필, 어느것이던지 매우 다루기 쉽게 바꿀수 있습니다." 
+	L["reset_desc"] = "단순히 다시 새롭게 구성을 원하는 경우, 현재 프로필을 기본값으로 초기화 합니다."
+	L["reset"] = "프로필 초기화"
+	L["reset_sub"] = "현재의 프로필을 기본값으로 초기화 합니다"
+	L["choose_desc"] = "새로운 이름을 입력하거나, 이미 있는 프로필중 하나를 선택하여 새로운 프로필을 만들 수 있습니다."
+	L["new"] = "새로운 프로필"
+	L["new_sub"] = "새로운 프로필을 만듭니다."
+	L["choose"] = "프로필 선택"
+	L["choose_sub"] = "당신이 현재 이용할수 있는 프로필을 선택합니다."
+	L["copy_desc"] = "현재 사용중인 프로필에, 선택한 프로필의 설정을 복사합니다."
+	L["copy"] = "복사"
+	L["delete_desc"] = "데이터베이스에 사용중이거나 저장된 프로파일 삭제로 SavedVariables 파일의 정리와 공간 절약이 됩니다."
+	L["delete"] = "프로필 삭제"
+	L["delete_sub"] = "데이터베이스의 프로필을 삭제합니다."
+	L["delete_confirm"] = "정말로 선택한 프로필의 삭제를 원하십니까?"
+	L["profiles"] = "프로필"
+	L["profiles_sub"] = "프로필 설정"
+elseif LOCALE == "esES" then
 	
 elseif LOCALE == "zhTW" then
 	
@@ -148,12 +165,12 @@ end
 function OptionsHandlerPrototype:ListProfiles(info)
 	local arg = info.arg
 	local profiles
-	if arg == "common" then
+	if arg == "common" and not self.noDefaultProfiles then
 		profiles = getProfileList(self.db, true, nil)
 	elseif arg == "nocurrent" then
 		profiles = getProfileList(self.db, nil, true)
 	elseif arg == "both" then -- currently not used
-		profiles = getProfileList(self.db, true, true)
+		profiles = getProfileList(self.db, (not self.noDefaultProfiles) and true, true)
 	else
 		profiles = getProfileList(self.db)
 	end
@@ -182,12 +199,12 @@ local function generateDefaultProfiles(db)
 end
 
 --[[ create and return a handler object for the db, or upgrade it if it already existed ]]
-local function getOptionsHandler(db)
+local function getOptionsHandler(db, noDefaultProfiles)
 	if not defaultProfiles then
 		generateDefaultProfiles(db)
 	end
 	
-	local handler = AceDBOptions.handlers[db] or { db = db }
+	local handler = AceDBOptions.handlers[db] or { db = db, noDefaultProfiles = noDefaultProfiles }
 	
 	for k,v in pairs(OptionsHandlerPrototype) do
 		handler[k] = v
@@ -281,14 +298,14 @@ local optionsTable = {
 	
 	creates and returns a option table to be used in your addon
 ]]
-function AceDBOptions:GetOptionsTable(db)
+function AceDBOptions:GetOptionsTable(db, noDefaultProfiles)
 	local tbl = AceDBOptions.optionTables[db] or {
 			type = "group",
 			name = L["profiles"],
 			desc = L["profiles_sub"],
 		}
 	
-	tbl.handler = getOptionsHandler(db)
+	tbl.handler = getOptionsHandler(db, noDefaultProfiles)
 	tbl.args = optionsTable
 
 	AceDBOptions.optionTables[db] = tbl

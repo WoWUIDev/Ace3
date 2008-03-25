@@ -5,11 +5,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Label"
-	local Version = 4
+	local Version = 6
 	
 	local function Acquire(self)
 		self:SetText("")
 		self:SetImage(nil)
+		self:SetColor()
 	end
 	
 	local function Release(self)
@@ -61,6 +62,13 @@ do
 		UpdateImageAnchor(self)
 	end
 	
+	local function SetColor(self, r, g, b)
+		if not (r and g and b) then
+			r, g, b = 1, 1, 1
+		end
+		self.label:SetVertexColor(r, g, b)
+	end
+	
 	local function OnWidthSet(self, width)
 		UpdateImageAnchor(self)
 	end
@@ -101,6 +109,7 @@ do
 		self.Release = Release
 		self.Acquire = Acquire
 		self.SetText = SetText
+		self.SetColor = SetColor
 		self.frame = frame
 		self.OnWidthSet = OnWidthSet
 		self.SetImage = SetImage
@@ -110,7 +119,7 @@ do
 		frame:SetHeight(18)
 		frame:SetWidth(200)
 		frame:SetScript("OnSizeChanged", OnFrameResize)
-		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontNormal")
+		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontHighlightSmall")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		label:SetWidth(200)
 		label:SetJustifyH("LEFT")

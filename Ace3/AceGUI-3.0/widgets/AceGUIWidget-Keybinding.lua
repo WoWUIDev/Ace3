@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Keybinding"
-	local Version = 5
+	local Version = 6
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -113,7 +113,7 @@ do
 			self.label:SetTextColor(0.5,0.5,0.5)
 		else
 			self.button:Enable()
-			self.label:SetTextColor(1,.82,0)
+			self.label:SetTextColor(1,1,1)
 		end
 	end
 	
@@ -159,7 +159,7 @@ do
 		
 		self.button = button
 		
-		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,0)
 		label:SetJustifyH("CENTER")

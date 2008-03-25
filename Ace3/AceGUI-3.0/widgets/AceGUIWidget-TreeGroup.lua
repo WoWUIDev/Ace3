@@ -51,7 +51,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 4
+	local Version = 5
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -123,61 +123,33 @@ do
 		self:RefreshTree()
 	end
 	
+	local is24 = GetSpellInfo and true
+	
+	local buttoncount = 1
 	local function CreateButton(self)
-		local button = CreateFrame("Button",nil,self.treeframe)
+		-- remove after 2.4
+		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, is24 and "InterfaceOptionsButtonTemplate" or "Ace3InterfaceOptionsButtonTemplate")
+		buttoncount = buttoncount + 1
 		button.obj = self
-		button:SetHeight(20)
 
 		button:SetScript("OnClick",ButtonOnClick)
 		button:SetScript("OnDoubleClick", ButtonOnDoubleClick)
-		local line = button:CreateTexture(nil,"BACKGROUND")
-		line:SetWidth(7)
-		line:SetHeight(20)
-		line:SetPoint("LEFT",button,"LEFT",13,0)
-		line:SetTexCoord(0,0.4375,0,0.625)
-		line:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-FilterLines")
-		button.line = line
 
-		button:SetNormalTexture("Interface\\AuctionFrame\\UI-AuctionFrame-FilterBg")
-		button:GetNormalTexture():SetTexCoord(0,0.53125,0,0.625)
-
-		button:SetHighlightTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight")
-		button:GetHighlightTexture():SetBlendMode("ADD")
-
-		local expand = CreateFrame("Button",nil,button)
-		expand.button = button
-		expand:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
-		expand:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
-		expand:SetDisabledTexture("Interface\\Buttons\\UI-PlusButton-Disabled")
-		expand:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight")
-		expand:SetScript("OnClick",ExpandOnClick)
-		expand:SetWidth(16)
-		expand:SetHeight(16)
-		button.expand = expand
-		
-		local text = button:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
-		button:SetFontString(text)
-		button.text = text
-		text:SetWidth(115)
-		text:SetHeight(8)
-		text:SetJustifyH("LEFT")
-		text:SetPoint("LEFT",button,"LEFT",4,0)
-
-		button:SetFont("GameFontNormalSmall",8)
+		button.toggle.button = button
+		button.toggle:SetScript("OnClick",ExpandOnClick)
 		
 		return button
 	end
 
-	local function UpdateButton(button, treeline, selected, last, canExpand, isExpanded)
+	local function UpdateButton(button, treeline, selected, canExpand, isExpanded)
 		local self = button.obj
-		local expand = button.expand
+		local toggle = button.toggle
 		local frame = self.frame
 		local text = treeline.text or ""
 		local level = treeline.level
 		local value = treeline.value
 		local uniquevalue = treeline.uniquevalue
 		local disabled = treeline.disabled
-		
 		
 		button.treeline = treeline
 		button.value = value
@@ -194,65 +166,36 @@ do
 		local line = button.line
 		button.level = level
 		if ( level == 1 ) then
-			button:SetText(text)
-			normalText:SetPoint("LEFT", button, "LEFT", 4, 0)
-			normalTexture:SetAlpha(1.0)
-			button:SetPoint("LEFT",frame,"LEFT",26,0)
-			expand:SetPoint("RIGHT",button,"LEFT",0,0)
-			line:Hide();
-		elseif ( level == 2 ) then
-			button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
-			button:SetPoint("LEFT",frame,"LEFT",34,0)
-			normalText:SetPoint("LEFT", button, "LEFT", 4, 0)
-			normalTexture:SetAlpha(0.4)
-			expand:SetPoint("RIGHT",button,"LEFT",0,0)
-			line:Hide()
-		elseif ( level >= 3 ) then
-			button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
-			button:SetPoint("LEFT",frame,"LEFT",26,0)
-			normalText:SetPoint("LEFT", button, "LEFT", 20 + (level-3)*8, 0)
-			line:SetPoint("LEFT",button,"LEFT",13 + (level-3)*8,0)
-			normalTexture:SetAlpha(0.0)
-			expand:SetPoint("RIGHT",button,"LEFT",13 + (level-3)*8,0)
-			if ( last ) then
-				line:SetTexCoord(0.4375, 0.875, 0, 0.625)
-			else
-				line:SetTexCoord(0, 0.4375, 0, 0.625)
-			end
-			line:Show();
+			button:SetTextFontObject("GameFontNormal")
+			button:SetHighlightFontObject("GameFontHighlight")
+			button.text:SetPoint("LEFT", 8, 2)
+		else
+			button:SetTextFontObject("GameFontHighlightSmall")
+			button:SetHighlightFontObject("GameFontHighlightSmall")
+			button.text:SetPoint("LEFT", 8 * level, 2)
 		end
 		
 		if disabled then
 			button:EnableMouse(false)
-			button:SetText("|cff808080"..text..FONT_COLOR_CODE_CLOSE)
+			button.text:SetText("|cff808080"..text..FONT_COLOR_CODE_CLOSE)
 		else
+			button.text:SetText(text)
 			button:EnableMouse(true)
 		end
 		
 		if canExpand then
-			if isExpanded then
-				expand:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
-				expand:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-Down")
-				expand:SetDisabledTexture("Interface\\Buttons\\UI-MinusButton-Disabled")
-				expand:Enable()
+			if not isExpanded then
+				toggle:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-UP")
+				toggle:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-DOWN")
 			else
-				if disabled then
-					expand:Disable()
-				else
-					expand:Enable()
-				end
-				expand:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
-				expand:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
-				expand:SetDisabledTexture("Interface\\Buttons\\UI-PlusButton-Disabled")
+				toggle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-UP")
+				toggle:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-DOWN")
 			end
+			toggle:Show()
 		else
-			expand:SetNormalTexture(nil)
-			expand:SetPushedTexture(nil)
-			expand:SetDisabledTexture(nil)
-			expand:Disable()
+			toggle:Hide()
 		end
 	end
-
 
 	
 	local function OnScrollValueChanged(this, value)
@@ -427,19 +370,22 @@ do
 				buttons[buttonnum] = button
 				button:SetParent(treeframe)
 				button:SetFrameLevel(treeframe:GetFrameLevel()+1)
+				button:ClearAllPoints()
 				if i == 1 then
 					if self.showscroll then
-						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-26,-10)
+						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-22,-10)
+						button:SetPoint("TOPLEFT", self.treeframe, "TOPLEFT", 0, -10)
 					else
-						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-10,-10)
+						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",0,-10)
+						button:SetPoint("TOPLEFT", self.treeframe, "TOPLEFT", 0, -10)
 					end
 				else
-					button:SetParent(self.treeframe)
 					button:SetPoint("TOPRIGHT", buttons[buttonnum-1], "BOTTOMRIGHT",0,0)
+					button:SetPoint("TOPLEFT", buttons[buttonnum-1], "BOTTOMLEFT",0,0)
 				end
 			end
 
-			UpdateButton(button, line, status.selected == line.uniquevalue, (not lines[i+1]) or lines[i+1].level ~= line.level, line.hasChildren, groupstatus[line.uniquevalue] )
+			UpdateButton(button, line, status.selected == line.uniquevalue, line.hasChildren, groupstatus[line.uniquevalue] )
 			button:Show()
 			buttonnum = buttonnum + 1
 		end
@@ -489,12 +435,12 @@ do
 		if show then
 			self.scrollbar:Show()
 			if self.buttons[1] then
-				self.buttons[1]:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-26,-10)
+				self.buttons[1]:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-22,-10)
 			end
 		else
 			self.scrollbar:Hide()
 			if self.buttons[1] then
-				self.buttons[1]:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-10,-10)
+				self.buttons[1]:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",0,-10)
 			end
 		end
 	end
@@ -585,7 +531,7 @@ do
 		self.scrollbar = scrollbar
 		local scrollbg = scrollbar:CreateTexture(nil,"BACKGROUND")
 		scrollbg:SetAllPoints(scrollbar)
-		scrollbg:SetTexture(0,0,0,1)
+		scrollbg:SetTexture(0,0,0,0.4)
 		scrollbar.obj = self
 		self.noupdate = true
 		scrollbar:SetPoint("TOPRIGHT",treeframe,"TOPRIGHT",-10,-26)
