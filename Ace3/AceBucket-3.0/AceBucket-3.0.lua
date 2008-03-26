@@ -9,7 +9,7 @@
 		stopped, and the bucket is only listening for the next event to happen, basicly back in initial state.
 ]]
 
-local MAJOR, MINOR = "AceBucket-3.0", 2
+local MAJOR, MINOR = "AceBucket-3.0", 3
 local AceBucket, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceBucket then return end -- No Upgrade needed
@@ -200,6 +200,7 @@ function AceBucket:UnregisterBucket(handle)
 		
 		if bucket.timer then
 			AceTimer.CancelTimer(bucket, bucket.timer)
+			bucket.timer = nil
 		end
 		
 		AceBucket.buckets[handle] = nil

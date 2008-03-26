@@ -1,3 +1,7 @@
+Ace3 Beta - Revision xxxxx (March xxth, 2008)
+---------------------------------------------
+- AceBucket-3.0: clear the timer reference when unregistering a bucket to prevent a error when unregistering a bucket that was never fired (nevcairiel)
+
 Ace3 Beta - Revision 65665 (March 25th, 2008)
 ---------------------------------------------
 - AceGUI-3.0: ACE-139: Changed all Widgets to resemble the Blizzard 2.4 Options Style (nevcairiel)
