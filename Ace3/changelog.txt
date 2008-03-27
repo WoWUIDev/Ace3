@@ -1,6 +1,11 @@
-Ace3 Beta - Revision xxxxx (March xxth, 2008)
+Ace3 Beta - Revision 66329 (March 27th, 2008)
 ---------------------------------------------
+- Overall 2.4 clean ups - removing 2.4 checks and work arounds (nevcairiel)
 - AceBucket-3.0: clear the timer reference when unregistering a bucket to prevent a error when unregistering a bucket that was never fired (nevcairiel)
+- AceAddon-3.0: Bugfix when enabling/disabling modules from the parents OnEnable after disabling / enabling the parent addon. (ammo)
+- AceGUI-3.0: Don't parent the BlizOptionsGroup widget to UIParent and Hide it by default. Fixes stray controls on the screen. (nargiddley)
+- AceConfigDialog-3.0: Config windows without a default size won't incorrectly get a default size from a previously open window. (nargiddley)
+- AceDBOptions-3.0: added zhCN and zhTW locale (nevcairiel)
 
 Ace3 Beta - Revision 65665 (March 25th, 2008)
 ---------------------------------------------

@@ -3,7 +3,7 @@ AceConfigDialog-3.0
 
 ]]
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 15
+local MAJOR, MINOR = "AceConfigDialog-3.0", 17
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -1224,7 +1224,7 @@ Rules:
 
 	If the group is a tab or select group, FeedOptions then add the Group Control
 	If the group is a tree group FeedOptions then
-		its parent isn't a tree group:  then add the tree control containing this and all child tree groups
+		its parent isnt a tree group:  then add the tree control containing this and all child tree groups
 		if its parent is a tree group, its already a node on a tree
 --]]
 
@@ -1466,6 +1466,12 @@ function lib:Open(appName, container)
 			f:SetTitle(name or "")
 		end
 		local status = lib:GetStatusTable(appName)
+		if not status.width then
+			status.width =  700
+		end
+		if not status.height then
+			status.height = 500
+		end
 		if f.SetStatusTable then
 			f:SetStatusTable(status)
 		end
@@ -1491,77 +1497,29 @@ function lib:Open(appName, container)
 	del(path)
 end
 
---2.4 Specific Stuff
-if InterfaceOptions_AddCategory then
+lib.BlizOptions = lib.BlizOptions or {}
 
-	lib.BlizOptions = lib.BlizOptions or {}
+local function FeedToBlizPanel(widget, event)
+	lib:Open(widget.userdata.appName, widget)
+end
 
-	local function FeedToBlizPanel(widget, event)
-		lib:Open(widget.userdata.appName, widget)
-	end
-	
-	local function ClearBlizPanel(widget, event)
-		widget:ReleaseChildren()
-	end
-	
-	function lib:AddToBlizOptions(appName, name, parent)
-		local BlizOptions = lib.BlizOptions
-		if not BlizOptions[appName] then
-			local group = gui:Create("BlizOptionsGroup")
-			BlizOptions[appName] = group
-			group:SetName(name or appName, parent)
-			group:SetTitle(name or appName)
-			group.userdata.appName = appName
-			group:SetCallback("OnShow", FeedToBlizPanel)
-			group:SetCallback("OnHide", ClearBlizPanel)
-			InterfaceOptions_AddCategory(group.frame)
-			return group.frame
-		else
-			error(("%s has already been added to the Blizzard Options Window"):format(appName), 2)
-		end
-	end
-	
-	local function OpenConfig(widget, event)
-		lib:Open(widget.userdata.appName)
-	end
-	
-	function lib:FeedIcons(widget)
-	
-		local scroll = gui:Create("ScrollFrame")
-		widget:SetLayout("Fill")
-		widget:AddChild(scroll)
-		scroll:SetLayout("Flow")
-			
-		local heading = gui:Create("Heading")
-		heading:SetText("Ace3 Addons")
-		heading.width = "fill"
-		scroll:AddChild(heading)
-		for appName in reg:IterateOptionsTables() do
-			local app = reg:GetOptionsTable(appName)
-			if not app then
-				error(("%s isn't registed with AceConfigRegistry, unable to open config"):format(appName), 2)
-			end
-			local options = app("dialog", MAJOR)
-			
-			local control = gui:Create("Icon")
-		
-			control.userdata.appName = appName
-			control:SetCallback("OnClick", OpenConfig)
-			local path = new()
-			local name = GetOptionsMemberValue("name", options, options, path, appName)
-			local icon = GetOptionsMemberValue("icon", options, options, path, appName)
-			if not icon then
-				icon = "Interface\\Icons\\INV_Misc_EngGizmos_20"
-			end
-			local iconCoords = GetOptionsMemberValue("iconCoords", options, options, path, appName)
-			if type(iconCoords) == 'table' then
-				control:SetImage(icon, unpack(iconCoords))
-			else
-				control:SetImage(icon)
-			end
-			control:SetText(name or appName)
-			scroll:AddChild(control)
-		end			
-	end
+local function ClearBlizPanel(widget, event)
+	widget:ReleaseChildren()
+end
 
+function lib:AddToBlizOptions(appName, name, parent)
+	local BlizOptions = lib.BlizOptions
+	if not BlizOptions[appName] then
+		local group = gui:Create("BlizOptionsGroup")
+		BlizOptions[appName] = group
+		group:SetName(name or appName, parent)
+		group:SetTitle(name or appName)
+		group.userdata.appName = appName
+		group:SetCallback("OnShow", FeedToBlizPanel)
+		group:SetCallback("OnHide", ClearBlizPanel)
+		InterfaceOptions_AddCategory(group.frame)
+		return group.frame
+	else
+		error(("%s has already been added to the Blizzard Options Window"):format(appName), 2)
+	end
 end

@@ -34,7 +34,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "BlizOptionsGroup"
-	local Version = 4
+	local Version = 5
 	
 	local function Acquire(self)
 
@@ -106,7 +106,7 @@ do
 	end
 	
 	local function Constructor()
-		local frame = CreateFrame("Frame",nil,UIParent)
+		local frame = CreateFrame("Frame")
 		local self = {}
 		self.type = Type
 
@@ -124,6 +124,7 @@ do
 		frame.cancel = cancel
 		frame.defaults = defaults
 		
+		frame:Hide()
 		frame:SetScript("OnHide",OnHide)
 		frame:SetScript("OnShow",OnShow)
 		

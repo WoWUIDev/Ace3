@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR, MINOR = "AceAddon-3.0", 3
+local MAJOR, MINOR = "AceAddon-3.0", 4
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -333,21 +333,27 @@ end
 function AceAddon:EnableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
 	if self.statuses[addon.name] or not addon.enabledState then return false end
+	
+	-- set the statuses first, before calling the OnEnable. this allows for Disabling of the addon in OnEnable.
+	self.statuses[addon.name] = true
+	
 	-- TODO: handle 'first'? Or let addons do it on their own?
 	safecall(addon.OnEnable, addon)
-	local embeds = self.embeds[addon]
-	for i = 1, #embeds do
-		local lib = LibStub:GetLibrary(embeds[i], true)
-		if lib then safecall(lib.OnEmbedEnable, lib, addon) end
-	end
-	self.statuses[addon.name] = addon.enabledState
 	
-	-- enable possible modules.
-	for name, module in pairs(addon.modules) do
-		self:EnableAddon(module)
-	end
+	-- make sure we're still enabled before continueing
+	if self.statuses[addon.name] then
+		local embeds = self.embeds[addon]
+		for i = 1, #embeds do
+			local lib = LibStub:GetLibrary(embeds[i], true)
+			if lib then safecall(lib.OnEmbedEnable, lib, addon) end
+		end
 	
-	return true
+		-- enable possible modules.
+		for name, module in pairs(addon.modules) do
+			self:EnableAddon(module)
+		end
+	end
+	return self.statuses[addon.name] -- return true if we're disabled
 end
 
 -- AceAddon:DisableAddon( addon )
@@ -358,20 +364,26 @@ end
 function AceAddon:DisableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
 	if not self.statuses[addon.name] then return false end
+	
+	-- set statuses first before calling OnDisable, this allows for aborting the disable in OnDisable.
+	self.statuses[addon.name] = false
+	
 	safecall( addon.OnDisable, addon )
-	local embeds = self.embeds[addon]
-	for i = 1, #embeds do
-		local lib = LibStub:GetLibrary(embeds[i], true)
-		if lib then safecall(lib.OnEmbedDisable, lib, addon) end
-	end
-	self.statuses[addon.name] = addon.enabledState
 	
-	-- disable possible modules.
-	for name, module in pairs(addon.modules) do
-		self:DisableAddon(module)
+	-- make sure we're still disabling...
+	if not self.statuses[addon.name] then 
+		local embeds = self.embeds[addon]
+		for i = 1, #embeds do
+			local lib = LibStub:GetLibrary(embeds[i], true)
+			if lib then safecall(lib.OnEmbedDisable, lib, addon) end
+		end
+		-- disable possible modules.
+		for name, module in pairs(addon.modules) do
+			self:DisableAddon(module)
+		end
 	end
 	
-	return true
+	return not self.statuses[addon.name] -- return true if we're disabled
 end
 
 --The next few funcs are just because no one should be reaching into the internal registries

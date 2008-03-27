@@ -51,7 +51,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 5
+	local Version = 6
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -122,13 +122,10 @@ do
 		status[button.uniquevalue] = not status[button.uniquevalue]
 		self:RefreshTree()
 	end
-	
-	local is24 = GetSpellInfo and true
-	
+
 	local buttoncount = 1
 	local function CreateButton(self)
-		-- remove after 2.4
-		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, is24 and "InterfaceOptionsButtonTemplate" or "Ace3InterfaceOptionsButtonTemplate")
+		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, "InterfaceOptionsButtonTemplate")
 		buttoncount = buttoncount + 1
 		button.obj = self
 

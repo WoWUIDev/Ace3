@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 4
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 5
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -93,9 +93,43 @@ elseif LOCALE == "koKR" then
 elseif LOCALE == "esES" then
 	
 elseif LOCALE == "zhTW" then
-	
+	L["default"] = "預設"
+	L["intro"] = "你可以選擇一個活動的資料設定檔，這樣你的每個角色就可以擁有不同的設定值，可以給你的插件設定帶來極大的靈活性。" 
+	L["reset_desc"] = "將當前的設定檔恢復到它的預設值，用於你的設定檔損壞，或者你只是想重來的情況。"
+	L["reset"] = "重置設定檔"
+	L["reset_sub"] = "將當前的設定檔恢復為預設值"
+	L["choose_desc"] = "你可以通過在文本框內輸入一個名字創立一個新的設定檔，也可以選擇一個已經存在的設定檔。"
+	L["new"] = "新建"
+	L["new_sub"] = "新建一個空的設定檔。"
+	L["choose"] = "現有的設定檔"
+	L["choose_sub"] = "從當前可用的設定檔裏面選擇一個。"
+	L["copy_desc"] = "從當前某個已保存的設定檔複製到當前正使用的設定檔。"
+	L["copy"] = "複製自"
+	L["delete_desc"] = "從資料庫裏刪除不再使用的設定檔，以節省空間，並且清理SavedVariables檔。"
+	L["delete"] = "刪除一個設定檔"
+	L["delete_sub"] = "從資料庫裏刪除一個設定檔。"
+	L["delete_confirm"] = "你確定要刪除所選擇的設定檔嗎？"
+	L["profiles"] = "設定檔"
+	L["profiles_sub"] = "管理設定檔"
 elseif LOCALE == "zhCN" then
-	
+	L["default"] = "默认"
+	L["intro"] = "你可以选择一个活动的数据配置文件，这样你的每个角色就可以拥有不同的设置值，可以给你的插件配置带来极大的灵活性。" 
+	L["reset_desc"] = "将当前的配置文件恢复到它的默认值，用于你的配置文件损坏，或者你只是想重来的情况。"
+	L["reset"] = "重置配置文件"
+	L["reset_sub"] = "将当前的配置文件恢复为默认值"
+	L["choose_desc"] = "你可以通过在文本框内输入一个名字创立一个新的配置文件，也可以选择一个已经存在的配置文件。"
+	L["new"] = "新建"
+	L["new_sub"] = "新建一个空的配置文件。"
+	L["choose"] = "现有的配置文件"
+	L["choose_sub"] = "从当前可用的配置文件里面选择一个。"
+	L["copy_desc"] = "从当前某个已保存的配置文件复制到当前正使用的配置文件。"
+	L["copy"] = "复制自"
+	L["delete_desc"] = "从数据库里删除不再使用的配置文件，以节省空间，并且清理SavedVariables文件。"
+	L["delete"] = "删除一个配置文件"
+	L["delete_sub"] = "从数据库里删除一个配置文件。"
+	L["delete_confirm"] = "你确定要删除所选择的配置文件么？"
+	L["profiles"] = "配置文件"
+	L["profiles_sub"] = "管理配置文件"
 elseif LOCALE == "ruRU" then
 	
 end
