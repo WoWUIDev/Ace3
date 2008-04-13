@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEHOOK_MAJOR, ACEHOOK_MINOR = "AceHook-3.0", 3
+local ACEHOOK_MAJOR, ACEHOOK_MINOR = "AceHook-3.0", 4
 local AceHook, oldminor = LibStub:NewLibrary(ACEHOOK_MAJOR, ACEHOOK_MINOR)
 
 if not AceHook then return end -- No upgrade needed
@@ -295,7 +295,7 @@ function AceHook:Unhook(obj, method)
 	
 	local uid
 	if obj then
-		uid = registry[self][obj][method]
+		uid = registry[self][obj] and registry[self][obj][method]
 	else
 		uid = registry[self][method]
 	end

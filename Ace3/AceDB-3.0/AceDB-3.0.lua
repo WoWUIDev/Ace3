@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 5
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 7
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -265,6 +265,7 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	else
 		-- hack this one in
 		db.RegisterDefaults = DBObjectLib.RegisterDefaults
+		db.ResetProfile = DBObjectLib.ResetProfile
 	end
 	
 	-- Set some properties in the database object
@@ -363,15 +364,15 @@ function DBObjectLib:SetProfile(name)
 	self.keys["profile"] = name
 	self.sv.profileKeys[charKey] = name
 
-	-- Callback: OnProfileChanged, database, newProfileKey
-	self.callbacks:Fire("OnProfileChanged", self, name)
-	
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
 			DBObjectLib.SetProfile(db, name)
 		end
 	end
+	
+	-- Callback: OnProfileChanged, database, newProfileKey
+	self.callbacks:Fire("OnProfileChanged", self, name)
 end
 
 -- DBObject:GetProfiles(tbl)
@@ -434,8 +435,6 @@ function DBObjectLib:DeleteProfile(name, silent)
 	end
 	
 	self.sv.profiles[name] = nil
-	-- Callback: OnProfileDeleted, database, profileKey
-	self.callbacks:Fire("OnProfileDeleted", self, name)
 	
 	-- populate to child namespaces
 	if self.children then
@@ -443,6 +442,9 @@ function DBObjectLib:DeleteProfile(name, silent)
 			DBObjectLib.DeleteProfile(db, name, true)
 		end
 	end
+	
+	-- Callback: OnProfileDeleted, database, profileKey
+	self.callbacks:Fire("OnProfileDeleted", self, name)
 end
 
 -- DBObject:CopyProfile(name)
@@ -471,21 +473,22 @@ function DBObjectLib:CopyProfile(name, silent)
 	
 	copyTable(source, profile)
 	
-	-- Callback: OnProfileCopied, database, sourceProfileKey
-	self.callbacks:Fire("OnProfileCopied", self, name)
-	
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
 			DBObjectLib.CopyProfile(db, name, true)
 		end
 	end
+	
+	-- Callback: OnProfileCopied, database, sourceProfileKey
+	self.callbacks:Fire("OnProfileCopied", self, name)
 end
 
 -- DBObject:ResetProfile()
--- 
+-- noChildren (boolean) - if set to true, the reset will not be populated to the child namespaces of this DB object
+--
 -- Resets the current profile
-function DBObjectLib:ResetProfile()
+function DBObjectLib:ResetProfile(noChildren)
 	local profile = self.profile
 	
 	for k,v in pairs(profile) do
@@ -496,16 +499,16 @@ function DBObjectLib:ResetProfile()
 	if defaults then
 		copyDefaults(profile, defaults)
 	end
-
-	-- Callback: OnProfileReset, database
-	self.callbacks:Fire("OnProfileReset", self)
 	
 	-- populate to child namespaces
-	if self.children then
+	if self.children and not noChildren then
 		for _, db in pairs(self.children) do
 			DBObjectLib.ResetProfile(db)
 		end
 	end
+	
+	-- Callback: OnProfileReset, database
+	self.callbacks:Fire("OnProfileReset", self)
 end
 
 -- DBObject:ResetDB(defaultProfile)
@@ -527,11 +530,6 @@ function DBObjectLib:ResetDB(defaultProfile)
 	
 	initdb(sv, self.defaults, defaultProfile, self)
 	
-	-- Callback: OnDatabaseReset, database
-	self.callbacks:Fire("OnDatabaseReset", self)
-	-- Callback: OnProfileChanged, database, profileKey
-	self.callbacks:Fire("OnProfileChanged", self, self.keys["profile"])
-	
 	-- fix the child namespaces
 	if self.children then
 		if not sv.namespaces then sv.namespaces = {} end
@@ -540,6 +538,11 @@ function DBObjectLib:ResetDB(defaultProfile)
 			initdb(sv.namespaces[name], db.defaults, self.keys.profile, db, self)
 		end
 	end
+	
+		-- Callback: OnDatabaseReset, database
+	self.callbacks:Fire("OnDatabaseReset", self)
+	-- Callback: OnProfileChanged, database, profileKey
+	self.callbacks:Fire("OnProfileChanged", self, self.keys["profile"])
 	
 	return self
 end

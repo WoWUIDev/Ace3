@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 5
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 6
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -13,7 +13,7 @@ AceDBOptions.handlers = AceDBOptions.handlers or {}
 
 local L = {
 	default = "Default",
-	intro = "You can change the active database profile, so you can have different settings for every character, which will allow a very flexible configuration.",
+	intro = "You can change the active database profile, so you can have different settings for every character.",
 	reset_desc = "Reset the current profile back to its default values, in case your configuration is broken, or you simply want to start over.",
 	reset = "Reset Profile",
 	reset_sub = "Reset the current profile to the default",

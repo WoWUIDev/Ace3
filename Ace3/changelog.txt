@@ -1,3 +1,12 @@
+Ace3 Beta - Revision 69509 (April 13th, 2008)
+---------------------------------------------
+- AceComm-3.0: turn off error messages when receiving invalid multi-part messages (its happening on login etc)
+- AceDBOptions-3.0: shorten info text at top to prevent scrollbars.
+- AceHook-3.0: ACE-162: fix unhooking of objects that were not actually hooked
+- AceDB-3.0: fire the DB callbacks after the namespaces changed their profile as well
+- AceDB-3.0: namespaces can now be individually reset using :ResetProfile() on the namespace directly
+- AceDB-3.0: added a optional argument to :ResetProfile to not populate the reset to all namespaces (so the main profile can reset individually without reseting all namespaces too) 
+
 Ace3 Beta - Revision 66329 (March 27th, 2008)
 ---------------------------------------------
 - Overall 2.4 clean ups - removing 2.4 checks and work arounds (nevcairiel)
