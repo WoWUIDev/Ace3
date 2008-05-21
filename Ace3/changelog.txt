@@ -1,4 +1,4 @@
-Ace3 Beta - Revision xxxxx (May 19th, 2008)
+Ace3 Beta - Revision 74633 (May 19th, 2008)
 --------------------------------------------
 - AceTimer-3.0: ACE-173: don't error on nil handle for CancelTimer(), just bail out early. (ammo)
 - AceGUI-3.0: ACE-161, ACE-180, ACE-181: New and improved DropDown widget (originally coded by Borlox) (nargiddley,nevcairiel)
