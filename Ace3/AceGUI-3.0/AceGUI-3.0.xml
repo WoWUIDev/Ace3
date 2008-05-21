@@ -6,6 +6,7 @@
 	<Script file="widgets\AceGUIWidget-ColorPicker.lua"/>
 	<Script file="widgets\AceGUIWidget-DropDownGroup.lua"/>
 	<Script file="widgets\AceGUIWidget-DropDown.lua"/>
+	<Script file="widgets\AceGUIWidget-DropDown-Items.lua"/>
 	<Script file="widgets\AceGUIWidget-EditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-Frame.lua"/>
 	<Script file="widgets\AceGUIWidget-Heading.lua"/>	

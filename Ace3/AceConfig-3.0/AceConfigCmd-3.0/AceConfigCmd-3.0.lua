@@ -13,7 +13,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 4
+local MAJOR, MINOR = "AceConfigCmd-3.0", 5
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -656,6 +656,9 @@ local function handle(info, inputpos, tab, depth, retfalse)
 
 		do_final(info, inputpos, tab, "set", value)
 
+	elseif tab.type=="description" then
+		------------ description --------------------
+		-- ignore description, GUI config only
 	else
 		err(info, inputpos, "unknown options table item type '"..tostring(tab.type).."'")
 	end

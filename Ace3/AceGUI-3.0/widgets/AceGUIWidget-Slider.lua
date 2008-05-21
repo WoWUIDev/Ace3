@@ -5,16 +5,16 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 3
+	local Version = 5
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self:SetDisabled(false)
 		self:SetSliderValues(0,100,1)
 		self:SetIsPercent(nil)
 		self:SetValue(0)
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self.slider:EnableMouseWheel(false)
@@ -143,6 +143,7 @@ do
 	
 	local function FrameOnMouseDown(this)
 		this.obj.slider:EnableMouseWheel(true)
+		AceGUI:ClearFocus()
 	end
 	
 	local SliderBackdrop  = {
@@ -157,8 +158,8 @@ do
 		local self = {}
 		self.type = Type
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		
 		self.frame = frame
 		frame.obj = self
@@ -205,13 +206,19 @@ do
 		editbox:SetFontObject(GameFontHighlightSmall)
 		editbox:SetPoint("TOP",slider,"BOTTOM",0,0)
 		editbox:SetHeight(14)
-		editbox:SetWidth(100)
+		editbox:SetWidth(70)
 		editbox:SetJustifyH("CENTER")
 		editbox:EnableMouse(true)
 		editbox:SetScript("OnEscapePressed",EditBox_OnEscapePressed)
 		editbox:SetScript("OnEnterPressed",EditBox_OnEnterPressed)
 		self.editbox = editbox
 		editbox.obj = self
+		
+		local bg = editbox:CreateTexture(nil,"BACKGROUND")
+		editbox.bg = bg
+		bg:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+		bg:SetVertexColor(0,0,0,0.25)
+		bg:SetAllPoints(editbox)
 		
 		slider:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
 	

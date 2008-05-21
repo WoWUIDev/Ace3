@@ -1,11 +1,30 @@
+Ace3 Beta - Revision xxxxx (May 19th, 2008)
+--------------------------------------------
+- AceTimer-3.0: ACE-173: don't error on nil handle for CancelTimer(), just bail out early. (ammo)
+- AceGUI-3.0: ACE-161, ACE-180, ACE-181: New and improved DropDown widget (originally coded by Borlox) (nargiddley,nevcairiel)
+- AceGUI-3.0: AceGUI will call OnWidthSet and OnHeightSet as frames resize (nargiddley)
+- AceGUI-3.0: TabGroup: Use OptionsFrameTabButtonTemplate for tabs (nargiddley)
+- AceGUI-3.0: TabGroup: Tabs now span multiple lines when there are too many to fit in the width of the frame (nargiddley)
+- AceGUI-3.0: TreeGroup: Tree is now sizable by dragging, orig patch by yssaril (nargiddley)
+- AceGUI-3.0: Flow layout will now reduce widgets width to fit rather than leaving them sticking out the side of container widgets (nargiddley)
+- AceGUI-3.0: Dropdowns will no longer be left open in the background when the frame is clicked or other widgets are activated (nargiddley)
+- AceGUI-3.0: ACE-159: Rename Release to OnRelease and Acquire to OnAcquire for widgets. (nargiddley)
+- AceGUI-3.0: ACE-171: add IsVisible and IsShown methods to the widget metatable (nargiddley)
+- AceGUI-3.0: ACE-164: add tooltips to tree to show full text of childs that got clipped (ammo)
+- AceGUI-3.0: ACE-174: make buttons in AceGUI-3.0 locale independant (ammo)
+- AceGUI-3.0: ACE-166: fix treegroup visual bug (ammo)
+- AceGUI-3.0: ACE-184: make numeric entry for slider more intuitive (ammo)
+- AceConfigCmd-3.0: ACE-172 - ignore description in cmd (ammo)
+- AceConsole-3.0:  nolonger check for existance of slashcommands, overwrite where needed. Last one wins, this enables AddonLoader to X-LoadOn-Slash and override the slashcommand from AddonLoader slashcommand with an Ace3 one. (Ammo)
+
 Ace3 Beta - Revision 69509 (April 13th, 2008)
 ---------------------------------------------
-- AceComm-3.0: turn off error messages when receiving invalid multi-part messages (its happening on login etc)
-- AceDBOptions-3.0: shorten info text at top to prevent scrollbars.
-- AceHook-3.0: ACE-162: fix unhooking of objects that were not actually hooked
-- AceDB-3.0: fire the DB callbacks after the namespaces changed their profile as well
-- AceDB-3.0: namespaces can now be individually reset using :ResetProfile() on the namespace directly
-- AceDB-3.0: added a optional argument to :ResetProfile to not populate the reset to all namespaces (so the main profile can reset individually without reseting all namespaces too) 
+- AceComm-3.0: turn off error messages when receiving invalid multi-part messages (its happening on login etc) (nevcairiel)
+- AceDBOptions-3.0: shorten info text at top to prevent scrollbars. (nevcairiel)
+- AceHook-3.0: ACE-162: fix unhooking of objects that were not actually hooked (nevcairiel)
+- AceDB-3.0: fire the DB callbacks after the namespaces changed their profile as well (nevcairiel)
+- AceDB-3.0: namespaces can now be individually reset using :ResetProfile() on the namespace directly (nevcairiel)
+- AceDB-3.0: added a optional argument to :ResetProfile to not populate the reset to all namespaces (so the main profile can reset individually without reseting all namespaces too)  (nevcairiel)
 
 Ace3 Beta - Revision 66329 (March 27th, 2008)
 ---------------------------------------------

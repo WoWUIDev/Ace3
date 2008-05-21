@@ -34,13 +34,13 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "BlizOptionsGroup"
-	local Version = 5
+	local Version = 6
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self:SetName()
@@ -110,8 +110,8 @@ do
 		local self = {}
 		self.type = Type
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		self.frame = frame
 		self.SetName = SetName
 		

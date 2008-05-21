@@ -5,9 +5,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 8
+	local Version = 9
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self.HasAlpha = false
 		self:SetColor(0,0,0,1)
 	end
@@ -83,9 +83,10 @@ do
 			end
 			ShowUIPanel(ColorPickerFrame)
 		end
+		AceGUI:ClearFocus()
 	end
 
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
@@ -104,8 +105,8 @@ do
 		local self = {}
 		self.type = Type
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		
 		self.SetLabel = SetLabel
 		self.SetColor = SetColor

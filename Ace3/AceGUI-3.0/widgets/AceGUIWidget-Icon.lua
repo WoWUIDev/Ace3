@@ -5,14 +5,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 3
+	local Version = 4
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self:SetText("")
 		self:SetImage(nil)
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
@@ -38,6 +38,7 @@ do
 	
 	local function OnClick(this)
 		this.obj:Fire("OnClick")
+		AceGUI:ClearFocus()
 	end
 	
 	local function OnEnter(this)
@@ -53,8 +54,8 @@ do
 		local self = {}
 		self.type = Type
 		
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		self.SetText = SetText
 		self.frame = frame
 		self.SetImage = SetImage

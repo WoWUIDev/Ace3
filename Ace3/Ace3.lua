@@ -95,7 +95,7 @@ function Ace3:PrintCmd(input)
 end
 
 function Ace3:OnInitialize()
-	self:RegisterChatCommand("ace3", function() self:Open() end )
-	self:RegisterChatCommand("rl", function() ReloadUI() end )
+	self:RegisterChatCommand("ace3", function() self:Open() end)
+	self:RegisterChatCommand("rl", function() ReloadUI() end)
 	self:RegisterChatCommand("print", "PrintCmd")
 end

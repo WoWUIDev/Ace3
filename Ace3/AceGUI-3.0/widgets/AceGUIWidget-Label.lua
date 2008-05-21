@@ -5,15 +5,15 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Label"
-	local Version = 6
+	local Version = 8
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self:SetText("")
 		self:SetImage(nil)
 		self:SetColor()
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
@@ -51,10 +51,10 @@ do
 			height = self.label:GetHeight()
 		end
 		
-		frame.resizing = true
+		self.resizing = true
 		self.frame:SetHeight(height)
 		self.frame.height = height
-		frame.resizing = nil
+		self.resizing = nil
 	end
 	
 	local function SetText(self, text)
@@ -70,13 +70,8 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
+		if self.resizing then return end
 		UpdateImageAnchor(self)
-	end
-	
-	local function OnFrameResize(this)
-		if this.resizing then return end
-		local self = this.obj
-		OnWidthSet(self, this:GetWidth())
 	end
 	
 	local function SetImage(self, path, ...)
@@ -106,8 +101,8 @@ do
 		local self = {}
 		self.type = Type
 		
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		self.SetText = SetText
 		self.SetColor = SetColor
 		self.frame = frame
@@ -118,7 +113,6 @@ do
 		
 		frame:SetHeight(18)
 		frame:SetWidth(200)
-		frame:SetScript("OnSizeChanged", OnFrameResize)
 		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontHighlightSmall")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		label:SetWidth(200)

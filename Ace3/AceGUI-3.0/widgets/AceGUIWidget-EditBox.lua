@@ -11,14 +11,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 5
-	
-	local function Acquire(self)
+	local Version = 8
+
+	local function OnAcquire(self)
 		self:SetDisabled(false)
 		self.showbutton = true
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self:SetDisabled(false)
@@ -80,6 +80,7 @@ do
 			ClearCursor()
 		end
 		HideButton(self)
+		AceGUI:ClearFocus()
 	end
 	
 	local function EditBox_OnTextChanged(this)
@@ -131,17 +132,18 @@ do
 		end
 	end
 	
-	local count = 0
+
 	local function Constructor()
-		count = count + 1
+		local num  = AceGUI:GetNextWidgetNum(Type)
 		local frame = CreateFrame("Frame",nil,UIParent)
-		local editbox = CreateFrame("EditBox","AceGUI-3.0EditBox"..count,frame,"InputBoxTemplate")
+		local editbox = CreateFrame("EditBox","AceGUI-3.0EditBox"..num,frame,"InputBoxTemplate")
 		
 		local self = {}
 		self.type = Type
+		self.num = num
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 
 		self.SetDisabled = SetDisabled
 		self.SetText = SetText
@@ -168,6 +170,7 @@ do
 		editbox:SetScript("OnTextChanged",EditBox_OnTextChanged)
 		editbox:SetScript("OnReceiveDrag", EditBox_OnReceiveDrag)
 		editbox:SetScript("OnMouseDown", EditBox_OnReceiveDrag)
+
 		editbox:SetTextInsets(0,0,3,3)
 		editbox:SetMaxLetters(256)
 		
@@ -183,10 +186,10 @@ do
 		self.label = label
 		
 		local button = CreateFrame("Button",nil,editbox,"UIPanelButtonTemplate")
-		button:SetWidth(20)
+		button:SetWidth(40)
 		button:SetHeight(20)
 		button:SetPoint("RIGHT",editbox,"RIGHT",-2,0)
-		button:SetText("OK")
+		button:SetText(OKAY)
 		button:SetScript("OnClick", Button_OnClick)
 		button:Hide()
 		

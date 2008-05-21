@@ -35,14 +35,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "InlineGroup"
-	local Version = 3
+	local Version = 4
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self:SetWidth(300)
 		self:SetHeight(100)
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
@@ -89,8 +89,8 @@ do
 		local self = {}
 		self.type = Type
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		self.SetTitle = SetTitle
 		self.frame = frame
 		self.LayoutFinished = LayoutFinished

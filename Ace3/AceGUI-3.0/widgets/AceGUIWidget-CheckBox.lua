@@ -10,14 +10,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 3
+	local Version = 4
 	
-	local function Acquire(self)
+	local function OnAcquire(self)
 		self:SetValue(false)
 		self.tristate = nil
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self.check:Hide()
@@ -60,6 +60,7 @@ do
 			self.text:SetPoint("LEFT",self.check,"RIGHT",1,-1)
 			self.down = true
 		end
+		AceGUI:ClearFocus()
 	end
 
 	local function SetDisabled(self,disabled)
@@ -159,8 +160,8 @@ do
 		local self = {}
 		self.type = Type
 
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 
 		self.SetValue = SetValue
 		self.GetValue = GetValue

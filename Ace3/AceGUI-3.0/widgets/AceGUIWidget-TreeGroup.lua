@@ -21,37 +21,16 @@ do
 	end
 end
 
--------------
--- Widgets --
--------------
---[[
-	Widgets must provide the following functions
-		Acquire() - Called when the object is aquired, should set everything to a default hidden state
-		Release() - Called when the object is Released, should remove any anchors and hide the Widget
-		
-	And the following members
-		frame - the frame or derivitive object that will be treated as the widget for size and anchoring purposes
-		type - the type of the object, same as the name given to :RegisterWidget()
-		
-	Widgets contain a table called userdata, this is a safe place to store data associated with the wigdet
-	It will be cleared automatically when a widget is released
-	Placing values directly into a widget object should be avoided
-	
-	If the Widget can act as a container for other Widgets the following
-		content - frame or derivitive that children will be anchored to
-		
-	The Widget can supply the following Optional Members
-
-
-]]
-
 --------------
 -- TreeView --
 --------------
 
 do
 	local Type = "TreeGroup"
-	local Version = 6
+	local Version = 11
+	
+	local DEFAULT_TREE_WIDTH = 175
+	local DEFAULT_TREE_SIZABLE = true
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -60,11 +39,19 @@ do
 		insets = { left = 3, right = 3, top = 5, bottom = 3 }
 	}
 
-	local function Acquire(self)
-
+    local DraggerBackdrop  = {
+		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		edgeFile = nil,
+		tile = true, tileSize = 16, edgeSize = 0,
+		insets = { left = 3, right = 3, top = 7, bottom = 7 }
+	}
+    
+	local function OnAcquire(self)
+		self:SetTreeWidth(DEFAULT_TREE_WIDTH,DEFAULT_TREE_SIZABLE)
 	end
 	
-	local function Release(self)
+	local function OnRelease(self)
+        
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self.status = nil
@@ -78,6 +65,8 @@ do
 			end
 		end
 		self.localstatus.scrollvalue = 0
+		self.localstatus.treewidth = DEFAULT_TREE_WIDTH
+		self.localstatus.treesizable = DEFAULT_TREE_SIZABLE
 	end
 	
 	local function GetButtonParents(line)
@@ -105,6 +94,7 @@ do
 			this:LockHighlight()
 			self:RefreshTree()
 		end
+		AceGUI:ClearFocus()
 	end
 	
 	local function ExpandOnClick(this)
@@ -122,7 +112,20 @@ do
 		status[button.uniquevalue] = not status[button.uniquevalue]
 		self:RefreshTree()
 	end
-
+    
+    local function Button_OnEnter(this)
+        GameTooltip:SetOwner(this, "ANCHOR_NONE")
+        GameTooltip:SetPoint("LEFT",this,"RIGHT")
+        GameTooltip:SetText(this.text:GetText(), 1, .82, 0, 1)
+    
+		GameTooltip:Show()
+	end
+	
+	local function Button_OnLeave(this)
+		GameTooltip:Hide()
+	end
+    
+    
 	local buttoncount = 1
 	local function CreateButton(self)
 		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, "InterfaceOptionsButtonTemplate")
@@ -131,6 +134,8 @@ do
 
 		button:SetScript("OnClick",ButtonOnClick)
 		button:SetScript("OnDoubleClick", ButtonOnDoubleClick)
+		button:SetScript("OnEnter",Button_OnEnter)
+		button:SetScript("OnLeave",Button_OnLeave)
 
 		button.toggle.button = button
 		button.toggle:SetScript("OnClick",ExpandOnClick)
@@ -201,6 +206,7 @@ do
 		local status = self.status or self.localstatus
 		status.scrollvalue = value
 		self:RefreshTree()
+		AceGUI:ClearFocus()
 	end
 	
 	-- called to set an external table to store status in
@@ -213,6 +219,13 @@ do
 		if not status.scrollvalue then
 			status.scrollvalue = 0
 		end
+		if not status.treewidth then
+			status.treewidth = DEFAULT_TREE_WIDTH
+		end
+		if not status.treesizable then
+			status.treesizable = DEFAULT_TREE_SIZABLE
+		end
+		self:SetTreeWidth(status.treewidth,status.treesizable)
 		self:RefreshTree()
 	end
 
@@ -334,7 +347,7 @@ do
 		
 		local numlines = #lines
 		
-		local maxlines = (math.floor(((self.treeframe:GetHeight()or 0) - 20 ) / 20))
+		local maxlines = (math.floor(((self.treeframe:GetHeight()or 0) - 20 ) / 18))
 		
 		local first, last
 		
@@ -443,13 +456,24 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
+
 		local content = self.content
-		local contentwidth = width - 199
+		local treeframe = self.treeframe
+		local status = self.status or self.localstatus
+
+		local contentwidth = width - status.treewidth - 20
 		if contentwidth < 0 then
 			contentwidth = 0
 		end
 		content:SetWidth(contentwidth)
 		content.width = contentwidth
+		
+		local maxtreewidth = math.min(400, width - 50)
+		
+		if maxtreewidth > 100 and status.treewidth > maxtreewidth then
+			self:SetTreeWidth(maxtreewidth, status.treesizable)
+		end
+		treeframe:SetMaxResize(maxtreewidth,1600)
 	end
 	
 	
@@ -477,6 +501,54 @@ do
 		end
 	end
 	
+    local function SetTreeWidth(self, treewidth, resizable)
+        if not resizable then
+            if type(treewidth) == 'number' then
+                resizable = false
+            elseif type(treewidth) == 'boolean' then
+                resizable = treewidth
+                treewidth = DEFAULT_TREE_WIDTH
+            else
+                resizable = false
+                treewidth = DEFAULT_TREE_WIDTH 
+            end
+        end
+        self.treeframe:SetWidth(treewidth)
+		self.dragger:EnableMouse(resizable)
+		
+		local status = self.status or self.localstatus
+    	status.treewidth = treewidth
+    	status.treesizable = resizable
+    end
+    
+	local function draggerLeave(this)
+		this:SetBackdropColor(1, 1, 1, 0)
+	end
+	
+	local function draggerEnter(this)
+		this:SetBackdropColor(1, 1, 1, 0.8)
+	end
+	
+	local function draggerDown(this)
+		local treeframe = this:GetParent()
+		treeframe:StartSizing("RIGHT")
+	end
+	
+	local function draggerUp(this)
+		local treeframe = this:GetParent()
+		local self = treeframe.obj
+		local frame = treeframe:GetParent()
+		treeframe:StopMovingOrSizing()
+		--treeframe:SetScript("OnUpdate", nil)
+		treeframe:SetUserPlaced(false)
+		treeframe:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
+		treeframe:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
+        treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
+        
+        local status = self.status or self.localstatus
+    	status.treewidth = treeframe:GetWidth()
+	end
+
 	local createdcount = 0
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
@@ -493,7 +565,7 @@ do
 		treeframe.obj = self
 		treeframe:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		treeframe:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
-		treeframe:SetWidth(183)
+		treeframe:SetWidth(DEFAULT_TREE_WIDTH)
 		treeframe:SetScript("OnUpdate",FirstFrameUpdate)
 		treeframe:SetScript("OnSizeChanged",ResizeUpdate)
 		
@@ -503,11 +575,27 @@ do
 		treeframe:SetBackdropColor(0.1,0.1,0.1,0.5)
 		treeframe:SetBackdropBorderColor(0.4,0.4,0.4)
 		
+        treeframe:SetResizable(true)
+		treeframe:SetMinResize(100, 1)
+		treeframe:SetMaxResize(400,1600)
+		local dragger = CreateFrame("Frame", nil, treeframe)
+		dragger:SetWidth(8)
+		dragger:SetPoint("TOP", treeframe, "TOPRIGHT")
+		dragger:SetPoint("BOTTOM", treeframe, "BOTTOMRIGHT")
+		dragger:SetBackdrop(DraggerBackdrop)
+		dragger:SetBackdropColor(1, 1, 1, 0)
+		dragger:SetScript("OnMouseDown", draggerDown)
+		dragger:SetScript("OnMouseUp", draggerUp)
+		dragger:SetScript("OnEnter", draggerEnter)
+		dragger:SetScript("OnLeave", draggerLeave)
+		
+        self.dragger = dragger
 		self.treeframe = treeframe
-		self.Release = Release
-		self.Acquire = Acquire
+		self.OnRelease = OnRelease
+		self.OnAcquire = OnAcquire
 		
 		self.SetTree = SetTree
+        self.SetTreeWidth = SetTreeWidth
 		self.RefreshTree = RefreshTree
 		self.SetStatusTable = SetStatusTable
 		self.BuildLevel = BuildLevel
@@ -523,6 +611,7 @@ do
 		
 		self.frame = frame
 		frame.obj = self
+
 		createdcount = createdcount + 1
 		local scrollbar = CreateFrame("Slider",("AceConfigDialogTreeGroup%dScrollBar"):format(createdcount),treeframe,"UIPanelScrollBarTemplate")
 		self.scrollbar = scrollbar
@@ -543,7 +632,7 @@ do
 
 		local border = CreateFrame("Frame",nil,frame)
 		self.border = border
-		border:SetPoint("TOPLEFT",frame,"TOPLEFT",179,0)
+		border:SetPoint("TOPLEFT",treeframe,"TOPRIGHT", 0,0)
 		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 		
 		border:SetBackdrop(PaneBackdrop)
