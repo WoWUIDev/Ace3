@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR, MINOR = "AceAddon-3.0", 4
+local MAJOR, MINOR = "AceAddon-3.0", 5
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -70,27 +70,51 @@ local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule,
 -- used in the addon metatable
 local function addontostring( self ) return self.name end 
 
--- AceAddon:NewAddon( name, [lib, lib, lib, ...] )
+-- AceAddon:NewAddon( [object, ]name, [lib, lib, lib, ...] ) 
+-- [object] (table) - table to use as the base for the addon
 -- name (string) - unique addon object name
 -- [lib] (string) - optional libs to embed in the addon object
 --
 -- returns the addon object when succesful
-function AceAddon:NewAddon(name, ...)
-	if type(name) ~= "string" then error(("Usage: NewAddon(name, [lib, lib, lib, ...]): 'name' - string expected got '%s'."):format(type(name)), 2) end
+function AceAddon:NewAddon(objectorname, ...)
+	local object,name
+	local i=1
+	if type(objectorname)=="table" then
+		object=objectorname
+		name=...
+		i=2
+	else
+		name=objectorname
+	end
+	if type(name)~="string" then
+		error(("Usage: NewAddon([object,] name, [lib, lib, lib, ...]): 'name' - string expected got '%s'."):format(type(name)), 2)
+	end
+	if self.addons[name] then 
+		error(("Usage: NewAddon([object,] name, [lib, lib, lib, ...]): 'name' - Addon '%s' already exists."):format(name), 2)
+	end
 	
-	if self.addons[name] then error(("Usage: NewAddon(name, [lib, lib, lib, ...]): 'name' - Addon '%s' already exists."):format(name), 2) end
+	object = object or {}
+	object.name = name
+
+	local addonmeta = {}
+	local oldmeta = getmetatable(object)
+	if oldmeta then
+		for k, v in pairs(oldmeta) do addonmeta[k] = v end
+	end
+	addonmeta.__tostring = addontostring
 	
-	local addon = setmetatable( {name = name}, { __tostring = addontostring } )
-	self.addons[name] = addon
-	addon.modules = {}
-	addon.defaultModuleLibraries = {}
-	Embed( addon ) -- embed NewModule, GetModule methods
-	self:EmbedLibraries(addon, ...)
+	setmetatable( object, addonmeta )
+	self.addons[name] = object
+	object.modules = {}
+	object.defaultModuleLibraries = {}
+	Embed( object ) -- embed NewModule, GetModule methods
+	self:EmbedLibraries(object, select(i,...))
 	
 	-- add to queue of addons to be initialized upon ADDON_LOADED
-	tinsert(self.initializequeue, addon)
-	return addon
+	tinsert(self.initializequeue, object)
+	return object
 end
+
 
 -- AceAddon:GetAddon( name, [silent])
 -- name (string) - unique addon object name

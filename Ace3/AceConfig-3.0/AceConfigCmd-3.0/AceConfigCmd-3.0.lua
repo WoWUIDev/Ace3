@@ -13,7 +13,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 5
+local MAJOR, MINOR = "AceConfigCmd-3.0", 6
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -310,7 +310,7 @@ local function handle(info, inputpos, tab, depth, retfalse)
 	local oldget,oldget_at = getparam(info,inputpos,tab,depth,"get",functypes,funcmsg)
 	local oldfunc,oldfunc_at = getparam(info,inputpos,tab,depth,"func",functypes,funcmsg)
 	local oldvalidate,oldvalidate_at = getparam(info,inputpos,tab,depth,"validate",functypes,funcmsg)
-	local oldconfirm,oldconfirm_at = getparam(info,inputpos,tab,depth,"confirm",functypes,funcmsg)
+	--local oldconfirm,oldconfirm_at = getparam(info,inputpos,tab,depth,"confirm",functypes,funcmsg)
 	
 	-------------------------------------------------------------------
 	-- Act according to .type of this table
@@ -357,7 +357,7 @@ local function handle(info, inputpos, tab, depth, retfalse)
 			info.get,info.get_at = oldget,oldget_at
 			info.func,info.func_at = oldfunc,oldfunc_at
 			info.validate,info.validate_at = oldvalidate,oldvalidate_at
-			info.confirm,info.confirm_at = oldconfirm,oldconfirm_at
+			--info.confirm,info.confirm_at = oldconfirm,oldconfirm_at
 			return false
 		end
 		

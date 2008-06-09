@@ -1,3 +1,17 @@
+Ace3 Beta - Revision 76325 (June 9th, 2008)
+--------------------------------------------
+- AceGUI-3.0: Finish Multiselect support for the Dropdown widget (nargiddley)
+- AceGUI-3.0: Re-write TabGroup layouting (nargiddley)
+- AceGUI-3.0: TreeGroup: Add :EnableButtonTooltips(enable) to make the default tooltips on the tree optional, enabled by default. (nargiddley)
+- AceGUI-3.0: TabGroup: Add OnTabEnter and OnTabLeave Callbacks  (nargiddley)
+- AceConfigDialog-3.0: Add :SelectGroup(appName, ...) - Selects the group given by the path specified then refreshes open windows. (nargiddley)
+- AceConfigDialog-3.0: :Open now accepts an optional path, when given will open the window with only the given group and its children visible (nargiddley)
+- AceConfigDialog-3.0: :AddToBlizOptions now accepts an optional path, this will add the config page to display the specified group and its children only. (nargiddley)
+- AceConfigDialog-3.0: ACE-189: allow multiselect to be shown as a dropdown by setting dialogControl = "Dropdown" (nargiddley)
+- AceConfigDialog-3.0: Add Custom tooltips to the TreeGroup and TabGroup, shows both name and desc for the group. (nargiddley)
+- AceConfigCmd-3.0: ACE-195: Remove unneeded references to .confirm, will no longer error when .confirm is a boolean (nargiddley)
+- AceAddon-3.0: Allow for an optional first argument to NewAddon to be a table to be used as the base for the addon. (ammo)
+
 Ace3 Beta - Revision 74633 (May 19th, 2008)
 --------------------------------------------
 - AceTimer-3.0: ACE-173: don't error on nil handle for CancelTimer(), just bail out early. (ammo)

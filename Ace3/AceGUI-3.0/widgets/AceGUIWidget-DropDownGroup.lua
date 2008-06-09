@@ -16,7 +16,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 8
+	local Version = 9
 	
 	local function OnAcquire(self)
 		self.dropdown:SetText("")
@@ -47,7 +47,7 @@ do
 	local function SelectedGroup(self,event,value)
 		local group = self.parentgroup
 		local status = group.status or group.localstatus
-		status.selectedgroup = value
+		status.selected = value
 		self.parentgroup:Fire("OnGroupSelected", value)
 	end
 	
@@ -64,7 +64,7 @@ do
 	local function SetGroup(self,group)
 		self.dropdown:SetValue(group)
 		local status = self.status or self.localstatus
-		status.selectedgroup = group
+		status.selected = group
 		self:Fire("OnGroupSelected", group)
 	end
 	

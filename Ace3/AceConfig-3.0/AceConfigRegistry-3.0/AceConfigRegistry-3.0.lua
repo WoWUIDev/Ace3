@@ -11,7 +11,7 @@ These functions receive two arguments: "uiType" and "uiName".
 :IterateOptionsTables() and :GetOptionsTable() always return a function reference that the requesting config handling addon must call with the above arguments.
 ]]
 
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 5
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 6
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -147,6 +147,9 @@ local typedkeys={
 		values=ismethodtable,
 		style=optstring,
 		tristate=optbool,
+		control=optstring,
+		dialogControl=optstring,
+		dropdownControl=optstring,
 	},
 	color={
 		hasAlpha=optbool,

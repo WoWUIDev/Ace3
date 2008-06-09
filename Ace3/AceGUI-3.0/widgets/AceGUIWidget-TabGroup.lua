@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 11
+	local Version = 14
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -84,6 +84,16 @@ do
 		UpdateTabLook(self)
 	end
 	
+	local function Tab_OnEnter(this)
+		local self = this.obj
+		self:Fire("OnTabEnter", self.tabs[this.id].value, this)
+	end
+	
+	local function Tab_OnLeave(this)
+		local self = this.obj
+		self:Fire("OnTabLeave", self.tabs[this.id].value, this)
+	end
+	
 	local function CreateTab(self, id)
 		local tabname = "AceGUITabGroup"..self.num.."Tab"..id
 		local tab = CreateFrame("Button",tabname,self.border,"OptionsFrameTabButtonTemplate")
@@ -91,7 +101,9 @@ do
 		tab.id = id
 		
 		tab:SetScript("OnClick",Tab_OnClick)
-
+		tab:SetScript("OnEnter",Tab_OnEnter)
+		tab:SetScript("OnLeave",Tab_OnLeave)
+		
 		tab._SetText = tab.SetText
 		tab.SetText = Tab_SetText
 		tab.SetSelected = Tab_SetSelected
@@ -133,6 +145,10 @@ do
 		self:BuildTabs()
 	end
 	
+
+	local widths = {}
+	local rowwidths = {}
+	local rowends = {}		
 	local function BuildTabs(self)
 		local status = self.status or self.localstatus
 		local tablist = self.tablist
@@ -143,58 +159,97 @@ do
 			v:Hide()
 		end
 		if not tablist then return end
-		local row = 1
-		local tabcount = 0
-		local rowstart = 0
-		local usedwidth = 0
+
+		
 		local width = self.frame.width or self.frame:GetWidth() or 0
 		
+		for i = #widths, 1, -1 do 
+			widths[i] = nil 
+		end
+		for i = #rowwidths, 1, -1 do
+			rowwidths[i] = nil 
+		end
+		for i = #rowends, 1, -1 do 
+			rowends[i] = nil 
+		end
+		
+		--Place Text into tabs and get thier initial width
 		for i, v in ipairs(tablist) do
 			local tab = tabs[i]
 			if not tab then
 				tab = self:CreateTab(i)
 				tabs[i] = tab
 			end
-
+		
 			tab:Show()
 			tab:SetText(v.text)
 			tab:SetDisabled(v.disabled)
 			tab.value = v.value
 			
-			local tabwidth = tab:GetWidth()
-			
-			tab:ClearAllPoints()
-			if i == 1 then
-				tab:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,-7-(row-1)*20 )
-				usedwidth = tab:GetWidth() -10
-				tabcount = tabcount + 1
-				rowstart = i
-			else
-				local rowwidth = usedwidth
-				usedwidth = usedwidth + tab:GetWidth() -10
-				if usedwidth > width then
-					
-					local padding = (width - rowwidth - 10) / (tabcount)
-					for n = rowstart, i-1 do
-						PanelTemplates_TabResize(padding, tabs[n])
-					end
-					row = row + 1
-					tabcount = 1
-					rowstart = i
-					usedwidth = tab:GetWidth()-10
+			widths[i] = tab:GetWidth() - 10 --tabs are anchored 10 pixels from the right side of the previous one to reduce spacing
+		end
+		
+		--First pass, find the minimum number of rows needed to hold all tabs and the initial tab layout
+		local numtabs = #tablist
+		local numrows = 1
+		local usedwidth = 0
+
+		for i = 1, #tablist do
+			--If this is not the first tab of a row and there isn't room for it
+			if usedwidth ~= 0 and (width - usedwidth - widths[i]) < 0 then
+				rowwidths[numrows] = usedwidth + 10 --first tab in each row takes up an extra 10px
+				rowends[numrows] = i - 1
+				numrows = numrows + 1
+				usedwidth = 0		
+			end
+			usedwidth = usedwidth + widths[i]
+		end
+		rowwidths[numrows] = usedwidth + 10 --first tab in each row takes up an extra 10px
+		rowends[numrows] = #tablist
+		
+		--Fix for single tabs being left on the last row, move a tab from the row above if applicable
+		if numrows > 1 then
+			--if the last row has only one tab
+			if rowends[numrows-1] == numtabs-1 then
+				--if there are more than 2 tabs in the 2nd last row
+				if (numrows == 2 and rowends[numrows-1] > 2) or (rowends[numrows] - rowends[numrows-1] > 2) then
+					--move 1 tab from the second last row to the last
+					rowends[numrows-1] = rowends[numrows-1] - 1
+					rowwidths[numrows] = rowwidths[numrows] + widths[numtabs-1]
+					rowwidths[numrows-1] = rowwidths[numrows-1] - widths[numtabs-1]
+				end
+			end
+		end
+
+		--anchor the rows as defined and resize tabs to fill thier row
+		local starttab = 1
+		for row, endtab in ipairs(rowends) do
+			local first = true
+			for tabno = starttab, endtab do
+				local tab = tabs[tabno]
+				tab:ClearAllPoints()
+				if first then
 					tab:SetPoint("TOPLEFT",self.frame,"TOPLEFT",0,-7-(row-1)*20 )
+					first = false
 				else
-					tab:SetPoint("LEFT",tabs[i-1],"RIGHT",-10,0)
-					tabcount = tabcount + 1
-				end				
-			end			
+					tab:SetPoint("LEFT",tabs[tabno-1],"RIGHT",-10,0)
+				end
+			end
+			--equal padding for each tab to fill the available width
+			local padding = (width - rowwidths[row]) / (endtab - starttab+1)
+			for i = starttab, endtab do
+				PanelTemplates_TabResize(padding, tabs[i])
+			end	
+			starttab = endtab + 1
 		end
-		local padding = (width - usedwidth - 10) / (tabcount)
-		for n = rowstart, #tabs do
-			PanelTemplates_TabResize(padding, tabs[n])
-		end
-		self.borderoffset = 10+((row)*20)
+		
+		self.borderoffset = 10+((numrows)*20)
 		self.border:SetPoint("TOPLEFT",self.frame,"TOPLEFT",3,-self.borderoffset)
+	end
+	
+	local function BuildTabsOnUpdate(this)
+		BuildTabs(this.obj)
+		this:SetScript("OnUpdate", nil)
 	end
 	
 	local function OnWidthSet(self, width)
@@ -206,6 +261,7 @@ do
 		content:SetWidth(contentwidth)
 		content.width = contentwidth
 		BuildTabs(self)
+		self.frame:SetScript("OnUpdate", BuildTabsOnUpdate)
 	end
 	
 	

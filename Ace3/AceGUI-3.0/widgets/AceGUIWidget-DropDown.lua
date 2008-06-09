@@ -344,7 +344,7 @@ end
 
 do 
 	local widgetType = "Dropdown"
-	local widgetVersion = 14
+	local widgetVersion = 17
 	
 	--[[ Static data ]]--
 	
@@ -390,7 +390,25 @@ do
 	end
 
 	local function OnPulloutClose(this)
-		this.userdata.obj.open = nil
+		local self = this.userdata.obj
+		self.open = nil
+		self:Fire("OnClosed")
+	end
+	
+	local function ShowMultiText(self)
+		local text
+		for i, widget in self.pullout:IterateItems() do
+			if widget.type == "Dropdown-Item-Toggle" then
+				if widget:GetValue() then
+					if text then
+						text = text..", "..widget:GetText()
+					else
+						text = widget:GetText()
+					end
+				end
+			end
+		end
+		self:SetText(text)
 	end
 	
 	local function OnItemValueChanged(this, event, checked)
@@ -398,6 +416,7 @@ do
 		
 		if self.multiselect then
 			self:Fire("OnValueChanged", this.userdata.value, checked)
+			ShowMultiText(self)
 		else
 			if checked then
 				self:SetValue(this.userdata.value)
@@ -430,6 +449,7 @@ do
 		self:SetText("")
 		self:SetLabel("")
 		self:SetDisabled(false)
+		self:SetMultiselect(false)
 		
 		self.value = nil
 		self.list = nil		
@@ -487,6 +507,28 @@ do
 		self.value = value
 	end
 	
+	-- exported
+	local function SetItemValue(self, item, value)
+		if not self.multiselect then return end
+		for i, widget in self.pullout:IterateItems() do
+			if widget.userdata.value == item then
+				if widget.SetValue then
+					widget:SetValue(value)
+				end
+			end
+		end
+		ShowMultiText(self)
+	end
+	
+	-- exported
+	local function SetItemDisabled(self, item, disabled)
+		for i, widget in self.pullout:IterateItems() do
+			if widget.userdata.value == item then
+				widget:SetDisabled(disabled)
+			end
+		end
+	end
+	
 	local function AddListItem(self, value, text)
 		local item = AceGUI:Create("Dropdown-Item-Toggle")
 		item:SetText(text)
@@ -510,6 +552,7 @@ do
 	local function SetList(self, list)
 		self.list = list
 		self.pullout:Clear()
+		self.hasClose = nil
 		
 		for v in pairs(list) do
 			sortlist[#sortlist + 1] = v
@@ -521,7 +564,8 @@ do
 			sortlist[i] = nil
 		end
 		if self.multiselect then
-			AddCloseButton()
+			ShowMultiText(self)
+			AddCloseButton(self)
 		end
 	end
 	
@@ -537,7 +581,8 @@ do
 	local function SetMultiselect(self, multi)
 		self.multiselect = multi
 		if multi then
-			AddCloseButton()
+			ShowMultiText(self)
+			AddCloseButton(self)
 		end
 	end
 	
@@ -574,6 +619,10 @@ do
 		self.AddItem     = AddItem
 		self.SetMultiselect = SetMultiselect
 		self.GetMultiselect = GetMultiselect
+		self.SetItemValue = SetItemValue
+		self.SetItemDisabled = SetItemDisabled
+		
+		self.alignoffset = 31
 		
 		frame:SetHeight(44)
 		frame:SetWidth(200)
