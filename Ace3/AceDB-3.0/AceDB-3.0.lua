@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 7
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 8
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -95,7 +95,7 @@ local function removeDefaults(db, defaults, blocker)
 				for key, value in pairs(db) do
 					if type(value) == "table" then
 						-- if the key was not explicitly specified in the defaults table, just strip everything from * and ** tables
-						if defaults[key] == nil then
+						if defaults[key] == nil and (not blocker or blocker[key] == nil) then
 							removeDefaults(value, v)
 							-- if the table is empty afterwards, remove it
 							if not next(value) then

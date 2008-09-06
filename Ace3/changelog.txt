@@ -1,3 +1,12 @@
+Ace3 Beta - Revision 81437 (Sept 6th, 2008)
+--------------------------------------------
+- AceConfigDialog-3.0: the confirm callback will now receive the new value that is being set (same signature as the validate callback)
+- AceConfigDialog-3.0: :Close and :CloseAll are now safe to call from within callbacks.
+- AceGUI-3.0: Added new methods to the widget base table, see ACE-205 for full reference
+- AceGUI-3.0: Various fixes to Widgets and recycling process
+- Now compatible with WoW 3.0 (compat layer is to be removed upon 3.0 release)
+
+
 Ace3 Beta - Revision 76325 (June 9th, 2008)
 --------------------------------------------
 - AceGUI-3.0: Finish Multiselect support for the Dropdown widget (nargiddley)

@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 6
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 7
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -131,7 +131,24 @@ elseif LOCALE == "zhCN" then
 	L["profiles"] = "配置文件"
 	L["profiles_sub"] = "管理配置文件"
 elseif LOCALE == "ruRU" then
-	
+	L["default"] = "По умолчанию"
+	L["intro"] = "Вы можете сменить активный профиль БД, этим вы можете устанавливать различные настройки для каждого персонажа."
+	L["reset_desc"] = "Сброс текущего профиля на его стандартные значения, в том случаи если ваша конфигурация испорчена, или вы желаете всё перенастроить заново."
+	L["reset"] = "Сброс профиля"
+	L["reset"] = "Сброс текущего профиля на стандартный"
+	L["choose_desc"] = "Вы можете создать новый профиль введя название в поле ввода, или выбрать один из уже существующих профилей."
+	L["new"] = "Новый"
+	L["new_sub"] = "Создать новый чистый профиль."
+	L["choose"] = "Профиля"
+	L["choose_sub"] = "Выберите один из уже доступных профилей."
+	L["copy_desc"] = "Скопировать настройки профиля в на данный момент активный профиль."
+	L["copy"] = "Скопировать с"
+	L["delete_desc"] = "Удалить существующий и неиспользуемый профиль из БД для сохранения места, и очистить SavedVariables файл."
+	L["delete"] = "Удалить профиль"
+	L["delete_sub"] = "Удаления профиля из БД."
+	L["delete_confirm"] = "Вы уверены что вы хотите удалить выбранный профиль?"
+	L["profiles"] = "Профиля"
+	L["profiles_sub"] = "Управление профилями"
 end
 
 local defaultProfiles

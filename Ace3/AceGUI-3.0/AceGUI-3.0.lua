@@ -1,10 +1,10 @@
 --[[ $Id$ ]]
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 13
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 16
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
 
-local con = LibStub("AceConsole-3.0",true)
+--local con = LibStub("AceConsole-3.0",true)
 
 AceGUI.WidgetRegistry = AceGUI.WidgetRegistry or {}
 AceGUI.LayoutRegistry = AceGUI.LayoutRegistry or {}
@@ -99,6 +99,12 @@ do
 		if not objPools[type] then
 			objPools[type] = {}
 		end
+		for i,v in ipairs(objPools[type]) do
+			if v == obj then
+				error("Attempt to Release Widget that is already released")
+				return
+			end
+		end
 		tinsert(objPools[type],obj)
 	end
 end
@@ -115,12 +121,17 @@ function AceGUI:Create(type)
 	if reg[type] then
 		local widget = new(type,reg[type])
 
-		if widget.Acquire then
+		if rawget(widget,'Acquire') then
 			widget.OnAcquire = widget.Acquire
 			widget.Acquire = nil
-		elseif widget.Aquire then
+		elseif rawget(widget,'Aquire') then
 			widget.OnAcquire = widget.Aquire
 			widget.Aquire = nil
+		end
+		
+		if rawget(widget,'Release') then
+			widget.OnRelease = rawget(widget,'Release') 
+			widget.Release = nil
 		end
 		
 		if widget.OnAcquire then
@@ -138,23 +149,19 @@ function AceGUI:Release(widget)
 	safecall( widget.PauseLayout, widget )
 	widget:Fire("OnRelease")
 	safecall( widget.ReleaseChildren, widget )
+
+	if widget.OnRelease then
+		widget:OnRelease()
+	else
+		error(("Widget type %s doesn't supply an OnRelease Function"):format(type))
+	end
 	for k in pairs(widget.userdata) do
 		widget.userdata[k] = nil
 	end
 	for k in pairs(widget.events) do
 		widget.events[k] = nil
 	end
-	widget.width = nil
-	if widget.Release then
-		widget.OnRelease = widget.Release
-		widget.Release = nil
-	end
-	if widget.OnRelease then
-		widget:OnRelease()
-	else
-		error(("Widget type %s doesn't supply an OnRelease Function"):format(type))
-	end
-	
+	widget.width = nil	
 	--widget.frame:SetParent(nil)
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()
@@ -285,6 +292,62 @@ do
 		return self.frame:IsShown()
 	end
 		
+	WidgetBase.Release = function(self)
+		AceGUI:Release(self)
+	end
+	
+	WidgetBase.SetPoint = function(self, ...)
+		return self.frame:SetPoint(...)
+	end
+	
+	WidgetBase.ClearAllPoints = function(self)
+		return self.frame:ClearAllPoints()
+	end
+	
+	WidgetBase.GetNumPoints = function(self)
+		return self.frame:GetNumPoints()
+	end
+	
+	WidgetBase.GetPoint = function(self, ...)
+		return self.frame:GetPoint(...)
+	end	
+	
+	WidgetBase.GetUserDataTable = function(self)
+		return self.userdata
+	end
+	
+	WidgetBase.SetUserData = function(self, key, value)
+		self.userdata[key] = value
+	end
+	
+	WidgetBase.GetUserData = function(self, key)
+		return self.userdata[key]
+	end
+	
+	WidgetBase.IsFullHeight = function(self)
+		return self.height == "fill"
+	end
+	
+	WidgetBase.SetFullHeight = function(self, isFull)
+		if isFull then
+			self.height = "fill"
+		else
+			self.height = nil
+		end
+	end
+	
+	WidgetBase.IsFullWidth = function(self)
+		return self.width == "fill"
+	end
+		
+	WidgetBase.SetFullWidth = function(self, isFull)
+		if isFull then
+			self.width = "fill"
+		else
+			self.width = nil
+		end
+	end
+	
 --	local function LayoutOnUpdate(this)
 --		this:SetScript("OnUpdate",nil)
 --		this.obj:PerformLayout()

@@ -21,13 +21,15 @@ do
 	end
 end
 
+local WotLK = select(4, GetBuildInfo()) >= 30000
+
 --------------
 -- TreeView --
 --------------
 
 do
 	local Type = "TreeGroup"
-	local Version = 13
+	local Version = 15
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -183,11 +185,19 @@ do
 		local line = button.line
 		button.level = level
 		if ( level == 1 ) then
-			button:SetTextFontObject("GameFontNormal")
+			if WotLK then
+				button:SetNormalFontObject("GameFontNormal")
+			else
+				button:SetTextFontObject("GameFontNormal")
+			end
 			button:SetHighlightFontObject("GameFontHighlight")
 			button.text:SetPoint("LEFT", 8, 2)
 		else
-			button:SetTextFontObject("GameFontHighlightSmall")
+			if WotLK then
+				button:SetNormalFontObject("GameFontHighlightSmall")
+			else
+				button:SetTextFontObject("GameFontHighlightSmall")
+			end
 			button:SetHighlightFontObject("GameFontHighlightSmall")
 			button.text:SetPoint("LEFT", 8 * level, 2)
 		end
@@ -287,7 +297,9 @@ do
 		}
 	]]
 	local function SetTree(self, tree)
-		assert(type(tree) == "table")
+		if tree then 
+			assert(type(tree) == "table") 
+		end
 		self.tree = tree
 		self:RefreshTree()
 	end
@@ -335,30 +347,29 @@ do
 	end
 	
 	local function RefreshTree(self)
-		if not self.tree then return end
-		--Build the list of visible entries from the tree and status tables
-		local status = self.status or self.localstatus
-		local groupstatus = status.groups
-		local tree = self.tree
-		local lines = self.lines
 		local buttons = self.buttons
-
-		local treeframe = self.treeframe
-
+		local lines = self.lines
 		
+		for i, v in ipairs(buttons) do
+			v:Hide()
+		end
 		while lines[1] do
 			local t = tremove(lines)
 			for k in pairs(t) do
 				t[k] = nil
 			end
 			del(t)
-		end
+		end		
 		
+		if not self.tree then return end
+		--Build the list of visible entries from the tree and status tables
+		local status = self.status or self.localstatus
+		local groupstatus = status.groups
+		local tree = self.tree
+
+		local treeframe = self.treeframe
+
 		self:BuildLevel(tree, 1)
-		
-		for i, v in ipairs(buttons) do
-			v:Hide()
-		end
 		
 		local numlines = #lines
 		
@@ -471,11 +482,10 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
-
 		local content = self.content
 		local treeframe = self.treeframe
 		local status = self.status or self.localstatus
-
+		
 		local contentwidth = width - status.treewidth - 20
 		if contentwidth < 0 then
 			contentwidth = 0
@@ -516,26 +526,26 @@ do
 		end
 	end
 	
-    local function SetTreeWidth(self, treewidth, resizable)
-        if not resizable then
-            if type(treewidth) == 'number' then
-                resizable = false
-            elseif type(treewidth) == 'boolean' then
-                resizable = treewidth
-                treewidth = DEFAULT_TREE_WIDTH
-            else
-                resizable = false
-                treewidth = DEFAULT_TREE_WIDTH 
-            end
-        end
-        self.treeframe:SetWidth(treewidth)
+	local function SetTreeWidth(self, treewidth, resizable)
+		if not resizable then
+			if type(treewidth) == 'number' then
+				resizable = false
+			elseif type(treewidth) == 'boolean' then
+				resizable = treewidth
+				treewidth = DEFAULT_TREE_WIDTH
+			else
+				resizable = false
+				treewidth = DEFAULT_TREE_WIDTH 
+			end
+		end
+		self.treeframe:SetWidth(treewidth)
 		self.dragger:EnableMouse(resizable)
 		
 		local status = self.status or self.localstatus
-    	status.treewidth = treewidth
-    	status.treesizable = resizable
-    end
-    
+		status.treewidth = treewidth
+		status.treesizable = resizable
+	end
+	
 	local function draggerLeave(this)
 		this:SetBackdropColor(1, 1, 1, 0)
 	end
@@ -560,10 +570,10 @@ do
 		treeframe:SetHeight(0)
 		treeframe:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		treeframe:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
-        treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
-        
-        local status = self.status or self.localstatus
-    	status.treewidth = treeframe:GetWidth()
+		treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
+		
+		local status = self.status or self.localstatus
+		status.treewidth = treeframe:GetWidth()
 	end
 
 	local createdcount = 0
@@ -592,7 +602,7 @@ do
 		treeframe:SetBackdropColor(0.1,0.1,0.1,0.5)
 		treeframe:SetBackdropBorderColor(0.4,0.4,0.4)
 		
-        treeframe:SetResizable(true)
+		treeframe:SetResizable(true)
 		treeframe:SetMinResize(100, 1)
 		treeframe:SetMaxResize(400,1600)
 		local dragger = CreateFrame("Frame", nil, treeframe)
@@ -606,13 +616,13 @@ do
 		dragger:SetScript("OnEnter", draggerEnter)
 		dragger:SetScript("OnLeave", draggerLeave)
 		
-        self.dragger = dragger
+		self.dragger = dragger
 		self.treeframe = treeframe
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
 		
 		self.SetTree = SetTree
-        self.SetTreeWidth = SetTreeWidth
+		self.SetTreeWidth = SetTreeWidth
 		self.RefreshTree = RefreshTree
 		self.SetStatusTable = SetStatusTable
 		self.BuildLevel = BuildLevel

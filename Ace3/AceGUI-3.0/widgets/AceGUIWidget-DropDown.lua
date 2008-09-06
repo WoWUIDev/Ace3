@@ -344,7 +344,7 @@ end
 
 do 
 	local widgetType = "Dropdown"
-	local widgetVersion = 17
+	local widgetVersion = 18
 	
 	--[[ Static data ]]--
 	
@@ -359,7 +359,10 @@ do
 	end
 
 	local function Dropdown_OnHide(this)
-		this.obj.pullout:Close()
+		local self = this.obj
+		if self.open then
+			self.pullout:Close()
+		end
 	end
 	
 	local function Dropdown_TogglePullout(this)
@@ -423,8 +426,10 @@ do
 				self:Fire("OnValueChanged", this.userdata.value)
 			else
 				this:SetValue(true)
-			end		
-			self.pullout:Close()
+			end
+			if self.open then	
+				self.pullout:Close()
+			end
 		end
 	end
 	
@@ -443,7 +448,9 @@ do
 	
 	-- exported, AceGUI callback
 	local function OnRelease(self)
-		self.pullout:Close()
+		if self.open then
+			self.pullout:Close()
+		end
 		AceGUI:Release(self.pullout)
 		
 		self:SetText("")
@@ -476,7 +483,9 @@ do
 	
 	-- exported
 	local function ClearFocus(self)
-		self.pullout:Close()
+		if self.open then
+			self.pullout:Close()
+		end
 	end
 	
 	-- exported
@@ -553,6 +562,7 @@ do
 		self.list = list
 		self.pullout:Clear()
 		self.hasClose = nil
+		if not list then return end
 		
 		for v in pairs(list) do
 			sortlist[#sortlist + 1] = v

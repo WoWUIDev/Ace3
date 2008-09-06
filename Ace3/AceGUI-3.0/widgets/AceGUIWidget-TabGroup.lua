@@ -24,13 +24,15 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 ]]
 
+local WotLK = select(4, GetBuildInfo()) >= 30000
+
 --------------------------
 -- Tab Group            --
 --------------------------
 
 do
 	local Type = "TabGroup"
-	local Version = 14
+	local Version = 15
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -55,7 +57,12 @@ do
 	
 	local function Tab_SetText(self, text)
 		self:_SetText(text)
-		PanelTemplates_TabResize(0, self)
+		-- TODO: Remove when 3.0 hits live
+		if WotLK then
+			PanelTemplates_TabResize(self, 0)
+		else
+			PanelTemplates_TabResize(0, self)
+		end
 	end
 	
 	local function UpdateTabLook(self)
@@ -238,7 +245,12 @@ do
 			--equal padding for each tab to fill the available width
 			local padding = (width - rowwidths[row]) / (endtab - starttab+1)
 			for i = starttab, endtab do
-				PanelTemplates_TabResize(padding, tabs[i])
+				-- TODO: Remove when 3.0 hits live
+				if WotLK then
+					PanelTemplates_TabResize(tabs[i], padding)
+				else
+					PanelTemplates_TabResize(padding, tabs[i])
+				end
 			end	
 			starttab = endtab + 1
 		end

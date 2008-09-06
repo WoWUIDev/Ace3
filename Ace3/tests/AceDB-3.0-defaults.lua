@@ -184,3 +184,41 @@ do
 
 	assert(data.profile.foo.hopla == 42)
 end 
+
+do
+	local defaultTest = {
+		profile = {
+			['**'] = {
+				['*'] = {
+					stuff = 5,
+					stuff2 = {
+						['**'] = {
+							a = 4,
+						},
+					},
+				},
+			},
+			stuff2 = {
+				blu = {
+					stuff = 6,
+					stuff2 = {
+						b = {
+							a = 5
+						},
+					},
+				},
+			},
+		},
+	}
+	
+	local bugdb = {}
+	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+	data.profile.stuff2.blu.stuff = 5
+	data.profile.stuff2.blu.stuff2.b.a = 4
+	data:RegisterDefaults()
+	
+	local data2 = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+	
+	assert(data2.profile.stuff2.blu.stuff == 5)
+	assert(data2.profile.stuff2.blu.stuff2.b.a == 4)
+end 
