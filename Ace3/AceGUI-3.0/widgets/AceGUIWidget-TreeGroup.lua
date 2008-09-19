@@ -29,7 +29,7 @@ local WotLK = select(4, GetBuildInfo()) >= 30000
 
 do
 	local Type = "TreeGroup"
-	local Version = 15
+	local Version = 16
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -145,7 +145,7 @@ do
     
 	local buttoncount = 1
 	local function CreateButton(self)
-		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, "InterfaceOptionsButtonTemplate")
+		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, WotLK and "OptionsListButtonTemplate" or "InterfaceOptionsButtonTemplate")
 		buttoncount = buttoncount + 1
 		button.obj = self
 
