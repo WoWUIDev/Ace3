@@ -1,0 +1,5 @@
+##Interface: 20300 
+##Title: Lib: AceGUI-3.0 
+##OptionalDeps: LibStub, CallbackHandler-1.0, AceGUI-3.0, AceConsole-3.0 
+##LoadWith: Ace3 
+AceGUI-3.0.xml 
