@@ -1,0 +1,9 @@
+package-as: Ace3
+
+ignore:
+ - tests
+ - benchs
+ - docs
+ - split.bat
+ - unsplit.bat
+ 

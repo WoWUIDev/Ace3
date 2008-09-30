@@ -1,4 +1,5 @@
 * text=auto !eol
+/.pkgmeta -text
 AceTab-3.0/AceConfigTab-3.0.lua -text
 AceTab-3.0/AceTab-3.0.lua -text
 AceTab-3.0/AceTab-3.0.xml -text
