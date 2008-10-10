@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 6
+local Version = 7
 ---------------------
 -- Common Elements --
 ---------------------
@@ -120,11 +120,15 @@ do
 		self.disabled = disabled
 		if disabled then
 			self.editbox:EnableMouse(false)
+			self.scrollframe:EnableMouse(false)
 			self.editbox:ClearFocus()
 			self.editbox:SetTextColor(0.5, 0.5, 0.5)
+			self.label:SetTextColor(0.5,0.5,0.5)
 		else
 			self.editbox:EnableMouse(true)
+			self.scrollframe:EnableMouse(true)
 			self.editbox:SetTextColor(1, 1, 1)
+			self.label:SetTextColor(1,.82,0)
 		end
 	end
 
@@ -187,15 +191,16 @@ do
 		scrollframe:SetPoint("TOPLEFT", 5, -6)
 		scrollframe:SetPoint("BOTTOMRIGHT", -28, 6)
 		scrollframe.obj = self
+		self.scrollframe = scrollframe
 		
 		local scrollchild = CreateFrame("Frame", nil, scrollframe)
 		scrollframe:SetScrollChild(scrollchild)
 		scrollchild:SetHeight(2)
 		scrollchild:SetWidth(2)
 	
-		local label = frame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
-		label:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)
-		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-14,0)
+		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,-2)
+		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,-2)
 		label:SetJustifyH("LEFT")
 		label:SetHeight(18)
 		self.label = label
