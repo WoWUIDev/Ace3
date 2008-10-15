@@ -21,7 +21,7 @@
 -- Can run as a standalone addon also, but, really, just embed it! :-)
 --
 
-local CTL_VERSION = 19
+local CTL_VERSION = 20
 
 if _G.ChatThrottleLib and _G.ChatThrottleLib.version >= CTL_VERSION then
 	-- There's already a newer (or same) version loaded. Buh-bye.
@@ -32,7 +32,7 @@ if not _G.ChatThrottleLib then
 	_G.ChatThrottleLib = {}
 end
 
-ChatThrottleLib = _G.ChatThrottleLib  -- in case some addon does "local ChatThrottleLib" above use and we're copypasted (AceComm, sigh)
+ChatThrottleLib = _G.ChatThrottleLib  -- in case some addon does "local ChatThrottleLib" above use and we're copypasted (AceComm-2, sigh)
 local ChatThrottleLib = _G.ChatThrottleLib
 
 ------------------ TWEAKABLES -----------------
@@ -369,11 +369,9 @@ end
 
 
 function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, language, destination, queueName)
-	if not self or not prio or not text or not self.Prio[prio] then
-		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix" or nil, "text"[, "chattype"[, "language"[, "destination"]]]', 2)
+	if not self or not prio or not prefix or not text or not self.Prio[prio] then
+		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix", "text"[, "chattype"[, "language"[, "destination"]]]', 2)
 	end
-	
-	prefix = prefix or tostring(this)		-- each frame gets its own queue if prefix is not given
 	
 	local nSize = text:len()
 	
