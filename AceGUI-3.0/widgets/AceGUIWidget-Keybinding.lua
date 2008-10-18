@@ -4,11 +4,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 -- Keybinding  		    --
 --------------------------
 
-local WotLK = select(4, GetBuildInfo()) >= 30000
-
 do
 	local Type = "Keybinding"
-	local Version = 10
+	local Version = 11
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -127,18 +125,10 @@ do
 	local function SetKey(self, key)
 		if (key or "") == "" then
 			self.button:SetText(NOT_BOUND)
-			if WotLK then
-				self.button:SetNormalFontObject("GameFontNormal")
-			else
-				self.button:SetTextFontObject("GameFontNormal")
-			end
+			self.button:SetNormalFontObject("GameFontNormal")
 		else
 			self.button:SetText(key)
-			if WotLK then
-				self.button:SetNormalFontObject("GameFontHighlight")
-			else
-				self.button:SetTextFontObject("GameFontHighlight")
-			end
+			self.button:SetNormalFontObject("GameFontHighlight")
 		end
 	end
 	

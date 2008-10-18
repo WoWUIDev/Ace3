@@ -21,8 +21,6 @@ do
 	end
 end
 
-local WotLK = select(4, GetBuildInfo()) >= 30000
-
 --------------
 -- TreeView --
 --------------
@@ -145,7 +143,7 @@ do
     
 	local buttoncount = 1
 	local function CreateButton(self)
-		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, WotLK and "OptionsListButtonTemplate" or "InterfaceOptionsButtonTemplate")
+		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, "OptionsListButtonTemplate")
 		buttoncount = buttoncount + 1
 		button.obj = self
 
@@ -185,19 +183,11 @@ do
 		local line = button.line
 		button.level = level
 		if ( level == 1 ) then
-			if WotLK then
-				button:SetNormalFontObject("GameFontNormal")
-			else
-				button:SetTextFontObject("GameFontNormal")
-			end
+			button:SetNormalFontObject("GameFontNormal")
 			button:SetHighlightFontObject("GameFontHighlight")
 			button.text:SetPoint("LEFT", 8, 2)
 		else
-			if WotLK then
-				button:SetNormalFontObject("GameFontHighlightSmall")
-			else
-				button:SetTextFontObject("GameFontHighlightSmall")
-			end
+			button:SetNormalFontObject("GameFontHighlightSmall")
 			button:SetHighlightFontObject("GameFontHighlightSmall")
 			button.text:SetPoint("LEFT", 8 * level, 2)
 		end

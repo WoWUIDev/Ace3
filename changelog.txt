@@ -1,3 +1,10 @@
+Ace3 Beta - Revision 706 (Oct 18th, 2008)
+--------------------------------------------
+- First Beta release after WoWAce move
+- Removed WoW 2.4.x compat layer
+- AceGUI-3.0: Fix disabling of the Multiline Editbox
+- AceGUI-3.0: Improvements to the Keybinding Widget
+
 Ace3 Beta - Revision 81437 (Sept 6th, 2008)
 --------------------------------------------
 - AceConfigDialog-3.0: the confirm callback will now receive the new value that is being set (same signature as the validate callback)
