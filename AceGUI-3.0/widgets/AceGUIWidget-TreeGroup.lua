@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 16
+	local Version = 17
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -286,7 +286,8 @@ do
 			},
 		}
 	]]
-	local function SetTree(self, tree)
+	local function SetTree(self, tree, filter)
+		self.filter = filter
 		if tree then 
 			assert(type(tree) == "table") 
 		end
@@ -294,33 +295,52 @@ do
 		self:RefreshTree()
 	end
 	
+	local function ShouldDisplayLevel(tree)
+		local result = false
+		for k, v in ipairs(tree) do
+			if v.children == nil and v.visible ~= false then
+				result = true
+			elseif v.children then
+				result = result or ShouldDisplayLevel(v.children)
+			end
+			if result then return result end
+		end
+		return false
+	end
+	
+	local function addLine(self, v, tree, level, parent)
+		local line = new()
+		line.value = v.value
+		line.text = v.text
+		line.disabled = v.disabled
+		line.tree = tree
+		line.level = level
+		line.parent = parent
+		line.visible = v.visible
+		line.uniquevalue = GetButtonUniqueValue(line)
+		if v.children then
+			line.hasChildren = true
+		else
+			line.hasChildren = nil
+		end		
+		self.lines[#self.lines+1] = line
+		return line
+	end
+	
 	local function BuildLevel(self, tree, level, parent)
-		local lines = self.lines
-
-		local status = (self.status or self.localstatus)
-		local groups = status.groups
+		local groups = (self.status or self.localstatus).groups
 		local hasChildren = self.hasChildren
 		
 		for i, v in ipairs(tree) do
-			local line = new()
-			lines[#lines+1] = line
-			line.value = v.value
-			line.text = v.text
-			line.disabled = v.disabled
-			line.tree = tree
-			line.level = level
-			line.parent = parent
-			line.uniquevalue = GetButtonUniqueValue(line)
-			
 			if v.children then
-				line.hasChildren = true
-			else
-				line.hasChildren = nil
-			end
-			if v.children then
-				if groups[line.uniquevalue] then
-					self:BuildLevel(v.children, level+1, line)
+				if not self.filter or ShouldDisplayLevel(v.children) then
+					local line = addLine(self, v, tree, level, parent)
+					if groups[line.uniquevalue] then
+						self:BuildLevel(v.children, level+1, line)
+					end
 				end
+			elseif v.visible ~= false or not self.filter then
+				addLine(self, v, tree, level, parent)
 			end
 		end
 	end
@@ -337,7 +357,7 @@ do
 	end
 	
 	local function RefreshTree(self)
-		local buttons = self.buttons
+		local buttons = self.buttons 
 		local lines = self.lines
 		
 		for i, v in ipairs(buttons) do
@@ -436,6 +456,7 @@ do
 	end
 	
 	local function Select(self, uniquevalue, ...)
+		self.filter = false
 		local status = self.status or self.localstatus
 		local groups = status.groups
 		for i = 1, select('#', ...) do
@@ -577,6 +598,7 @@ do
 		self.hasChildren = {}
 		self.localstatus = {}
 		self.localstatus.groups = {}
+		self.filter = false
 		
 		local treeframe = CreateFrame("Frame",nil,frame)
 		treeframe.obj = self
@@ -626,6 +648,7 @@ do
 		self.OnWidthSet = OnWidthSet
 		self.OnHeightSet = OnHeightSet		
 		self.EnableButtonTooltips = EnableButtonTooltips
+		self.Filter = Filter
 		
 		self.frame = frame
 		frame.obj = self
