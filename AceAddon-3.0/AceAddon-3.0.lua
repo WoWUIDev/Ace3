@@ -1,4 +1,8 @@
---[[ $Id$ ]]
+--- AceAddon-3.0 provides a template for creating addon objects.
+-- This file is still on the TODO for complete documentation.
+-- @class file
+-- @name AceAddon-3.0
+-- @release $Id$
 local MAJOR, MINOR = "AceAddon-3.0", 5
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 

@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- AceConsole-3.0 provides registration facilities for slash commands.
+-- @class file
+-- @name AceConsole-3.0
+-- @release $Id$
 local MAJOR,MINOR = "AceConsole-3.0", 6
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)

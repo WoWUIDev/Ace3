@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- Manages localization in addons, allowing for multiple locale to be registered with fallback to the base locale for untranslated strings.
+-- @class file
+-- @name AceLocale-3.0
+-- @release $Id$
 local MAJOR,MINOR = "AceLocale-3.0", 1
 
 local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)

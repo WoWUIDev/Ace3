@@ -1,4 +1,8 @@
---[[ $Id$ ]]
+--- AceSerializer-3.0 can serialize any variable (except functions) into a string format,
+-- that can be send over the addon comm channel
+-- @class file
+-- @name AceSerializer-3.0
+-- @release $Id$
 local MAJOR,MINOR = "AceSerializer-3.0", 2
 local AceSerializer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 

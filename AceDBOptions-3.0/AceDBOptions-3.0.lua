@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- AceDBOptions-3.0 provides a universal AceConfig options screen for managing AceDB-3.0 profiles.
+-- @class file
+-- @name AceDBOptions-3.0
+-- @release $Id$
 local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 7
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 

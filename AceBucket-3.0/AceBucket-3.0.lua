@@ -1,4 +1,9 @@
---[[ $Id$ ]]
+--- A bucket to catch events in. AceBucket-3.0 provides throttling of events that fire in bursts and
+-- your addon only needs to know about the full burst.
+-- This file is still on the TODO for complete documentation.
+-- @class file
+-- @name AceBucket-3.0
+-- @release $Id$
 
 --[[
 	This Bucket implementation works as follows:

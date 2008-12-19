@@ -1,8 +1,6 @@
 * text=auto !eol
+/.docmeta -text
 /.pkgmeta -text
-AceTab-3.0/AceConfigTab-3.0.lua -text
-AceTab-3.0/AceTab-3.0.lua -text
-AceTab-3.0/AceTab-3.0.xml -text
 /LICENSE.txt svneol=native#text/plain
 benchs/Bench-AceTimer-3.0/Bench-AceTimer-3.0.toc svneol=native#text/plain
 benchs/Bench-AceTimer-3.0/bench1.lua svneol=native#text/plain

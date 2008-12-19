@@ -1,4 +1,8 @@
---[[ $Id: AceTab-3.0.lua 81396 2008-09-05 12:14:21Z ammo $ ]]
+--- AceTab-3.0 provides support for tab-completion.
+-- Note: This library is not yet finalized.
+-- @class file
+-- @name AceTab-3.0
+-- @release $Id$
 
 local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 3
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)

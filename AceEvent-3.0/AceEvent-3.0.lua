@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- AceEvent-3.0 provides event registration and secure dispatching.
+-- @class file
+-- @name AceEvent-3.0
+-- @release $Id$
 local MAJOR, MINOR = "AceEvent-3.0", 3
 local AceEvent = LibStub:NewLibrary(MAJOR, MINOR)
 

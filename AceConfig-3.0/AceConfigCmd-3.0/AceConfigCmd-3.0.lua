@@ -1,3 +1,7 @@
+--- AceConfigCmd-3.0 handles access to optionstable through the "command line" interface via the ChatFrames.
+-- @class file
+-- @name AceConfigCmd-3.0
+-- @release $Id$
 
 --[[
 AceConfigCmd-3.0

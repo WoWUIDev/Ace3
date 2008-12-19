@@ -1,4 +1,9 @@
---[[ $Id$ ]]
+--- AceComm-3.0 allows you to send messages of unlimited length over the addon comm channels.
+-- It'll automatically split the messages into multiple parts and rebuild them on the receiving end.
+-- Of course, ChatThrottleLib is being used to avoid being disconnected by the server.
+-- @class file
+-- @name AceComm-3.0
+-- @release $Id$
 
 --[[ AceComm-3.0
 

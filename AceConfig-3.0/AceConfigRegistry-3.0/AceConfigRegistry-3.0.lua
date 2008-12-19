@@ -1,16 +1,12 @@
---[[
-AceConfigRegistry-3.0:
-
-Handle central registration of options tables in use by addons and modules. Do nothing else.
-
-Options tables can be registered as raw tables, or as function refs that return a table.
-These functions receive two arguments: "uiType" and "uiName". 
-- Valid "uiTypes": "cmd", "dropdown", "dialog". This is verified by the library at call time.
-- The "uiName" field is expected to contain the full name of the calling addon, including version, e.g. "FooBar-1.0". This is verified by the library at call time.
-
-:IterateOptionsTables() and :GetOptionsTable() always return a function reference that the requesting config handling addon must call with the above arguments.
-]]
-
+--- AceConfigRegistry-3.0 handles central registration of options tables in use by addons and modules.
+-- Options tables can be registered as raw tables, or as function refs that return a table.<br>
+-- These functions receive two arguments: "uiType" and "uiName". <br>
+-- Valid "uiTypes": "cmd", "dropdown", "dialog". This is verified by the library at call time. <br>
+-- The "uiName" field is expected to contain the full name of the calling addon, including version, e.g. "FooBar-1.0". This is verified by the library at call time.<br>
+-- :IterateOptionsTables() and :GetOptionsTable() always return a function reference that the requesting config handling addon must call with the above arguments.
+-- @class file
+-- @name AceConfigRegistry-3.0
+-- @release $Id$
 local MAJOR, MINOR = "AceConfigRegistry-3.0", 6
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 

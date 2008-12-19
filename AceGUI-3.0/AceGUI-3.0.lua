@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- AceGUI-3.0 provides access to numerous widgets which can be used to create GUIs.
+-- @class file
+-- @name AceGUI-3.0
+-- @release $Id$
 local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 16
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 

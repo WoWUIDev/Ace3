@@ -1,4 +1,7 @@
---[[ $Id$ ]]
+--- Safe Hooking/Unhooking of functions, methods and frame scripts.
+-- @class file
+-- @name AceHook-3.0
+-- @release $Id$
 local ACEHOOK_MAJOR, ACEHOOK_MINOR = "AceHook-3.0", 4
 local AceHook, oldminor = LibStub:NewLibrary(ACEHOOK_MAJOR, ACEHOOK_MINOR)
 
