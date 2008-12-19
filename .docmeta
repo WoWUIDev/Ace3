@@ -1,9 +1,3 @@
--
-  type: luadoc
-  input-files: "Ace*/*.lua"
-  output-directory: API
-
--
-  type: luadoc
-  input-files: "AceConfig-3.0/**/*.lua"
-  output-directory: API
+type: luadoc
+input-files: "Ace*/*.lua"
+output-directory: API
