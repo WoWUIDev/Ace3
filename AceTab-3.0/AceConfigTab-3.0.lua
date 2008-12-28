@@ -1,8 +1,8 @@
---[[
--- AceConfigTab-3.0
---
--- Creates an AceTab-3.0 completion set for handling AceConfig-3.0 command trees.
--- ]]
+--- AceConfigTab-3.0 provides support for tab-completion to AceConfig tables
+-- Note: This library is not yet finalized.
+-- @class file
+-- @name AceConfigTab-3.0
+-- @release $Id$
 
 local MAJOR, MINOR = "AceConfigTab-3.0", 1
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
