@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDBOptions-3.0
 -- @release $Id$
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 7
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 8
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -157,13 +157,12 @@ end
 local defaultProfiles
 local tmpprofiles = {}
 
---[[
-	getProfileList(db, common, nocurrent)
-	
-	db - the db object to retrieve the profiles from
-	common (boolean) - if common is true, getProfileList will add the default profiles to the return list, even if they have not been created yet
-	nocurrent (boolean) - if true then getProfileList will not display the current profile in the list
-]]--
+-- Get a list of available profiles for the specified database.
+-- You can specify which profiles to include/exclude in the list using the two boolean parameters listed below.
+-- @param db The db object to retrieve the profiles from
+-- @param common If true, getProfileList will add the default profiles to the return list, even if they have not been created yet
+-- @param nocurrent If true, then getProfileList will not display the current profile in the list
+-- @return Hashtable of all profiles with the internal name as keys and the display name as value.
 local function getProfileList(db, common, nocurrent)
 	local profiles = {}
 	
@@ -346,12 +345,11 @@ local optionsTable = {
 	},
 }
 
---[[
-	GetOptionsTable(db)
-	db - the database object to create the options table for
-	
-	creates and returns a option table to be used in your addon
-]]
+--- Get/Create a option table that you can use in your addon to control the profiles of AceDB-3.0.
+-- @param db The database object to create the options table for.
+-- @return The options table to be used in AceConfig-3.0
+-- @usage Assuming ''options'' is your top-level options table and ''self.db'' is your database:<br/>
+-- <tt>options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)</tt>
 function AceDBOptions:GetOptionsTable(db, noDefaultProfiles)
 	local tbl = AceDBOptions.optionTables[db] or {
 			type = "group",
