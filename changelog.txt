@@ -1,3 +1,13 @@
+Ace3 Beta - Revision 722 (Jan 4th, 2009)
+--------------------------------------------
+- AceHook-3.0: Fix :SecureHookScript to not fail on previously empty scripts since frame:HookScript does nothing at all in that case. (Ticket #16)
+- AceLocale-3.0: Implement 'silent' option for :NewLocale to disable the warnings on unknown entrys (Ticket #18)
+- AceTimer-3.0: Implement :TimeLeft(handle) function (Ticket #10)
+- AceGUI-3.0: Fix TabGroup tab resizing to be consistent
+- AceGUI-3.0: Fixed EditBox alignment when the label is disabled (Ticket #13)
+- AceDB-3.0: Implement OnProfileShutdown callback (Ticket #7)
+- AceDBOptions-3.0: Updated esES and ruRU locale
+
 Ace3 Beta - Revision 706 (Oct 18th, 2008)
 --------------------------------------------
 - First Beta release after WoWAce move
