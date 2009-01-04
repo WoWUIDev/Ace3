@@ -1,9 +1,4 @@
 --- AceAddon-3.0 provides a template for creating addon objects.
--- It supports handy short-cuts for executing code on different stages during the login process,
--- OnInitialize and OnEnable, former directly after all files of the addon have been parsed, and later 
--- as soon as the player completes login (PLAYER_LOGIN event).
--- @class file
--- @name AceAddon-3.0.lua
 -- @release $Id$
 local MAJOR, MINOR = "AceAddon-3.0", 5
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
@@ -76,14 +71,12 @@ local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule,
 -- used in the addon metatable
 local function addontostring( self ) return self.name end 
 
---- Create a new AddOn object and return the reference to it (a table).
--- @param objectorname Name of the new Addon Object (string), or alternatively a table to base the addon on (see usage)
--- @param ... A list of libraries to embed (string)
--- @usage Basic Example - MyAddon object which embeds AceEvent-3.0:
--- <pre>MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon", "AceEvent-3.0")</pre><br/>
--- Providing a base table:
--- <pre>local MyFrame = CreateFrame("Frame")<br/>
--- local MyAdvancedAddon = LibStub("AceAddon-3.0"):NewAddon(MyFrame, "MyAdvancedAddon", "AceEvent-3.0")</pre>
+-- AceAddon:NewAddon( [object, ]name, [lib, lib, lib, ...] ) 
+-- [object] (table) - table to use as the base for the addon
+-- name (string) - unique addon object name
+-- [lib] (string) - optional libs to embed in the addon object
+--
+-- returns the addon object when succesful
 function AceAddon:NewAddon(objectorname, ...)
 	local object,name
 	local i=1

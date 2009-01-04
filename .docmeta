@@ -1,3 +1,0 @@
-type: luadoc
-input-files: "Ace*/Ace*.lua"
-output-directory: API
