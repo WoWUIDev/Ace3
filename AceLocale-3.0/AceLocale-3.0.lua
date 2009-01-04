@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceLocale-3.0
 -- @release $Id$
-local MAJOR,MINOR = "AceLocale-3.0", 1
+local MAJOR,MINOR = "AceLocale-3.0", 2
 
 local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -18,14 +18,23 @@ AceLocale.appnames = AceLocale.appnames or {}  -- array of [localetableref]="App
 
 -- This metatable is used on all tables returned from GetLocale
 local readmeta = {
-	__index = function(self, key)	-- requesting totally unknown entries: fire off a nonbreaking error and return key
+	__index = function(self, key) -- requesting totally unknown entries: fire off a nonbreaking error and return key
+		rawset(self, key, key)      -- only need to see the warning once, really
 		geterrorhandler()(MAJOR..": "..tostring(AceLocale.appnames[self])..": Missing entry for '"..tostring(key).."'")
-		rawset(self, key, key)	-- only need to see the warning once, really
+		return key
+	end
+}
+
+-- This metatable is used on all tables returned from GetLocale if the silent flag is true, it does not issue a warning on unknown keys
+local readmetasilent = {
+	__index = function(self, key) -- requesting totally unknown entries: return key
+		rawset(self, key, key)      -- only need to invoke this function once
 		return key
 	end
 }
 
 -- Remember the locale table being registered right now (it gets set by :NewLocale())
+-- NOTE: Do never try to register 2 locale tables at once and mix their definition.
 local registering
 
 -- local assert false function
@@ -62,8 +71,12 @@ local writedefaultproxy = setmetatable({}, {
 --  isDefault (string)    - if this is the default locale being registered
 --
 -- Returns a table where localizations can be filled out, or nil if the locale is not needed
-function AceLocale:NewLocale(application, locale, isDefault)
-
+function AceLocale:NewLocale(application, locale, isDefault, silent)
+	
+	if silent and not isDefault then
+		error("Usage: NewLocale(application, locale[, isDefault[, silent]]): 'silent' can only be specified for the default locale", 2)
+	end
+	
 	-- GAME_LOCALE allows translators to test translations of addons without having that wow client installed
 	-- Ammo: I still think this is a bad idea, for instance an addon that checks for some ingame string will fail, just because some other addon
 	-- gives the user the illusion that they can run in a different locale? Ditch this whole thing or allow a setting per 'application'. I'm of the
@@ -77,12 +90,12 @@ function AceLocale:NewLocale(application, locale, isDefault)
 	local app = AceLocale.apps[application]
 	
 	if not app then
-		app = setmetatable({}, readmeta)
+		app = setmetatable({}, silent and readmetasilent or readmeta)
 		AceLocale.apps[application] = app
 		AceLocale.appnames[app] = application
 	end
 
-	registering = app	-- remember globally for writeproxy and writedefaultproxy
+	registering = app -- remember globally for writeproxy and writedefaultproxy
 	
 	if isDefault then
 		return writedefaultproxy
