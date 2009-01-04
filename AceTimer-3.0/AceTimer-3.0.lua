@@ -22,7 +22,7 @@
 	- ALLOWS unscheduling ANY timer (including the current running one) at any time, including during OnUpdate processing
 ]]
 
-local MAJOR, MINOR = "AceTimer-3.0", 4
+local MAJOR, MINOR = "AceTimer-3.0", 5
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -130,7 +130,7 @@ local function OnUpdate()
 		local curbucket = (curint % BUCKETS)+1
 		-- Yank the list of timers out of the bucket and empty it. This allows reinsertion in the currently-processed bucket from callbacks.
 		local nexttimer = hash[curbucket]
-		hash[curbucket] = false	-- false rather than nil to prevent the array from becoming a hash
+		hash[curbucket] = false -- false rather than nil to prevent the array from becoming a hash
 
 		while nexttimer do
 			local timer = nexttimer
@@ -269,7 +269,7 @@ end
 
 function AceTimer:CancelTimer(handle, silent)
 	if not handle then return end -- nil handle -> bail out without erroring
-	if type(handle)~="string" then
+	if type(handle) ~= "string" then
 		error(MAJOR..": CancelTimer(handle): 'handle' - expected a string", 2)	-- for now, anyway
 	end
 	local selftimers = AceTimer.selfs[self]
@@ -302,23 +302,43 @@ end
 --
 -- Cancels all timers registered to given 'self'
 function AceTimer:CancelAllTimers()
-	if not(type(self)=="string" or type(self)=="table") then
+	if not(type(self) == "string" or type(self) == "table") then
 		error(MAJOR..": CancelAllTimers(): 'self' - must be a string or a table",2)
 	end
-	if self==AceTimer then
+	if self == AceTimer then
 		error(MAJOR..": CancelAllTimers(): supply a meaningful 'self'", 2)
 	end
 	
 	local selftimers = AceTimer.selfs[self]
 	if selftimers then
 		for handle,v in pairs(selftimers) do
-			if type(v)=="table" then	-- avoid __ops, etc
+			if type(v) == "table" then  -- avoid __ops, etc
 				AceTimer.CancelTimer(self, handle, true)
 			end
 		end
 	end
 end
 
+
+-----------------------------------------------------------------------
+-- AceTimer:TimeLeft(timer)
+--
+-- handle - Opaque object given by ScheduleTimer
+--
+-- Returns the time left for a timer with the given handle, registered by the same 'self' as given in ScheduleTimer
+function AceTimer:TimeLeft(handle)
+	if not handle then return end
+	if type(handle) ~= "string" then
+		error(MAJOR..": TimeLeft(handle): 'handle' - expected a string", 2)    -- for now, anyway
+	end
+	local selftimers = AceTimer.selfs[self]
+	local timer = selftimers and selftimers[handle]
+	if not timer then
+		geterrorhandler()(MAJOR..": TimeLeft(handle): '"..tostring(handle).."' - no such timer registered")
+		return false
+	end
+	return timer.when - GetTime()
+end
 
 
 -----------------------------------------------------------------------
@@ -376,7 +396,8 @@ AceTimer.embeds = AceTimer.embeds or {}
 
 local mixins = {
 	"ScheduleTimer", "ScheduleRepeatingTimer", 
-	"CancelTimer", "CancelAllTimers"
+	"CancelTimer", "CancelAllTimers",
+	"TimeLeft"
 }
 
 function AceTimer:Embed(target)
