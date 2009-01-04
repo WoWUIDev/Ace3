@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDB-3.0
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 8
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 9
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -357,6 +357,9 @@ function DBObjectLib:SetProfile(name)
 	
 	local oldProfile = self.profile
 	local defaults = self.defaults and self.defaults.profile
+	
+	-- Callback: OnProfileShutdown, database
+	self.callbacks:Fire("OnProfileShutdown", self)
 	
 	if oldProfile and defaults then
 		-- Remove the defaults from the old profile
