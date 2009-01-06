@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDBOptions-3.0
 -- @release $Id$
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 9
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 10
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -248,6 +248,11 @@ function OptionsHandlerPrototype:ListProfiles(info)
 	return profiles
 end
 
+function OptionsHandlerPrototype:HasNoProfiles(info)
+	local profiles = self:ListProfiles(info)
+	return ((not next(profiles)) and true or false)
+end
+
 --[[ Copy a profile ]]
 function OptionsHandlerPrototype:CopyProfile(info, value)
 	self.db:CopyProfile(value)
@@ -341,6 +346,7 @@ local optionsTable = {
 		get = false,
 		set = "CopyProfile",
 		values = "ListProfiles",
+		disabled = "HasNoProfiles",
 		arg = "nocurrent",
 	},
 	deldesc = {
@@ -356,6 +362,7 @@ local optionsTable = {
 		get = false,
 		set = "DeleteProfile",
 		values = "ListProfiles",
+		disabled = "HasNoProfiles",
 		arg = "nocurrent",
 		confirm = true,
 		confirmText = L["delete_confirm"],
