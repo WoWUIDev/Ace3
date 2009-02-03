@@ -1,9 +1,9 @@
---- AceAddon-3.0 provides a template for creating addon objects.
+--- '''AceAddon-3.0''' provides a template for creating addon objects.
 -- It'll provide you with a set of callback functions that allow you to simplify the loading
--- process of your addon. Callbacks provided are `OnInitialize`, which is called directly after the
--- addon is fully loaded, `OnEnable` which gets called during the PLAYER_LOGIN event, when most of the
--- data provided by the game is already present, and `OnDisable`, which is only called when your addon
--- is manually being disabled.
+-- process of your addon. Callbacks provided are:<br> 
+-- - '''OnInitialize''', which is called directly after the addon is fully loaded.<br>
+-- - '''OnEnable''' which gets called during the PLAYER_LOGIN event, when most of the data provided by the game is already present.<br>
+-- - '''OnDisable''', which is only called when your addon is manually being disabled.<br>
 -- @class file
 -- @name AceAddon-3.0.lua
 -- @release $Id$
@@ -132,7 +132,7 @@ end
 
 
 --- Get the addon object by its name from the internal AceAddon registry.
--- throws an error if the addon object cannot be found (except if silent is set)
+-- Throws an error if the addon object cannot be found (except if silent is set).
 -- @param name unique name of the addon object
 -- @param silent if true, the addon is optional, silently return nil if its not found
 -- @usage 
@@ -179,7 +179,7 @@ function AceAddon:EmbedLibrary(addon, libname, silent, offset)
 end
 
 --- Return the specified module from an addon object.
--- throws an error if the addon object cannot be found (except if silent is set)
+-- Throws an error if the addon object cannot be found (except if silent is set)
 -- @paramsig name[, silent]
 -- @param name unique name of the module
 -- @param silent if true, the module is optional, silently return nil if its not found (optional)
@@ -199,7 +199,7 @@ end
 local function IsModuleTrue(self) return true end
 
 --- Create a new module for the addon.
--- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module
+-- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module.<br>
 -- A module has the same functionality as a real addon, it can have modules of its own, and has the same API as
 -- an addon object.
 -- @paramsig name[, prototype|lib[, lib, ...]]
@@ -263,7 +263,7 @@ end
 
 --- Enables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:EnableAddon(), thus dispatching a OnEnable callback
--- and enabling all modules of the addon (unless explicitly disabled)
+-- and enabling all modules of the addon (unless explicitly disabled).<br>
 -- :Enable() also sets the internal `enableState` variable to true
 -- @paramsig 
 -- @usage 
@@ -279,7 +279,7 @@ end
 
 --- Disables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:DisableAddon(), thus dispatching a OnDisable callback
--- and disabling all modules of the addon.
+-- and disabling all modules of the addon.<br>
 -- :Disable() also sets the internal `enableState` variable to false
 -- @paramsig 
 -- @usage 
@@ -392,7 +392,7 @@ function SetDefaultModulePrototype(self, prototype)
 end
 
 --- Set the state of an addon or module
--- This should only be caleld before any enabling actually happend, aka in/before OnInitialize
+-- This should only be caleld before any enabling actually happend, aka in/before OnInitialize.
 -- @paramsig state
 -- @param state the state of an addon or module  (enabled=true, disabled=false)
 function SetEnabledState(self, state)
@@ -461,8 +461,8 @@ end
 
 --- Initialize the addon after creation.
 -- Note: This function is only used internally during the ADDON_LOADED event
--- It will call the `OnInitialize` function on the addon object (if present), 
--- and the `OnEmbedInitialize` function on all embeded libraries.
+-- It will call the '''OnInitialize''' function on the addon object (if present), 
+-- and the '''OnEmbedInitialize''' function on all embeded libraries. <br>
 -- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- @param addon addon object to intialize
 function AceAddon:InitializeAddon(addon)
@@ -481,9 +481,9 @@ end
 --- Enable the addon after creation.
 -- Note: This function is only used internally during the PLAYER_LOGIN event, or during ADDON_LOADED,
 -- if IsLoggedIn() already returns true at that point, e.g. for LoD Addons.
--- It will call the `OnEnabled` function on the addon object (if present), 
--- and the `OnEmbedEnable` function on all embeded libraries.
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.
+-- It will call the '''OnEnable''' function on the addon object (if present), 
+-- and the '''OnEmbedEnable''' function on all embeded libraries.<br>
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.<br>
 -- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- @param addon addon object to enable
 function AceAddon:EnableAddon(addon)
@@ -513,9 +513,9 @@ end
 
 --- Disable the addon
 -- Note: This function is only used internally.
--- It will call the `OnDisable` function on the addon object (if present), 
--- and the `OnEmbedDisable` function on all embeded libraries.
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.
+-- It will call the '''OnDisable''' function on the addon object (if present), 
+-- and the '''OnEmbedDisable''' function on all embeded libraries.<br>
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.<br>
 -- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- @param addon addon object to enable
 function AceAddon:DisableAddon(addon)
