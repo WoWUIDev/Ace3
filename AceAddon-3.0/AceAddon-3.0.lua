@@ -1,4 +1,11 @@
 --- AceAddon-3.0 provides a template for creating addon objects.
+-- It'll provide you with a set of callback functions that allow you to simplify the loading
+-- process of your addon. Callbacks provided are `OnInitialize`, which is called directly after the
+-- addon is fully loaded, `OnEnable` which gets called during the PLAYER_LOGIN event, when most of the
+-- data provided by the game is already present, and `OnDisable`, which is only called when your addon
+-- is manually being disabled.
+-- @class file
+-- @name AceAddon-3.0.lua
 -- @release $Id$
 local MAJOR, MINOR = "AceAddon-3.0", 5
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
