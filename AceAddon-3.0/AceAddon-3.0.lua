@@ -146,7 +146,7 @@ function AceAddon:GetAddon(name, silent)
 	return self.addons[name]
 end
 
---- Embed a list of libraries into the specified addon
+--- Embed a list of libraries into the specified addon.
 -- Note: This function is for internal use by :NewAddon/:NewModule
 -- @paramsig addon, [lib, ...]
 -- @param addon addon object to embed the libs in
@@ -158,7 +158,7 @@ function AceAddon:EmbedLibraries(addon, ...)
 	end
 end
 
---- Embed a library into the addon object
+--- Embed a library into the addon object.
 -- Note: This function is for internal use by :EmbedLibraries
 -- @paramsig addon, libname[, silent[, offset]]
 -- @param addon addon object to embed the library in
@@ -198,7 +198,7 @@ end
 
 local function IsModuleTrue(self) return true end
 
---- Create a new module for the addon
+--- Create a new module for the addon.
 -- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module
 -- A module has the same functionality as a real addon, it can have modules of its own, and has the same API as
 -- an addon object.
@@ -261,7 +261,7 @@ function GetName(self)
 	return self.moduleName or self.name
 end
 
---- Enables the Addon, if possible, return true or false depending on success
+--- Enables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:EnableAddon(), thus dispatching a OnEnable callback
 -- and enabling all modules of the addon (unless explicitly disabled)
 -- :Enable() also sets the internal `enableState` variable to true
@@ -277,7 +277,7 @@ function Enable(self)
 	return AceAddon:EnableAddon(self)
 end
 
---- Disables the Addon, if possible, return true or false depending on success
+--- Disables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:DisableAddon(), thus dispatching a OnDisable callback
 -- and disabling all modules of the addon.
 -- :Disable() also sets the internal `enableState` variable to false
@@ -292,7 +292,7 @@ function Disable(self)
 	return AceAddon:DisableAddon(self)
 end
 
---- Enables the Module, if possible, return true or false depending on success
+--- Enables the Module, if possible, return true or false depending on success.
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Enable` on the module object.
 -- @paramsig name
 -- @usage 
@@ -311,7 +311,7 @@ function EnableModule(self, name)
 	return module:Enable()
 end
 
---- Disables the Module, if possible, return true or false depending on success
+--- Disables the Module, if possible, return true or false depending on success.
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Disable` on the module object.
 -- @paramsig name
 -- @usage 
@@ -348,7 +348,7 @@ function SetDefaultModuleLibraries(self, ...)
 	self.defaultModuleLibraries = {...}
 end
 
---- Set the default state in which new modules are being created
+--- Set the default state in which new modules are being created.
 -- Note that you can only change the default state before any module is created.
 -- @paramsig state
 -- @param state Default state for new modules, true for enabled, false for disabled
@@ -400,7 +400,7 @@ function SetEnabledState(self, state)
 end
 
 
---- Return an iterator of all modules associated to the addon
+--- Return an iterator of all modules associated to the addon.
 -- @paramsig 
 -- @usage 
 -- -- Enable all modules
@@ -415,7 +415,7 @@ local function IterateModules(self) return pairs(self.modules) end
 -- @return Iterator of all embeded libraries
 local function IterateEmbeds(self) return pairs(AceAddon.embeds[self]) end
 
---- Query the enabledState of an addon
+--- Query the enabledState of an addon.
 -- @paramsig 
 -- @usage 
 -- if MyAddon:IsEnabled() then
@@ -459,7 +459,7 @@ function Embed(target)
 end
 
 
---- Initialize the addon after creation
+--- Initialize the addon after creation.
 -- Note: This function is only used internally during the ADDON_LOADED event
 -- It will call the `OnInitialize` function on the addon object (if present), 
 -- and the `OnEmbedInitialize` function on all embeded libraries.
@@ -478,7 +478,7 @@ function AceAddon:InitializeAddon(addon)
 	-- from the event handler and only done _once_
 end
 
---- Enable the addon after creation
+--- Enable the addon after creation.
 -- Note: This function is only used internally during the PLAYER_LOGIN event, or during ADDON_LOADED,
 -- if IsLoggedIn() already returns true at that point, e.g. for LoD Addons.
 -- It will call the `OnEnabled` function on the addon object (if present), 
@@ -546,7 +546,7 @@ end
 --The next few funcs are just because no one should be reaching into the internal registries
 --Thoughts?
 
---- Get an iterator over all registered addons
+--- Get an iterator over all registered addons.
 -- @usage 
 -- -- Print a list of all installed AceAddon's
 -- for name, addon in AceAddon:IterateAddons() do
@@ -555,7 +555,7 @@ end
 -- @return Iterator over all addons (pairs)
 function AceAddon:IterateAddons() return pairs(self.addons) end
 
---- Get an iterator over the internal status registry
+--- Get an iterator over the internal status registry.
 -- @usage 
 -- -- Print a list of all enabled addons
 -- for name, status in AceAddon:IterateAddonStatus() do
