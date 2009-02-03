@@ -135,7 +135,7 @@ end
 -- throws an error if the addon object cannot be found (except if silent is set)
 -- @param name unique name of the addon object
 -- @param silent if true, the addon is optional, silently return nil if its not found
--- @usage
+-- @usage 
 -- -- Get the Addon
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- @return The addon object, if found
@@ -183,7 +183,7 @@ end
 -- @paramsig name[, silent]
 -- @param name unique name of the module
 -- @param silent if true, the module is optional, silently return nil if its not found (optional)
--- @usage
+-- @usage 
 -- -- Get the Addon
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- -- Get the Module
@@ -206,7 +206,7 @@ local function IsModuleTrue(self) return true end
 -- @param name unique name of the module
 -- @param prototype object to derive this module from, methods and values from this table will be mixed into the module (optional)
 -- @param lib List of libraries to embed into the addon
--- @usage
+-- @usage 
 -- -- Create a module with some embeded libraries
 -- MyModule = MyAddon:NewModule("MyModule", "AceEvent-3.0", "AceHook-3.0")
 -- 
@@ -252,8 +252,8 @@ function NewModule(self, name, prototype, ...)
 end
 
 --- Returns the real name of the addon or module, without any prefix.
--- @paramsig
--- @usage
+-- @paramsig 
+-- @usage 
 -- print(MyAddon:GetName())
 -- -- prints "MyAddon"
 -- @return The name of the addon or module
@@ -265,8 +265,8 @@ end
 -- This internally calls AceAddon:EnableAddon(), thus dispatching a OnEnable callback
 -- and enabling all modules of the addon (unless explicitly disabled)
 -- :Enable() also sets the internal `enableState` variable to true
--- @paramsig
--- @usage
+-- @paramsig 
+-- @usage 
 -- -- Enable MyModule
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyModule = MyAddon:GetModule("MyModule")
@@ -281,8 +281,8 @@ end
 -- This internally calls AceAddon:DisableAddon(), thus dispatching a OnDisable callback
 -- and disabling all modules of the addon.
 -- :Disable() also sets the internal `enableState` variable to false
--- @paramsig
--- @usage
+-- @paramsig 
+-- @usage 
 -- -- Disable MyAddon
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyAddon:Disable()
@@ -295,7 +295,7 @@ end
 --- Enables the Module, if possible, return true or false depending on success
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Enable` on the module object.
 -- @paramsig name
--- @usage
+-- @usage 
 -- -- Enable MyModule using :GetModule
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyModule = MyAddon:GetModule("MyModule")
@@ -314,7 +314,7 @@ end
 --- Disables the Module, if possible, return true or false depending on success
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Disable` on the module object.
 -- @paramsig name
--- @usage
+-- @usage 
 -- -- Disable MyModule using :GetModule
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyModule = MyAddon:GetModule("MyModule")
@@ -334,7 +334,7 @@ end
 -- Note that you can only change the default module libraries before any module is created.
 -- @paramsig lib[, lib, ...]
 -- @param lib List of libraries to embed into the addon
--- @usage
+-- @usage 
 -- -- Create the addon object
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon")
 -- -- Configure default libraries for modules (all modules need AceEvent-3.0)
@@ -352,7 +352,7 @@ end
 -- Note that you can only change the default state before any module is created.
 -- @paramsig state
 -- @param state Default state for new modules, true for enabled, false for disabled
--- @usage
+-- @usage 
 -- -- Create the addon object
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon")
 -- -- Set the default state to "disabled"
@@ -371,7 +371,7 @@ end
 -- Note that you can only change the default prototype before any module is created.
 -- @paramsig prototype
 -- @param prototype Default prototype for the new modules (table)
--- @usage
+-- @usage 
 -- -- Define a prototype
 -- local prototype = { OnEnable = function(self) print("OnEnable called!") end }
 -- -- Set the default prototype
@@ -401,8 +401,8 @@ end
 
 
 --- Return an iterator of all modules associated to the addon
--- @paramsig
--- @usage
+-- @paramsig 
+-- @usage 
 -- -- Enable all modules
 -- for name, module in MyAddon:IterateModules() do
 --    module:Enable()
@@ -411,13 +411,13 @@ end
 local function IterateModules(self) return pairs(self.modules) end
 
 -- Returns an iterator of all embeds in the addon
--- @paramsig
+-- @paramsig 
 -- @return Iterator of all embeded libraries
 local function IterateEmbeds(self) return pairs(AceAddon.embeds[self]) end
 
 --- Query the enabledState of an addon
--- @paramsig
--- @usage
+-- @paramsig 
+-- @usage 
 -- if MyAddon:IsEnabled() then
 --     MyAddon:Disable()
 -- end
@@ -547,7 +547,7 @@ end
 --Thoughts?
 
 --- Get an iterator over all registered addons
--- @usage
+-- @usage 
 -- -- Print a list of all installed AceAddon's
 -- for name, addon in AceAddon:IterateAddons() do
 --   print("Addon: " .. name)
@@ -556,7 +556,7 @@ end
 function AceAddon:IterateAddons() return pairs(self.addons) end
 
 --- Get an iterator over the internal status registry
--- @usage
+-- @usage 
 -- -- Print a list of all enabled addons
 -- for name, status in AceAddon:IterateAddonStatus() do
 --   if status then
