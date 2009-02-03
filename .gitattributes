@@ -1,4 +1,5 @@
 * text=auto !eol
+/.docmeta -text
 /.pkgmeta -text
 /LICENSE.txt svneol=native#text/plain
 benchs/Bench-AceTimer-3.0/Bench-AceTimer-3.0.toc svneol=native#text/plain
