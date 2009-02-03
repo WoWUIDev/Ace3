@@ -17,7 +17,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 6
+local MAJOR, MINOR = "AceConfigCmd-3.0", 7
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -222,7 +222,7 @@ local function showhelp(info, inputpos, tab, noHead)
 			if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
 				print("  "..(desc or name)..":")
 				showhelp(info, inputpos, v, true)
-			else
+			elseif v.type ~= "description" and v.type ~= "header" then
 				print("  |cffffff78"..k.."|r - "..(desc or name or ""))
 			end
 		end
