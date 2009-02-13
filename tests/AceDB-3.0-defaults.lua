@@ -222,3 +222,24 @@ do
 	assert(data2.profile.stuff2.blu.stuff == 5)
 	assert(data2.profile.stuff2.blu.stuff2.b.a == 4)
 end 
+
+do
+	local defaultTest = {
+		profile = {
+			boo = {
+				[true] = "true",
+				[false] = "false",
+			},
+		}
+	}
+	
+	local bugdb = {}
+	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+	data.profile.boo[true] = "not so true"
+	data.profile.boo[false] = "not so false"
+	WoWAPI_FireEvent("PLAYER_LOGOUT")
+	
+	local data2 = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+	assert(data2.profile.boo[true] == "not so true")
+	assert(data2.profile.boo[false] == "not so false")
+end 

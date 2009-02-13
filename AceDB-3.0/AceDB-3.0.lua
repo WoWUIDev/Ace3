@@ -101,7 +101,7 @@ local function removeDefaults(db, defaults, blocker)
 						if defaults[key] == nil and (not blocker or blocker[key] == nil) then
 							removeDefaults(value, v)
 							-- if the table is empty afterwards, remove it
-							if not next(value) then
+							if next(value) == nil then
 								db[key] = nil
 							end
 						-- if it was specified, only strip ** content, but block values which were set in the key table
@@ -121,7 +121,7 @@ local function removeDefaults(db, defaults, blocker)
 		elseif type(v) == "table" and type(db[k]) == "table" then
 			-- if a blocker was set, dive into it, to allow multi-level defaults
 			removeDefaults(db[k], v, blocker and blocker[k])
-			if not next(db[k]) then
+			if next(db[k]) == nil then
 				db[k] = nil
 			end
 		else
