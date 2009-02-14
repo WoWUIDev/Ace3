@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 25
+local MAJOR, MINOR = "AceConfigDialog-3.0", 26
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -582,6 +582,7 @@ local function confirmPopup(appName, rootframe, basepath, info, message, func, .
 		if dialog and oldstrata then
 			dialog:SetFrameStrata(oldstrata)
 		end
+		lib:Open(appName, rootframe, basepath and unpack(basepath))
 		del(info)
 	end
 	for i = 1, select('#', ...) do
