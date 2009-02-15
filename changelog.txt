@@ -1,4 +1,4 @@
-Ace3 Beta - Revision 738 (Feb 15th, 2009)
+Ace3 Beta - Revision 741 (Feb 15th, 2009)
 --------------------------------------------
 - AceDBOptions-3.0: Disable the "Copy From" and "Delete" dropdowns if there are no profiles to choose from. (Ticket #19)
 - AceGUI-3.0: Improve TabGroup visual style - only stretch them to the full width if they would use more then 75% of the exisiting space.
