@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 16
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 17
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -381,8 +381,21 @@ do
 --		end
 	end
 	
-	WidgetContainerBase.AddChild = function(self, child)
-		tinsert(self.children,child)
+	WidgetContainerBase.AddChild = function(self, child, previousWidget)
+		if previousWidget == 1 then
+			tinsert(self.children, 1, child)
+		elseif previousWidget then
+			local siblingIndex = 1
+			for _, widget in pairs(self.children) do
+				if widget == previousWidget then
+					break
+				end
+				siblingIndex = siblingIndex + 1 
+			end
+			tinsert(self.children, siblingIndex + 1, child)
+		else
+			tinsert(self.children, child)
+		end
 		child:SetParent(self)
 		child.frame:Show()
 		self:DoLayout()
