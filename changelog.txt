@@ -1,3 +1,12 @@
+Ace3 Beta - Revision 738 (Feb 15th, 2009)
+--------------------------------------------
+- AceDBOptions-3.0: Disable the "Copy From" and "Delete" dropdowns if there are no profiles to choose from. (Ticket #19)
+- AceGUI-3.0: Improve TabGroup visual style - only stretch them to the full width if they would use more then 75% of the exisiting space.
+- AceGUI-3.0: Added a third optional argument to <container>:AddChild() to specify the position for the new widget. (Ticket #22)
+- AceConfigCmd-3.0: Improve help output when viewing groups.
+- AceConfigDialog-3.0: Refresh the Options Panel after a confirmation is canceled to reset the value to its previous value. (Ticket #23)
+- AceDB-3.0: Fix a data inconsistency when using false as a table key. (Ticket #25)
+
 Ace3 Beta - Revision 722 (Jan 4th, 2009)
 --------------------------------------------
 - AceHook-3.0: Fix :SecureHookScript to not fail on previously empty scripts since frame:HookScript does nothing at all in that case. (Ticket #16)
