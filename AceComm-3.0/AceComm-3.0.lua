@@ -11,7 +11,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 
 ]]
 
-local MAJOR, MINOR = "AceComm-3.0", 4
+local MAJOR, MINOR = "AceComm-3.0", 5
 	
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -114,7 +114,7 @@ end
 ----------------------------------------
 
 do
-	local compost = setmetatable({}, {__mode=="k"})
+	local compost = setmetatable({}, {__mode = "k"})
 	local function new()
 		local t = next(compost)
 		if t then 
@@ -143,7 +143,7 @@ do
 		end
 		--]]
 		
-		spool[key] = message	-- plain string for now
+		spool[key] = message  -- plain string for now
 	end
 
 	function AceComm:OnReceiveMultipartNext(prefix, message, distribution, sender)
@@ -159,9 +159,9 @@ do
 		if type(olddata)~="table" then
 			-- ... but what we have is not a table. So make it one. (Pull a composted one if available)
 			local t = new()
-			t[1] = olddata		-- add old data as first string
-			t[2] = message      -- and new message as second string
-			spool[key] = t		-- and put the table in the spool instead of the old string
+			t[1] = olddata    -- add old data as first string
+			t[2] = message    -- and new message as second string
+			spool[key] = t    -- and put the table in the spool instead of the old string
 		else
 			tinsert(olddata, message)
 		end
@@ -179,11 +179,11 @@ do
 
 		spool[key] = nil
 		
-		if type(olddata)=="table" then
+		if type(olddata) == "table" then
 			-- if we've received a "next", the spooled data will be a table for rapid & garbage-free tconcat
 			tinsert(olddata, message)
 			AceComm.callbacks:Fire(prefix, tconcat(olddata, ""), distribution, sender)
-			compost[olddata]=true
+			compost[olddata] = true
 		else
 			-- if we've only received a "first", the spooled data will still only be a string
 			AceComm.callbacks:Fire(prefix, olddata..message, distribution, sender)
