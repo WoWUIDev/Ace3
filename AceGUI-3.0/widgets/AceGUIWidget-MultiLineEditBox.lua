@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 7
+local Version = 8
 ---------------------
 -- Common Elements --
 ---------------------
@@ -101,7 +101,7 @@ do
 			self:Fire("OnEnterPressed",name)
 			ClearCursor()
 		end
-		self.button:Disable()
+		--self.button:Disable()
 		AceGUI:ClearFocus()
 	end
 	
@@ -193,10 +193,10 @@ do
 		scrollframe.obj = self
 		self.scrollframe = scrollframe
 		
-		local scrollchild = CreateFrame("Frame", nil, scrollframe)
-		scrollframe:SetScrollChild(scrollchild)
-		scrollchild:SetHeight(2)
-		scrollchild:SetWidth(2)
+		--local scrollchild = CreateFrame("Frame", nil, scrollframe)
+		--scrollframe:SetScrollChild(scrollchild)
+		--scrollchild:SetHeight(2)
+		--scrollchild:SetWidth(2)
 	
 		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
 		label:SetPoint("TOPLEFT",frame,"TOPLEFT",0,-2)
@@ -205,10 +205,11 @@ do
 		label:SetHeight(18)
 		self.label = label
 			
-		local editbox = CreateFrame("EditBox", nil, scrollchild)
+		local editbox = CreateFrame("EditBox", nil, scrollframe)
 		self.editbox = editbox
 		editbox.obj = self
 		editbox:SetPoint("TOPLEFT")
+		editbox:SetPoint("BOTTOMLEFT")
 		editbox:SetHeight(50)
 		editbox:SetWidth(50)
 		editbox:SetMultiLine(true)
@@ -217,6 +218,7 @@ do
 		editbox:EnableMouse(true)
 		editbox:SetAutoFocus(false)
 		editbox:SetFontObject(ChatFontNormal)
+		scrollframe:SetScrollChild(editbox)
 
 		local button = CreateFrame("Button",nil,scrollframe,"UIPanelButtonTemplate")
 		button:SetWidth(80)
@@ -238,8 +240,8 @@ do
 		editbox:SetScript("OnLeave", function(this) this.obj:Fire("OnLeave") end)
 		
 		local function FixSize()
-			scrollchild:SetHeight(scrollframe:GetHeight())
-			scrollchild:SetWidth(scrollframe:GetWidth())
+			--scrollchild:SetHeight(scrollframe:GetHeight())
+			--scrollchild:SetWidth(scrollframe:GetWidth())
 			editbox:SetWidth(scrollframe:GetWidth())
 		end
 		scrollframe:SetScript("OnShow", FixSize)
@@ -250,9 +252,9 @@ do
 			scrollframe:UpdateScrollChildRect()
 			local value = editbox:GetText()
 			if value ~= self.lasttext then
-			self:Fire("OnTextChanged", value)
-			self.lasttext = value
-			self.button:Enable()
+				self:Fire("OnTextChanged", value)
+				self.lasttext = value
+				self.button:Enable()
 			end
 		end)
 	
@@ -263,36 +265,36 @@ do
 			local cursorOffset, cursorHeight
 			local idleTime
 			local function FixScroll(_, elapsed)
-			if cursorOffset and cursorHeight then
-				idleTime = 0
-				local height = scrollframe:GetHeight()
-				local range = scrollframe:GetVerticalScrollRange()
-				local scroll = scrollframe:GetVerticalScroll()
-				local size = height + range
-				cursorOffset = -cursorOffset
-				while cursorOffset < scroll do
-				scroll = scroll - (height / 2)
-				if scroll < 0 then scroll = 0 end
-				scrollframe:SetVerticalScroll(scroll)
+				if cursorOffset and cursorHeight then
+					idleTime = 0
+					local height = scrollframe:GetHeight()
+					local range = scrollframe:GetVerticalScrollRange()
+					local scroll = scrollframe:GetVerticalScroll()
+					local size = height + range
+					cursorOffset = -cursorOffset
+					while cursorOffset < scroll do
+						scroll = scroll - (height / 2)
+						if scroll < 0 then scroll = 0 end
+						scrollframe:SetVerticalScroll(scroll)
+					end
+					while cursorOffset + cursorHeight > scroll + height and scroll < range do
+						scroll = scroll + (height / 2)
+						if scroll > range then scroll = range end
+						scrollframe:SetVerticalScroll(scroll)
+					end
+				elseif not idleTime or idleTime > 2 then
+					frame:SetScript("OnUpdate", nil)
+					idleTime = nil
+				else
+					idleTime = idleTime + elapsed
 				end
-				while cursorOffset + cursorHeight > scroll + height and scroll < range do
-				scroll = scroll + (height / 2)
-				if scroll > range then scroll = range end
-				scrollframe:SetVerticalScroll(scroll)
-				end
-			elseif not idleTime or idleTime > 2 then
-				frame:SetScript("OnUpdate", nil)
-				idleTime = nil
-			else
-				idleTime = idleTime + elapsed
-			end
-			cursorOffset = nil
+				cursorOffset = nil
 			end
 			editbox:SetScript("OnCursorChanged", function(_, x, y, w, h)
-			cursorOffset, cursorHeight = y, h
-			if not idleTime then
-				frame:SetScript("OnUpdate", FixScroll)
-			end
+				cursorOffset, cursorHeight = y, h
+				if not idleTime then
+					frame:SetScript("OnUpdate", FixScroll)
+				end
 			end)
 		end
 	
