@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 8
+local Version = 9
 ---------------------
 -- Common Elements --
 ---------------------
