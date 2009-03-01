@@ -253,7 +253,7 @@ do
 		frame:SetParent(nil)
 		frame:SetParent(parent.content)
 		self.parent = parent
-		fixlevels(parent.frame,parent.frame:GetChildren())
+		--fixlevels(parent.frame,parent.frame:GetChildren())
 	end
 	
 	WidgetBase.SetCallback = function(self, name, func)

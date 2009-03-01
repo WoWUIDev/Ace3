@@ -226,6 +226,7 @@ do
 		button:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,2)
 		button:SetText(ACCEPT)
 		button:SetScript("OnClick", Button_OnClick)
+		button:SetFrameLevel(editbox:GetFrameLevel() + 1)
 		button:Disable()
 		button:Hide()
 		self.button = button
