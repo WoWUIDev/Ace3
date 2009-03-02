@@ -64,11 +64,12 @@ local writedefaultproxy = setmetatable({}, {
 	__index = assertfalse
 })
 
--- AceLocale:NewLocale(application, locale, isDefault)
+-- AceLocale:NewLocale(application, locale, isDefault [, silent])
 --
 --  application (string)  - unique name of addon / module
 --  locale (string)       - name of locale to register, e.g. "enUS", "deDE", etc...
---  isDefault (string)    - if this is the default locale being registered
+--  isDefault (boolean)   - if this is the default locale being registered
+--  silent (boolean)      - if true, the locale will not issue warnings for missing keys.  may only be set on the default locale
 --
 -- Returns a table where localizations can be filled out, or nil if the locale is not needed
 function AceLocale:NewLocale(application, locale, isDefault, silent)
