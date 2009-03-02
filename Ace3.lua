@@ -3,6 +3,11 @@
 -- for now only /rl to reload your UI :)
 -- note the complete overkill use of AceAddon and console, ain't it cool?
 
+-- BINDINGs labels
+BINDING_HEADER_ACE3 = "Ace3"
+BINDING_NAME_RELOADUI = "ReloadUI"
+--
+
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 local dialog = LibStub("AceConfigDialog-3.0")
