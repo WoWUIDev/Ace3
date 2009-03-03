@@ -9,8 +9,9 @@
 --    stopped, and the bucket is only listening for the next event to happen, basicly back in initial state.
 --
 -- In addition, the buckets collect information about the "arg1" argument of the events that fire, and pass those as a 
--- table to your callback. This functionality was mostly designed for the UNIT_* events. The table will have the different
--- values of "arg1" as keys, and the number of occurances as their value, e.g. { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
+-- table to your callback. This functionality was mostly designed for the UNIT_* events. <br>
+-- The table will have the different values of "arg1" as keys, and the number of occurances as their value, e.g. 
+--   { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
 -- @class file
 -- @name AceBucket-3.0.lua
 -- @release $Id$
