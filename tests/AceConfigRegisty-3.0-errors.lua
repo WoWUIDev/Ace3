@@ -80,9 +80,9 @@ opts.type=nil
 test("mytable.type")
 opts.type="group"
 
-opts.plugins.plugin1["bad key"]=true
-test("mytable.plugins.plugin1.*contained spaces")
-opts.plugins.plugin1["bad key"]=nil
+opts.plugins.plugin1["bad\tkey"]=true
+test("mytable.plugins.plugin1.*contained control characters")
+opts.plugins.plugin1["bad\tkey"]=nil
 
 opts.plugins.mybad = "hi"
 test("mytable.plugins.mybad.*expected a table")

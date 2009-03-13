@@ -17,7 +17,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 7
+local MAJOR, MINOR = "AceConfigCmd-3.0", 8
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -223,7 +223,8 @@ local function showhelp(info, inputpos, tab, noHead)
 				print("  "..(desc or name)..":")
 				showhelp(info, inputpos, v, true)
 			elseif v.type ~= "description" and v.type ~= "header" then
-				print("  |cffffff78"..k.."|r - "..(desc or name or ""))
+				local key = k:gsub(" ", "_")
+				print("  |cffffff78"..key.."|r - "..(desc or name or ""))
 			end
 		end
 	end
@@ -347,7 +348,7 @@ local function handle(info, inputpos, tab, depth, retfalse)
 					return	-- done, name was found in inline group
 				end
 			-- matching name and not a inline group
-			elseif strlower(arg)==strlower(k) then
+			elseif strlower(arg)==strlower(k:gsub(" ", "_")) then
 				info[depth+1] = k
 				return handle(info,nextpos,v,depth+1)
 			end

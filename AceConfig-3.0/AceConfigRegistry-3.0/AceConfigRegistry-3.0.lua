@@ -7,7 +7,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 6
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 7
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -160,8 +160,8 @@ local function validateKey(k,errlvl,...)
 	if type(k)~="string" then
 		err("["..tostring(k).."] - key is not a string", errlvl,...)
 	end
-	if strfind(k, "[%c \127]") then
-		err("["..tostring(k).."] - key name contained spaces (or control characters)", errlvl,...)
+	if strfind(k, "[%c\127]") then
+		err("["..tostring(k).."] - key name contained control characters", errlvl,...)
 	end
 end
 
