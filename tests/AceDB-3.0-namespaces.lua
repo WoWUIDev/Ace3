@@ -35,4 +35,7 @@ do
 	assert(namespace.profile.key1 == nil)
 	assert(namespace.profile.key2 == nil)
 	assert(namespace.profile.key3 == "stillfun")
+	
+	local ns2 = db:GetNamespace("test")
+	assert(namespace == ns2)
 end
