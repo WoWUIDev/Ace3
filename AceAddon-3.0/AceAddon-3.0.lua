@@ -209,7 +209,7 @@ local function IsModuleTrue(self) return true end
 -- @usage 
 -- -- Create a module with some embeded libraries
 -- MyModule = MyAddon:NewModule("MyModule", "AceEvent-3.0", "AceHook-3.0")
--- @usage
+-- 
 -- -- Create a module with a prototype
 -- local prototype = { OnEnable = function(self) print("OnEnable called!") end }
 -- MyModule = MyAddon:NewModule("MyModule", prototype, "AceEvent-3.0", "AceHook-3.0")
