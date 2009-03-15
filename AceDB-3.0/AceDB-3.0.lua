@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 11
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 12
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -570,11 +570,15 @@ end
 
 --- Returns an already existing namespace from the database object.
 -- @param name The name of the new namespace
-function DBObjectLib:GetNamespace(name)
+-- @param silent if true, the addon is optional, silently return nil if its not found 
+-- @usage
+-- local namespace = self.db:GetNamespace('namespace')
+-- @return the namespace object if found
+function DBObjectLib:GetNamespace(name, silent)
 	if type(name) ~= "string" then
 		error("Usage: AceDBObject:GetNamespace(name): 'name' - string expected.", 2)
 	end
-	if not (self.children and self.children[name]) then
+	if not silent and not (self.children and self.children[name]) then
 		error ("Usage: AceDBObject:GetNamespace(name): 'name' - namespace does not exist.", 2)
 	end
 	return self.children[name]
