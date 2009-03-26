@@ -5,12 +5,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 5
+	local Version = 6
 	
 	local function OnAcquire(self)
 		self:SetDisabled(false)
-		self:SetSliderValues(0,100,1)
 		self:SetIsPercent(nil)
+		self:SetSliderValues(0,100,1)
 		self:SetValue(0)
 	end
 	
@@ -30,10 +30,22 @@ do
 	end
 	
 	local function UpdateText(self)
+		local value = self.value or 0
 		if self.ispercent then
-			self.editbox:SetText((math.floor(self.value*1000+0.5)/10)..'%')
+			self.editbox:SetText(("%s%%"):format(math.floor(value*1000+0.5)/10))
 		else
-			self.editbox:SetText(math.floor(self.value*100+0.5)/100)
+			self.editbox:SetText(math.floor(value*100+0.5)/100)
+		end
+	end
+	
+	local function UpdateLabels(self)
+		local min, max = (self.min or 0), (self.max or 100)
+		if self.ispercent then
+			self.lowtext:SetFormattedText("%s%%",(min * 100))
+			self.hightext:SetFormattedText("%s%%",(max * 100))
+		else
+			self.lowtext:SetText(min)
+			self.hightext:SetText(max)
 		end
 	end
 	
@@ -105,15 +117,14 @@ do
 		self.label:SetText(text)
 	end
 	
-	local function SetSliderValues(self,min, max, step)
+	local function SetSliderValues(self, min, max, step)
 		local frame = self.slider
 		frame.setup = true
 		self.min = min
 		self.max = max
 		self.step = step
 		frame:SetMinMaxValues(min or 0,max or 100)
-		self.lowtext:SetText(min or 0)
-		self.hightext:SetText(max or 100)
+		UpdateLabels(self)
 		frame:SetValueStep(step or 1)
 		frame.setup = nil
 	end
@@ -139,6 +150,8 @@ do
 	
 	local function SetIsPercent(self, value)
 		self.ispercent = value
+		UpdateLabels(self)
+		UpdateText(self)
 	end
 	
 	local function FrameOnMouseDown(this)
