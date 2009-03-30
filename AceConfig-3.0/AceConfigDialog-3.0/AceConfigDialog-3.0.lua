@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 26
+local MAJOR, MINOR = "AceConfigDialog-3.0", 27
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -1582,6 +1582,10 @@ local function RefreshOnUpdate(this)
 		if lib.OpenFrames[appName] then
 			lib.OpenFrames[appName]:Hide()
 		end
+		if lib.BlizOptions and lib.BlizOptions[appName] then
+			local widget = lib.BlizOptions[appName]
+			widget:ReleaseChildren()
+		end
 		this.closing[appName] = nil
 	end
 	
@@ -1722,7 +1726,9 @@ local function FeedToBlizPanel(widget, event)
 end
 
 local function ClearBlizPanel(widget, event)
-	widget:ReleaseChildren()
+	local appName = widget:GetUserData('appName')
+	lib.frame.closing[appName] = true
+	lib.frame:SetScript("OnUpdate", RefreshOnUpdate)
 end
 
 function lib:AddToBlizOptions(appName, name, parent, ...)
