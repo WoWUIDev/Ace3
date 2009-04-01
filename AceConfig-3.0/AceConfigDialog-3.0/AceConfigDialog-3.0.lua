@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 27
+local MAJOR, MINOR = "AceConfigDialog-3.0", 28
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -1584,7 +1584,9 @@ local function RefreshOnUpdate(this)
 		end
 		if lib.BlizOptions and lib.BlizOptions[appName] then
 			local widget = lib.BlizOptions[appName]
-			widget:ReleaseChildren()
+			if not widget:IsVisible() then
+				widget:ReleaseChildren()
+			end
 		end
 		this.closing[appName] = nil
 	end
