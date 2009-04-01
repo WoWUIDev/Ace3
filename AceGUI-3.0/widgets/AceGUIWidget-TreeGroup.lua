@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 17
+	local Version = 18
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -113,20 +113,20 @@ do
 		status[button.uniquevalue] = not status[button.uniquevalue]
 		self:RefreshTree()
 	end
-    
-    local function EnableButtonTooltips(self, enable)
-    	self.enabletooltips = enable
-    end
-    
-    local function Button_OnEnter(this)
-    	local self = this.obj
-    	self:Fire("OnButtonEnter", this.uniquevalue, this)
-    	
-    	if self.enabletooltips then
-	        GameTooltip:SetOwner(this, "ANCHOR_NONE")
-	        GameTooltip:SetPoint("LEFT",this,"RIGHT")
-	        GameTooltip:SetText(this.text:GetText(), 1, .82, 0, 1)
-	    
+
+	local function EnableButtonTooltips(self, enable)
+		self.enabletooltips = enable
+	end
+
+	local function Button_OnEnter(this)
+		local self = this.obj
+		self:Fire("OnButtonEnter", this.uniquevalue, this)
+
+		if self.enabletooltips then
+			GameTooltip:SetOwner(this, "ANCHOR_NONE")
+			GameTooltip:SetPoint("LEFT",this,"RIGHT")
+			GameTooltip:SetText(this.text:GetText() or "", 1, .82, 0, 1)
+
 			GameTooltip:Show()
 		end
 	end
