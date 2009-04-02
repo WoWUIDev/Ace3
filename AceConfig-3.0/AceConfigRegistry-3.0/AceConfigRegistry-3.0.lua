@@ -7,7 +7,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 7
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 8
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -102,11 +102,10 @@ local typedkeys={
 		childGroups=optstring,
 	},
 	execute={
---		func={
---			["function"]=true,
---			["string"]=true, 
---			_="methodname or funcref"
---		},
+		image=optstringfunc,
+		imageCoords=optmethodtable,
+		imageHeight=optnumber,
+		imageWidth=optnumber,
 	},
 	input={
 		pattern=optstring,

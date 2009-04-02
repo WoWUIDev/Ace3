@@ -5,11 +5,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 4
+	local Version = 5
 	
 	local function OnAcquire(self)
 		self:SetText("")
 		self:SetImage(nil)
+		self:SetImageSize(64, 64)
 	end
 	
 	local function OnRelease(self)
@@ -18,7 +19,14 @@ do
 	end
 	
 	local function SetText(self, text)
-		self.label:SetText(text or "")
+		if text and text ~= "" then
+			self.label:Show()
+			self.label:SetText(text)
+			self.frame:SetHeight(self.image:GetHeight() + 25)
+		else
+			self.label:Hide()
+			self.frame:SetHeight(self.image:GetHeight() + 10)
+		end
 	end
 	
 	local function SetImage(self, path, ...)
@@ -33,6 +41,17 @@ do
 			end
 		else
 			self.imageshown = nil
+		end
+	end
+	
+	local function SetImageSize(self, width, height)
+		self.image:SetWidth(width)
+		self.image:SetHeight(height)
+		--self.frame:SetWidth(width + 30)
+		if self.label:IsShown() then
+			self.frame:SetHeight(height + 25)
+		else
+			self.frame:SetHeight(height + 10)
 		end
 	end
 	
@@ -59,6 +78,7 @@ do
 		self.SetText = SetText
 		self.frame = frame
 		self.SetImage = SetImage
+		self.SetImageSize = SetImageSize
 
 		frame.obj = self
 		
@@ -69,8 +89,8 @@ do
 		frame:SetScript("OnLeave", OnLeave)
 		frame:SetScript("OnEnter", OnEnter)
 		local label = frame:CreateFontString(nil,"BACKGROUND","GameFontHighlight")
-		label:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,10)
-		label:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,10)
+		label:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
+		label:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
 		label:SetJustifyH("CENTER")
 		label:SetJustifyV("TOP")
 		label:SetHeight(18)
@@ -80,7 +100,7 @@ do
 		self.image = image
 		image:SetWidth(64)
 		image:SetHeight(64)
-		image:SetPoint("TOP",frame,"TOP",0,-10)
+		image:SetPoint("TOP",frame,"TOP",0,-5)
 		
 		local highlight = frame:CreateTexture(nil,"OVERLAY")
 		self.highlight = highlight
