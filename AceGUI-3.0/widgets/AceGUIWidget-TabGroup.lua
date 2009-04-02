@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 17
+	local Version = 18
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -55,7 +55,8 @@ do
 	
 	local function Tab_SetText(self, text)
 		self:_SetText(text)
-		PanelTemplates_TabResize(self, 0)
+		local width = self.obj.frame.width or self.obj.frame:GetWidth() or 0
+		PanelTemplates_TabResize(self, 0, nil, width)
 	end
 	
 	local function UpdateTabLook(self)
@@ -103,6 +104,11 @@ do
 		local tab = CreateFrame("Button",tabname,self.border,"OptionsFrameTabButtonTemplate")
 		tab.obj = self
 		tab.id = id
+		
+		tab.text = _G[tabname .. "Text"]
+		tab.text:ClearAllPoints()
+		tab.text:SetPoint("LEFT", tab, "LEFT", 14, -3)
+		tab.text:SetPoint("RIGHT", tab, "RIGHT", -12, -3)
 		
 		tab:SetScript("OnClick",Tab_OnClick)
 		tab:SetScript("OnEnter",Tab_OnEnter)
@@ -218,10 +224,12 @@ do
 			if rowends[numrows-1] == numtabs-1 then
 				--if there are more than 2 tabs in the 2nd last row
 				if (numrows == 2 and rowends[numrows-1] > 2) or (rowends[numrows] - rowends[numrows-1] > 2) then
-					--move 1 tab from the second last row to the last
-					rowends[numrows-1] = rowends[numrows-1] - 1
-					rowwidths[numrows] = rowwidths[numrows] + widths[numtabs-1]
-					rowwidths[numrows-1] = rowwidths[numrows-1] - widths[numtabs-1]
+					--move 1 tab from the second last row to the last, if there is enough space
+					if (rowwidths[numrows] + widths[numtabs-1]) <= width then
+						rowends[numrows-1] = rowends[numrows-1] - 1
+						rowwidths[numrows] = rowwidths[numrows] + widths[numtabs-1]
+						rowwidths[numrows-1] = rowwidths[numrows-1] - widths[numtabs-1]
+					end
 				end
 			end
 		end
@@ -249,7 +257,7 @@ do
 			end
 			
 			for i = starttab, endtab do
-				PanelTemplates_TabResize(tabs[i], padding + 4)
+				PanelTemplates_TabResize(tabs[i], padding + 4, nil, width)
 			end
 			starttab = endtab + 1
 		end
