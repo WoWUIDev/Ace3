@@ -1,9 +1,27 @@
---- '''AceAddon-3.0''' provides a template for creating addon objects.
+--- **AceAddon-3.0** provides a template for creating addon objects.
 -- It'll provide you with a set of callback functions that allow you to simplify the loading
--- process of your addon. Callbacks provided are:<br> 
--- - '''OnInitialize''', which is called directly after the addon is fully loaded.<br>
--- - '''OnEnable''' which gets called during the PLAYER_LOGIN event, when most of the data provided by the game is already present.<br>
--- - '''OnDisable''', which is only called when your addon is manually being disabled.<br>
+-- process of your addon.\\
+-- Callbacks provided are:\\
+-- * **OnInitialize**, which is called directly after the addon is fully loaded.
+-- * **OnEnable** which gets called during the PLAYER_LOGIN event, when most of the data provided by the game is already present.
+-- * **OnDisable**, which is only called when your addon is manually being disabled.
+-- @usage
+-- -- A small (but complete) addon, that doesn't do anything, but shows usage of the callbacks.
+-- local MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon")
+-- 
+-- function MyAddon:OnInitialize()
+--   -- do init tasks here, like loading the Saved Variables, or setting up slash commands.
+-- end
+-- 
+-- function MyAddon:OnEnable()
+--   -- Do more initialization here, that really enables the use of your addon.
+--   -- Register Events, Hook functions, Create Frames, Get information from the game that wasn't available in OnInit
+-- end
+--
+-- function MyAddon:OnDisable()
+--   -- Unhook, Unregister Events, Hide frames that you created.
+--   -- You would probably only use an OnDisable if you want to build a "standby" mode, or be able to toggle modules on/off.
+-- end
 -- @class file
 -- @name AceAddon-3.0.lua
 -- @release $Id$
@@ -199,7 +217,7 @@ end
 local function IsModuleTrue(self) return true end
 
 --- Create a new module for the addon.
--- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module.<br>
+-- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module.\\
 -- A module has the same functionality as a real addon, it can have modules of its own, and has the same API as
 -- an addon object.
 -- @paramsig name[, prototype|lib[, lib, ...]]
@@ -263,7 +281,7 @@ end
 
 --- Enables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:EnableAddon(), thus dispatching a OnEnable callback
--- and enabling all modules of the addon (unless explicitly disabled).<br>
+-- and enabling all modules of the addon (unless explicitly disabled).\\
 -- :Enable() also sets the internal `enableState` variable to true
 -- @paramsig 
 -- @usage 
@@ -279,7 +297,7 @@ end
 
 --- Disables the Addon, if possible, return true or false depending on success.
 -- This internally calls AceAddon:DisableAddon(), thus dispatching a OnDisable callback
--- and disabling all modules of the addon.<br>
+-- and disabling all modules of the addon.\\
 -- :Disable() also sets the internal `enableState` variable to false
 -- @paramsig 
 -- @usage 
@@ -461,8 +479,8 @@ end
 
 --- Initialize the addon after creation.
 -- Note: This function is only used internally during the ADDON_LOADED event
--- It will call the '''OnInitialize''' function on the addon object (if present), 
--- and the '''OnEmbedInitialize''' function on all embeded libraries. <br>
+-- It will call the **OnInitialize** function on the addon object (if present), 
+-- and the **OnEmbedInitialize** function on all embeded libraries. \\
 -- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- @param addon addon object to intialize
 function AceAddon:InitializeAddon(addon)
@@ -481,10 +499,10 @@ end
 --- Enable the addon after creation.
 -- Note: This function is only used internally during the PLAYER_LOGIN event, or during ADDON_LOADED,
 -- if IsLoggedIn() already returns true at that point, e.g. for LoD Addons.
--- It will call the '''OnEnable''' function on the addon object (if present), 
--- and the '''OnEmbedEnable''' function on all embeded libraries.<br>
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.<br>
--- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
+-- It will call the **OnEnable** function on the addon object (if present), 
+-- and the **OnEmbedEnable** function on all embeded libraries.\\
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.\\
+-- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing. Use :Enable on the addon itself instead.
 -- @param addon addon object to enable
 function AceAddon:EnableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
@@ -513,10 +531,10 @@ end
 
 --- Disable the addon
 -- Note: This function is only used internally.
--- It will call the '''OnDisable''' function on the addon object (if present), 
--- and the '''OnEmbedDisable''' function on all embeded libraries.<br>
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.<br>
--- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
+-- It will call the **OnDisable** function on the addon object (if present), 
+-- and the **OnEmbedDisable** function on all embeded libraries.\\
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.\\
+-- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing. Use :Disable on the addon itself instead.
 -- @param addon addon object to enable
 function AceAddon:DisableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
