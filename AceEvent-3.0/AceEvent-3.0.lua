@@ -43,12 +43,50 @@ local mixins = {
 	"RegisterMessage", "UnregisterMessage",
 	"SendMessage",
 	"UnregisterAllEvents", "UnregisterAllMessages",
-} 
+}
 
--- AceEvent:Embed( target )
--- target (object) - target object to embed AceEvent in
---
--- Embeds AceEvent into the target object making the functions from the mixins list available on target:..
+--- Register for a Blizzard Event.
+-- The callback will always be called with the event as the first argument, and if supplied, the `arg` as second argument.
+-- Any arguments to the event will be passed on after that.
+-- @name AceEvent:RegisterEvent
+-- @class function
+-- @paramsig event[, callback [, arg]]
+-- @param event The event to register for
+-- @param callback The callback function to call when the event is triggered (funcref or method, defaults to a method with the event name)
+-- @param arg An optional argument to pass to the callback function
+
+--- Unregister an event.
+-- @name AceEvent:UnregisterEvent
+-- @class function
+-- @paramsig event
+-- @param event The event to unregister
+
+--- Register for a custom AceEvent-internal message.
+-- The callback will always be called with the event as the first argument, and if supplied, the `arg` as second argument.
+-- Any arguments to the event will be passed on after that.
+-- @name AceEvent:RegisterMessage
+-- @class function
+-- @paramsig message[, callback [, arg]]
+-- @param message The message to register for
+-- @param callback The callback function to call when the message is triggered (funcref or method, defaults to a method with the event name)
+-- @param arg An optional argument to pass to the callback function
+
+--- Unregister a message
+-- @name AceEvent:UnregisterMessage
+-- @class function
+-- @paramsig message
+-- @param message The message to unregister
+
+--- Send a message over the AceEvent-3.0 internal message system to other addons registered for this message.
+-- @name AceEvent:SendMessage
+-- @class function
+-- @paramsig message, ...
+-- @param message The message to send
+-- @param ... Any arguments to the message
+
+
+--- Embeds AceEvent into the target object making the functions from the mixins list available on target:..
+-- @param target target object to embed AceEvent in
 function AceEvent:Embed(target)
 	for k, v in pairs(mixins) do
 		target[v] = self[v]

@@ -1,16 +1,16 @@
---- A bucket to catch events in. '''AceBucket-3.0''' provides throttling of events that fire in bursts and
+--- A bucket to catch events in. **AceBucket-3.0** provides throttling of events that fire in bursts and
 -- your addon only needs to know about the full burst.
---
+-- 
 -- This Bucket implementation works as follows:
---    Initially, no schedule is running, and its waiting for the first event to happen.
+--    Initially, no schedule is running, and its waiting for the first event to happen.\\
 --    The first event will start the bucket, and get the scheduler running, which will collect all
 --    events in the given interval. When that interval is reached, the bucket is pushed to the 
 --    callback and a new schedule is started. When a bucket is empty after its interval, the scheduler is 
 --    stopped, and the bucket is only listening for the next event to happen, basicly back in initial state.
---
+-- 
 -- In addition, the buckets collect information about the "arg1" argument of the events that fire, and pass those as a 
--- table to your callback. This functionality was mostly designed for the UNIT_* events. <br>
--- The table will have the different values of "arg1" as keys, and the number of occurances as their value, e.g. 
+-- table to your callback. This functionality was mostly designed for the UNIT_* events.\\
+-- The table will have the different values of "arg1" as keys, and the number of occurances as their value, e.g.\\
 --   { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
 -- @class file
 -- @name AceBucket-3.0.lua
@@ -244,8 +244,7 @@ end
 
 
 
---- embedding and embed handling
-
+-- embedding and embed handling
 local mixins = {
 	"RegisterBucketEvent",
 	"RegisterBucketMessage", 
@@ -253,10 +252,8 @@ local mixins = {
 	"UnregisterAllBuckets",
 } 
 
--- AceBucket:Embed( target )
--- target (object) - target object to embed AceBucket in
---
--- Embeds AceBucket into the target object making the functions from the mixins list available on target:..
+--- Embeds AceBucket into the target object making the functions from the mixins list available on target:..
+-- @param target target object to embed AceBucket in
 function AceBucket:Embed( target )
 	for _, v in pairs( mixins ) do
 		target[v] = self[v]
@@ -265,10 +262,6 @@ function AceBucket:Embed( target )
 	return target
 end
 
---AceBucket:OnEmbedDisable( target )
--- target (object) - target object that AceBucket is embedded in.
---
--- Disables all buckets registered on the object
 function AceBucket:OnEmbedDisable( target )
 	target:UnregisterAllBuckets()
 end
