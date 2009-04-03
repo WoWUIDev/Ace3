@@ -6,21 +6,25 @@
 -- * **OnEnable** which gets called during the PLAYER_LOGIN event, when most of the data provided by the game is already present.
 -- * **OnDisable**, which is only called when your addon is manually being disabled.
 -- @usage
--- -- A small (but complete) addon, that doesn't do anything, but shows usage of the callbacks.
+-- -- A small (but complete) addon, that doesn't do anything, 
+-- -- but shows usage of the callbacks.
 -- local MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon")
 -- 
 -- function MyAddon:OnInitialize()
---   -- do init tasks here, like loading the Saved Variables, or setting up slash commands.
+--   -- do init tasks here, like loading the Saved Variables, 
+--   -- or setting up slash commands.
 -- end
 -- 
 -- function MyAddon:OnEnable()
 --   -- Do more initialization here, that really enables the use of your addon.
---   -- Register Events, Hook functions, Create Frames, Get information from the game that wasn't available in OnInit
+--   -- Register Events, Hook functions, Create Frames, Get information from 
+--   -- the game that wasn't available in OnInitialize
 -- end
 --
 -- function MyAddon:OnDisable()
 --   -- Unhook, Unregister Events, Hide frames that you created.
---   -- You would probably only use an OnDisable if you want to build a "standby" mode, or be able to toggle modules on/off.
+--   -- You would probably only use an OnDisable if you want to 
+--   -- build a "standby" mode, or be able to toggle modules on/off.
 -- end
 -- @class file
 -- @name AceAddon-3.0.lua
@@ -107,7 +111,7 @@ local function addontostring( self ) return self.name end
 --
 -- -- Create a Addon object based on the table of a frame
 -- local MyFrame = CreateFrame("Frame")
--- local MyBetterAddon = LibStub("AceAddon-3.0"):NewAddon(MyFrame, "MyBetterAddon", "AceEvent-3.0")
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon(MyFrame, "MyAddon", "AceEvent-3.0")
 -- @return The newly created addon object
 function AceAddon:NewAddon(objectorname, ...)
 	local object,name

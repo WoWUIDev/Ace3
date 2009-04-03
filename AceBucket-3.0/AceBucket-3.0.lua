@@ -12,6 +12,12 @@
 -- table to your callback. This functionality was mostly designed for the UNIT_* events.\\
 -- The table will have the different values of "arg1" as keys, and the number of occurances as their value, e.g.\\
 --   { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
+--
+-- AceBucket-3.0 can be embeded into your addon, either explicitly by calling AceBucket:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceBucket itself.\\
+-- It is recommended to embed AceBucket, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceBucket.
 -- @class file
 -- @name AceBucket-3.0.lua
 -- @release $Id$
@@ -252,7 +258,7 @@ local mixins = {
 	"UnregisterAllBuckets",
 } 
 
---- Embeds AceBucket into the target object making the functions from the mixins list available on target:..
+-- Embeds AceBucket into the target object making the functions from the mixins list available on target:..
 -- @param target target object to embed AceBucket in
 function AceBucket:Embed( target )
 	for _, v in pairs( mixins ) do

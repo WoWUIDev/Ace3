@@ -1,4 +1,10 @@
 --- AceEvent-3.0 provides event registration and secure dispatching.
+--
+-- AceEvent-3.0 can be embeded into your addon, either explicitly by calling AceEvent:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceEvent itself.\\
+-- It is recommended to embed AceEvent, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceEvent.
 -- @class file
 -- @name AceEvent-3.0
 -- @release $Id$
@@ -85,7 +91,7 @@ local mixins = {
 -- @param ... Any arguments to the message
 
 
---- Embeds AceEvent into the target object making the functions from the mixins list available on target:..
+-- Embeds AceEvent into the target object making the functions from the mixins list available on target:..
 -- @param target target object to embed AceEvent in
 function AceEvent:Embed(target)
 	for k, v in pairs(mixins) do

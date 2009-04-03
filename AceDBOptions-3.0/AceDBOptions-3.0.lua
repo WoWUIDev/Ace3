@@ -373,7 +373,7 @@ local optionsTable = {
 -- @param db The database object to create the options table for.
 -- @return The options table to be used in AceConfig-3.0
 -- @usage 
--- -- Assuming ´options´ is your top-level options table and ´self.db´ is your database:
+-- -- Assuming `options` is your top-level options table and `self.db` is your database:
 -- options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 function AceDBOptions:GetOptionsTable(db, noDefaultProfiles)
 	local tbl = AceDBOptions.optionTables[db] or {

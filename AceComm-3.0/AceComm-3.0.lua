@@ -1,6 +1,12 @@
 --- **AceComm-3.0** allows you to send messages of unlimited length over the addon comm channels.
 -- It'll automatically split the messages into multiple parts and rebuild them on the receiving end.\\
 -- **ChatThrottleLib** is of course being used to avoid being disconnected by the server.
+--
+-- AceComm-3.0 can be embeded into your addon, either explicitly by calling AceComm:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceComm itself.\\
+-- It is recommended to embed AceComm, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceComm.
 -- @class file
 -- @name AceComm-3.0
 -- @release $Id$
@@ -262,7 +268,7 @@ local mixins = {
 	"SendCommMessage",
 }
 
---- Embeds AceComm-3.0 into the target object making the functions from the mixins list available on target:..
+-- Embeds AceComm-3.0 into the target object making the functions from the mixins list available on target:..
 -- @param target target object to embed AceComm-3.0 in
 function AceComm:Embed(target)
 	for k, v in pairs(mixins) do

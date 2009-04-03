@@ -1,4 +1,10 @@
 --- AceConsole-3.0 provides registration facilities for slash commands.
+--
+-- AceConsole-3.0 can be embeded into your addon, either explicitly by calling AceConsole:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceConsole itself.\\
+-- It is recommended to embed AceConsole, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceConsole.
 -- @class file
 -- @name AceConsole-3.0
 -- @release $Id$
@@ -184,7 +190,7 @@ local mixins = {
 	"GetArgs",
 } 
 
---- Embeds AceConsole into the target object making the functions from the mixins list available on target:..
+-- Embeds AceConsole into the target object making the functions from the mixins list available on target:..
 -- @param target target object to embed AceBucket in
 function AceConsole:Embed( target )
 	for k, v in pairs( mixins ) do
