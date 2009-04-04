@@ -1,6 +1,8 @@
 --- **AceHook-3.0** offers safe Hooking/Unhooking of functions, methods and frame scripts.
+-- Using AceHook-3.0 is recommended when you need to unhook your hooks again, so the hook chain isn't broken
+-- when you manually restore the original function.
 --
--- AceHook-3.0 can be embeded into your addon, either explicitly by calling AceHook:Embed(MyAddon) or by 
+-- **AceHook-3.0** can be embeded into your addon, either explicitly by calling AceHook:Embed(MyAddon) or by 
 -- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
 -- and can be accessed directly, without having to explicitly call AceHook itself.\\
 -- It is recommended to embed AceHook, otherwise you'll have to specify a custom `self` on all calls you
