@@ -101,6 +101,9 @@ local Enable, Disable, EnableModule, DisableModule, Embed, NewModule, GetModule,
 local function addontostring( self ) return self.name end 
 
 --- Create a new AceAddon-3.0 addon.
+-- Any libraries you specified will be embeded, and the addon will be scheduled for 
+-- its OnInitialize and OnEnable callbacks.
+-- The final addon object, with all libraries embeded, will be returned.
 -- @paramsig [object ,]name[, lib, ...]
 -- @param object Table to use as a base for the addon (optional)
 -- @param name Name of the addon object to create
@@ -112,7 +115,6 @@ local function addontostring( self ) return self.name end
 -- -- Create a Addon object based on the table of a frame
 -- local MyFrame = CreateFrame("Frame")
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon(MyFrame, "MyAddon", "AceEvent-3.0")
--- @return The newly created addon object
 function AceAddon:NewAddon(objectorname, ...)
 	local object,name
 	local i=1
@@ -160,7 +162,6 @@ end
 -- @usage 
 -- -- Get the Addon
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
--- @return The addon object, if found
 function AceAddon:GetAddon(name, silent)
 	if not silent and not self.addons[name] then
 		error(("Usage: GetAddon(name): 'name' - Cannot find an AceAddon '%s'."):format(tostring(name)), 2)
@@ -218,7 +219,6 @@ end
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- -- Get the Module
 -- MyModule = MyAddon:GetModule("MyModule")
--- @return the module object, if found
 function GetModule(self, name, silent)
 	if not self.modules[name] and not silent then
 		error(("Usage: GetModule(name, silent): 'name' - Cannot find module '%s'."):format(tostring(name)), 2)
@@ -244,7 +244,6 @@ local function IsModuleTrue(self) return true end
 -- -- Create a module with a prototype
 -- local prototype = { OnEnable = function(self) print("OnEnable called!") end }
 -- MyModule = MyAddon:NewModule("MyModule", prototype, "AceEvent-3.0", "AceHook-3.0")
--- @return the module object, if successfull
 function NewModule(self, name, prototype, ...)
 	if type(name) ~= "string" then error(("Usage: NewModule(name, [prototype, [lib, lib, lib, ...]): 'name' - string expected got '%s'."):format(type(name)), 2) end
 	if type(prototype) ~= "string" and type(prototype) ~= "table" and type(prototype) ~= "nil" then error(("Usage: NewModule(name, [prototype, [lib, lib, lib, ...]): 'prototype' - table (prototype), string (lib) or nil expected got '%s'."):format(type(prototype)), 2) end
@@ -288,7 +287,6 @@ end
 -- @usage 
 -- print(MyAddon:GetName())
 -- -- prints "MyAddon"
--- @return The name of the addon or module
 function GetName(self)
 	return self.moduleName or self.name
 end
@@ -304,7 +302,6 @@ end
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyModule = MyAddon:GetModule("MyModule")
 -- MyModule:Enable()
--- @return true if the addon was enabled successfully
 function Enable(self)
 	self:SetEnabledState(true)
 	return AceAddon:EnableAddon(self)
@@ -320,7 +317,6 @@ end
 -- -- Disable MyAddon
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyAddon:Disable()
--- @return true if the addon was disabled successfully
 function Disable(self)
 	self:SetEnabledState(false)
 	return AceAddon:DisableAddon(self)
@@ -339,8 +335,6 @@ end
 -- -- Enable MyModule using the short-hand
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyAddon:EnableModule("MyModule")
--- @return true if the module was enabled successfully
--- @see Enable
 function EnableModule(self, name)
 	local module = self:GetModule( name )
 	return module:Enable()
@@ -359,8 +353,6 @@ end
 -- -- Disable MyModule using the short-hand
 -- MyAddon = LibStub("AceAddon-3.0"):GetAddon("MyAddon")
 -- MyAddon:DisableModule("MyModule")
--- @return true if the module was disabled successfully
--- @see Disable
 function DisableModule(self, name)
 	local module = self:GetModule( name )
 	return module:Disable()
@@ -448,13 +440,11 @@ end
 -- for name, module in MyAddon:IterateModules() do
 --    module:Enable()
 -- end
--- @return Iterator of all modules
 local function IterateModules(self) return pairs(self.modules) end
 
 -- Returns an iterator of all embeds in the addon
 -- @name //addon//:IterateEmbeds
 -- @paramsig 
--- @return Iterator of all embeded libraries
 local function IterateEmbeds(self) return pairs(AceAddon.embeds[self]) end
 
 --- Query the enabledState of an addon.
@@ -464,7 +454,6 @@ local function IterateEmbeds(self) return pairs(AceAddon.embeds[self]) end
 -- if MyAddon:IsEnabled() then
 --     MyAddon:Disable()
 -- end
--- @return true if the addon/module is enabled, false otherwise
 local function IsEnabled(self) return self.enabledState end
 local mixins = {
 	NewModule = NewModule,
@@ -597,7 +586,6 @@ end
 -- for name, addon in AceAddon:IterateAddons() do
 --   print("Addon: " .. name)
 -- end
--- @return Iterator over all addons (pairs)
 function AceAddon:IterateAddons() return pairs(self.addons) end
 
 --- Get an iterator over the internal status registry.
@@ -608,7 +596,6 @@ function AceAddon:IterateAddons() return pairs(self.addons) end
 --     print("EnabledAddon: " .. name)
 --   end
 -- end
--- @return Iterator over the status registry
 function AceAddon:IterateAddonStatus() return pairs(self.statuses) end
 
 -- Following Iterators are deprecated, and their addon specific versions should be used
