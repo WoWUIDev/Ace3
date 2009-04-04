@@ -2,6 +2,11 @@
 -- AceGUI is used by AceConfigDialog to create the option GUIs, but you can use it by itself
 -- to create any custom GUI. There are more extensive examples in the test suite in the Ace3 
 -- stand-alone distribution.
+--
+-- **Note**: When using AceGUI-3.0 directly, please do not modify the frames of the widgets directly,
+-- as any "unknown" change to the widgets will cause addons that get your widget out of the widget pool
+-- to misbehave. If you think some part of a widget should be modifiable, please open a ticket, and we'll
+-- implement a proper API to modify it.
 -- @usage
 -- local AceGUI = LibStub("AceGUI-3.0")
 -- -- Create a container frame

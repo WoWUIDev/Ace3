@@ -4,14 +4,15 @@ local AceGUI = LibStub("AceGUI-3.0")
 -- Label 	 			--
 --------------------------
 do
-	local Type = "Label"
-	local Version = 9
+	local Type = "InteractiveLabel"
+	local Version = 1
 	
 	local function OnAcquire(self)
 		self:SetText("")
 		self:SetImage(nil)
 		self:SetColor()
 		self:SetFontObject()
+		self:SetHighlight()
 	end
 	
 	local function OnRelease(self)
@@ -104,11 +105,40 @@ do
 		self.image:SetHeight(height)
 		UpdateImageAnchor(self)
 	end
+	
+	local function SetHighlight(self, texture, ...)
+		self.highlight:SetTexture(texture)
+		if select('#', ...) >= 1 then
+			self.highlight:SetTexCoord(...)
+		else
+			self.highlight:SetTexCoord(0, 1, 0, 1)
+		end
+	end
+	
+	local function OnEnter(this)
+		this.obj.highlight:Show()
+		this.obj:Fire("OnEnter")
+	end
+	
+	local function OnLeave(this)
+		this.obj.highlight:Hide()
+		this.obj:Fire("OnLeave")
+	end
+	
+	local function OnClick(this, ...)
+		this.obj:Fire("OnClick", ...)
+		AceGUI:ClearFocus()
+	end
 
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
 		self.type = Type
+		
+		frame:EnableMouse(true)
+		frame:SetScript("OnEnter", OnEnter)
+		frame:SetScript("OnLeave", OnLeave)
+		frame:SetScript("OnMouseDown", OnClick)
 		
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
@@ -120,6 +150,7 @@ do
 		self.SetImageSize = SetImageSize
 		self.SetFont = SetFont
 		self.SetFontObject = SetFontObject
+		self.SetHighlight = SetHighlight
 		frame.obj = self
 		
 		frame:SetHeight(18)
@@ -130,6 +161,13 @@ do
 		label:SetJustifyH("LEFT")
 		label:SetJustifyV("TOP")
 		self.label = label
+		
+		local highlight = frame:CreateTexture(nil, "OVERLAY")
+		highlight:SetTexture(nil)
+		highlight:SetAllPoints()
+		highlight:SetBlendMode("ADD")
+		highlight:Hide()
+		self.highlight = highlight
 		
 		local image = frame:CreateTexture(nil,"BACKGROUND")
 		self.image = image

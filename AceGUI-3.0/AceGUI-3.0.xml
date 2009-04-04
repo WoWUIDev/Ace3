@@ -20,5 +20,6 @@
 	<Script file="widgets\AceGUIWidget-Label.lua"/>
 	<Script file="widgets\AceGUIWidget-MultiLineEditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-BlizOptionsGroup.lua"/>
+	<Script file="widgets\AceGUIWidget-InteractiveLabel.lua"/>
 	<Script file="widgets\AceGUIWidget-Icon.lua"/>
 </Ui>
