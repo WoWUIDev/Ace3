@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 29
+local MAJOR, MINOR = "AceConfigDialog-3.0", 30
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -959,6 +959,7 @@ local function BuildSubGroups(group, tree, options, path, appName)
 				local entry = new()
 				entry.value = k
 				entry.text = GetOptionsMemberValue("name", v, options, path, appName)
+				entry.icon = GetOptionsMemberValue("icon", v, options, path, appName)
 				entry.disabled = CheckOptionDisabled(v, options, path, appName)
 				if not tree.children then tree.children = new() end
 				tinsert(tree.children,entry)
@@ -992,6 +993,7 @@ local function BuildGroups(group, options, path, appName, recurse)
 				local entry = new()
 				entry.value = k
 				entry.text = GetOptionsMemberValue("name", v, options, path, appName)
+				entry.icon = GetOptionsMemberValue("icon", v, options, path, appName)
 				entry.disabled = CheckOptionDisabled(v, options, path, appName)
 				tinsert(tree,entry)
 				if recurse and (v.childGroups or "tree") == "tree" then

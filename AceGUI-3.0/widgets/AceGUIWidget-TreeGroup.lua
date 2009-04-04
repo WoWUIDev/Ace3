@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 18
+	local Version = 19
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -146,7 +146,12 @@ do
 		local button = CreateFrame("Button",("AceGUI30TreeButton%d"):format(buttoncount),self.treeframe, "OptionsListButtonTemplate")
 		buttoncount = buttoncount + 1
 		button.obj = self
-
+		
+		local icon = button:CreateTexture(nil, "OVERLAY")
+		icon:SetWidth(14)
+		icon:SetHeight(14)
+		button.icon = icon
+		
 		button:SetScript("OnClick",ButtonOnClick)
 		button:SetScript("OnDoubleClick", ButtonOnDoubleClick)
 		button:SetScript("OnEnter",Button_OnEnter)
@@ -163,6 +168,7 @@ do
 		local toggle = button.toggle
 		local frame = self.frame
 		local text = treeline.text or ""
+		local icon = treeline.icon
 		local level = treeline.level
 		local value = treeline.value
 		local uniquevalue = treeline.uniquevalue
@@ -178,18 +184,17 @@ do
 			button:UnlockHighlight()
 			button.selected = false
 		end
-		local normalText = button.text
 		local normalTexture = button:GetNormalTexture()
 		local line = button.line
 		button.level = level
 		if ( level == 1 ) then
 			button:SetNormalFontObject("GameFontNormal")
 			button:SetHighlightFontObject("GameFontHighlight")
-			button.text:SetPoint("LEFT", 8, 2)
+			button.text:SetPoint("LEFT", (icon and 16 or 0) + 8, 2)
 		else
 			button:SetNormalFontObject("GameFontHighlightSmall")
 			button:SetHighlightFontObject("GameFontHighlightSmall")
-			button.text:SetPoint("LEFT", 8 * level, 2)
+			button.text:SetPoint("LEFT", (icon and 16 or 0) + 8 * level, 2)
 		end
 		
 		if disabled then
@@ -198,6 +203,13 @@ do
 		else
 			button.text:SetText(text)
 			button:EnableMouse(true)
+		end
+		
+		if icon then
+			button.icon:SetTexture(icon)
+			button.icon:SetPoint("LEFT", button, "LEFT", 8 * level, (level == 1) and 0 or 1)
+		else
+			button.icon:SetTexture(nil)
 		end
 		
 		if canExpand then
@@ -312,6 +324,7 @@ do
 		local line = new()
 		line.value = v.value
 		line.text = v.text
+		line.icon = v.icon
 		line.disabled = v.disabled
 		line.tree = tree
 		line.level = level
