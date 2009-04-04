@@ -119,6 +119,11 @@ end
 
 -- Gets a widget Object
 
+--- Create a new Widget of the given type.
+-- This function will instantiate a new widget (or use one from the widget pool), and call the
+-- OnAcquire function on it, before returning.
+-- @param type The type of the widget.
+-- @return The newly created widget.
 function AceGUI:Create(type)
 	local reg = WidgetRegistry
 	if reg[type] then
@@ -147,7 +152,10 @@ function AceGUI:Create(type)
 	end
 end
 
--- Releases a widget Object
+--- Releases a widget Object.
+-- This function calls OnRelease on the widget and places it back in the widget pool.
+-- Any data on the widget is being erased, and the widget will be hidden.
+-- @param widget The widget to release
 function AceGUI:Release(widget)
 	safecall( widget.PauseLayout, widget )
 	widget:Fire("OnRelease")
@@ -180,10 +188,10 @@ end
 -- Focus --
 -----------
 
------
--- Called when a widget has taken focus
+
+--- Called when a widget has taken focus.
 -- e.g. Dropdowns opening, Editboxes gaining kb focus
------
+-- @param widget The widget that should be focused
 function AceGUI:SetFocus(widget)
 	if self.FocusedWidget and self.FocusedWidget ~= widget then
 		safecall(self.FocusedWidget.ClearFocus, self.FocusedWidget)
@@ -191,10 +199,9 @@ function AceGUI:SetFocus(widget)
 	self.FocusedWidget = widget
 end
 
------
--- Called when something has happened that could cause widgets with focus to drop it
+
+--- Called when something has happened that could cause widgets with focus to drop it
 -- e.g. titlebar of a frame being clicked
------
 function AceGUI:ClearFocus()
 	if self.FocusedWidget then
 		safecall(self.FocusedWidget.ClearFocus, self.FocusedWidget)
@@ -434,6 +441,9 @@ do
 	setmetatable(WidgetContainerBase,{__index=WidgetBase})
 
 	--One of these function should be called on each Widget Instance as part of its creation process
+	
+	--- Register a widget-class as a container for newly created widgets.
+	-- @param widget The widget class
 	function AceGUI:RegisterAsContainer(widget)
 		widget.children = {}
 		widget.userdata = {}
@@ -447,6 +457,8 @@ do
 		widget:SetLayout("List")
 	end
 	
+	--- Register a widget-class as a widget.
+	-- @param widget The widget class
 	function AceGUI:RegisterAsWidget(widget)
 		widget.userdata = {}
 		widget.events = {}
@@ -463,7 +475,11 @@ end
 ------------------
 -- Widget API   --
 ------------------
--- Registers a widget Constructor, this function returns a new instance of the Widget
+
+--- Registers a widget Constructor, this function returns a new instance of the Widget
+-- @param Name The name of the widget
+-- @param Constructor The widget constructor function
+-- @param Version The version of the widget
 function AceGUI:RegisterWidgetType(Name, Constructor, Version)
 	assert(type(Constructor) == "function")
 	assert(type(Version) == "number") 
@@ -475,7 +491,9 @@ function AceGUI:RegisterWidgetType(Name, Constructor, Version)
 	WidgetRegistry[Name] = Constructor
 end
 
--- Registers a Layout Function
+--- Registers a Layout Function
+-- @param Name The name of the layout
+-- @param LayoutFunc Reference to the layout function
 function AceGUI:RegisterLayout(Name, LayoutFunc)
 	assert(type(LayoutFunc) == "function")
 	if type(Name) == "string" then
@@ -484,6 +502,8 @@ function AceGUI:RegisterLayout(Name, LayoutFunc)
 	LayoutRegistry[Name] = LayoutFunc
 end
 
+--- Get a Layout Function from the registry
+-- @name Name The name of the layout
 function AceGUI:GetLayout(Name)
 	if type(Name) == "string" then
 		Name = Name:upper()
@@ -493,6 +513,10 @@ end
 
 AceGUI.counts = AceGUI.counts or {}
 
+--- A type-based counter to count the number of widgets created.
+-- This is used by widgets that require a named frame, e.g. when a Blizzard
+-- Template requires it.
+-- @param type The widget type
 function AceGUI:GetNextWidgetNum(type)
 	if not self.counts[type] then
 		self.counts[type] = 0
