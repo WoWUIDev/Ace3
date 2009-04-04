@@ -15,9 +15,9 @@ Also automatically adds "config", "enable" and "disable" commands to options tab
 ]]
 
 local MAJOR, MINOR = "AceConfig-3.0", 2
-local lib = LibStub:NewLibrary(MAJOR, MINOR)
+local AceConfig = LibStub:NewLibrary(MAJOR, MINOR)
 
-if not lib then return end
+if not AceConfig then return end
 
 
 local cfgreg = LibStub("AceConfigRegistry-3.0")
@@ -26,14 +26,23 @@ local cfgdlg = LibStub("AceConfigDialog-3.0")
 --TODO: local cfgdrp = LibStub("AceConfigDropdown-3.0")
 
 
----------------------------------------------------------------------
+-- -------------------------------------------------------------------
 -- :RegisterOptionsTable(appName, options, slashcmd, persist)
 --
 -- - appName - (string) application name
 -- - options - table or function ref, see AceConfigRegistry
 -- - slashcmd - slash command (string) or table with commands, or nil to NOT create a slash command
 
-function lib:RegisterOptionsTable(appName, options, slashcmd)
+--- Register a option table with the AceConfig registry.
+-- You can supply a slash command (or a table of slash commands) to register with AceConfigCmd directly.
+-- @paramsig appName, options [, slashcmd]
+-- @param appName The application name for the config table.
+-- @param options The option table (or a function to generate one on demand)
+-- @param slashcmd A slash command to register for the option table, or a table of slash commands.
+-- @usage
+-- local AceConfig = LibStub("AceConfig-3.0")
+-- AceConfig:RegisterOptionsTable("MyAddon", myOptions, {"/myslash", "/my"})
+function AceConfig:RegisterOptionsTable(appName, options, slashcmd)
 	local ok,msg = pcall(cfgreg.RegisterOptionsTable, self, appName, options)
 	if not ok then error(msg, 2) end
 	

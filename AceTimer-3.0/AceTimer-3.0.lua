@@ -276,6 +276,7 @@ end
 -- @param callback Callback function for the timer pulse (funcref or method name).
 -- @param delay Delay for the timer, in seconds.
 -- @param arg An optional argument to be passed to the callback function.
+-- @usage
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon("TimerTest", "AceTimer-3.0")
 -- 
 -- function MyAddon:OnEnable()

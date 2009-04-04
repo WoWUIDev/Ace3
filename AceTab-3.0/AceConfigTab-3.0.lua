@@ -1,4 +1,4 @@
---- AceConfigTab-3.0 provides support for tab-completion to AceConfig tables
+--- AceConfigTab-3.0 provides support for tab-completion to AceConfig tables.
 -- Note: This library is not yet finalized.
 -- @class file
 -- @name AceConfigTab-3.0

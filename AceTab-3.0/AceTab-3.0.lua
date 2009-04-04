@@ -64,7 +64,7 @@ local firstPMLength
 
 local fallbacks, notfallbacks = {}, {}  -- classifies completions into those which have preconditions and those which do not.  Those without preconditions are only considered if no other completions have matches.
 local pmolengths = {}  -- holds the number of characters to overwrite according to pmoverwrite and the current prematch
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- RegisterTabCompletion( descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite )
 -- See http://www.wowace.com/wiki/AceTab-2.0 for detailed API documentation
 --
@@ -89,7 +89,7 @@ local pmolengths = {}  -- holds the number of characters to overwrite according 
 --										This is useful when you want to use the prematch as an indicator character, but ultimately do not want it as part of the text, itself.
 --
 -- no return
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite)
 	-- Arg checks
 	if type(descriptor) ~= 'string' then error("Usage: RegisterTabCompletion(descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite): 'descriptor' - string expected.", 3) end
@@ -156,7 +156,7 @@ function AceTab:UnregisterTabCompletion(descriptor)
 	notfallbacks[descriptor] = nil
 end
 
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- gcbs( s1, s2 )
 --
 -- s1		string		First string to be compared
@@ -164,7 +164,7 @@ end
 -- s2		string		Second string to be compared
 --
 -- returns the greatest common substring beginning s1 and s2
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 local function gcbs(s1, s2)
 	if not s1 and not s2 then return end
 	if not s1 then s1 = s2 end
@@ -180,12 +180,12 @@ local function gcbs(s1, s2)
 end
 
 local cursor  -- Holds cursor position.  Set in :OnTabPressed().
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- cycleTab()
 -- For when a tab press has multiple possible completions, we need to allow the user to press tab repeatedly to cycle through them.
 -- If we have multiple possible completions, all tab presses after the first will call this function to cycle through and insert the different possible matches.
 -- This function will stop being called after OnTextChanged() is triggered by something other than AceTab (i.e. the user inputs a character).
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 local previousLength, cMatch, matched, postmatch
 local function cycleTab(this)
 	cMatch = 0  -- Counter across all sets.  The pseudo-index relevant to this value and corresponding to the current match is held in this.at3curMatch

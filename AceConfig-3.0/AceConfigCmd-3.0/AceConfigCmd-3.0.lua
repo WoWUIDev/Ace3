@@ -1,4 +1,4 @@
---- AceConfigCmd-3.0 handles access to optionstable through the "command line" interface via the ChatFrames.
+--- AceConfigCmd-3.0 handles access to an options table through the "command line" interface via the ChatFrames.
 -- @class file
 -- @name AceConfigCmd-3.0
 -- @release $Id$
@@ -18,12 +18,12 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 
 
 local MAJOR, MINOR = "AceConfigCmd-3.0", 8
-local lib = LibStub:NewLibrary(MAJOR, MINOR)
+local AceConfigCmd = LibStub:NewLibrary(MAJOR, MINOR)
 
-if not lib then return end
+if not AceConfigCmd then return end
 
-lib.commands = lib.commands or {}
-local commands = lib.commands
+AceConfigCmd.commands = AceConfigCmd.commands or {}
+local commands = AceConfigCmd.commands
 
 local cfgreg = LibStub("AceConfigRegistry-3.0")
 local AceConsole -- LoD
@@ -669,17 +669,27 @@ local function handle(info, inputpos, tab, depth, retfalse)
 	end
 end
 
-
------------------------------------------------------------------------
--- HandleCommand(slashcmd, appName, input)
---
--- Call this from a chat command handler to parse the command input as operations on an aceoptions table
+--- Handle the chat command.
+-- This is usually called from a chat command handler to parse the command input as operations on an aceoptions table.\\
+-- AceConfigCmd uses this function internally when a slash command is registered with `:CreateChatCommand`
+-- @param slashcmd The slash command WITHOUT leading slash (only used for error output)
+-- @param appName The application name as given to `:RegisterOptionsTable()`
+-- @param input The commandline input (as given by the WoW handler, i.e. without the command itself)
+-- @usage
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon", "AceConsole-3.0")
+-- -- Use AceConsole-3.0 to register a Chat Command
+-- MyAddon:RegisterChatCommand("mychat", "ChatCommand)
 -- 
--- slashcmd (string) - the slash command WITHOUT leading slash (only used for error output)
--- appName (string) - the application name as given to AceConfigRegistry:RegisterOptionsTable()
--- input (string) -- the commandline input (as given by the WoW handler, i.e. without the command itself)
-
-function lib:HandleCommand(slashcmd, appName, input)
+-- -- Show the GUI if no input is supplied, otherwise handle the chat input.
+-- function MyAddon:ChatCommand(input)
+--   -- Assuming "MyOptions" is the appName of a valid options table
+--   if not input or input:trim() == "" then
+--     LibStub("AceConfigDialog-3.0"):Open("MyOptions")
+--   else
+--     LibStub("AceConfigCmd-3.0").HandleCommand(MyAddon, "mychat", "MyOptions", input)
+--   end
+-- end
+function AceConfigCmd:HandleCommand(slashcmd, appName, input)
 
 	local optgetter = cfgreg:GetOptionsTable(appName)
 	if not optgetter then
@@ -701,34 +711,26 @@ function lib:HandleCommand(slashcmd, appName, input)
 	handle(info, 1, options, 0)  -- (info, inputpos, table, depth)
 end
 
-
-
------------------------------------------------------------------------
--- CreateChatCommand(slashcmd, appName)
---
--- Utility function to create a slash command handler.
+--- Utility function to create a slash command handler.
 -- Also registers tab completion with AceTab
--- 
--- slashcmd (string) - the slash command WITHOUT leading slash (only used for error output)
--- appName (string) - the application name as given to AceConfigRegistry:RegisterOptionsTable()
-
-function lib:CreateChatCommand(slashcmd, appName)
+-- @param slashcmd The slash command WITHOUT leading slash (only used for error output)
+-- @param appName The application name as given to `:RegisterOptionsTable()`
+function AceConfigCmd:CreateChatCommand(slashcmd, appName)
 	if not AceConsole then
 		AceConsole = LibStub(AceConsoleName)
 	end
 	if AceConsole.RegisterChatCommand(self, slashcmd, function(input)
-				lib.HandleCommand(self, slashcmd, appName, input)	-- upgradable
+				AceConfigCmd.HandleCommand(self, slashcmd, appName, input)	-- upgradable
 		end,
 	true) then -- succesfully registered so lets get the command -> app table in
 		commands[slashcmd] = appName
 	end
 end
 
--- GetChatCommandOptions(slashcmd)
--- 
--- Utility function that returns the options table that belongs to a slashcommand
--- mainly used by AceTab
-
-function lib:GetChatCommandOptions(slashcmd)
+--- Utility function that returns the options table that belongs to a slashcommand.
+-- Designed to be used for the AceTab interface.
+-- @param slashcmd The slash command WITHOUT leading slash (only used for error output)
+-- @return The options table associated with the slash command (or nil if the slash command was not registered)
+function AceConfigCmd:GetChatCommandOptions(slashcmd)
 	return commands[slashcmd]
 end
