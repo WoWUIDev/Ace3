@@ -1,5 +1,13 @@
---- AceSerializer-3.0 can serialize any variable (except functions) into a string format,
--- that can be send over the addon comm channel
+--- **AceSerializer-3.0** can serialize any variable (except functions or userdata) into a string format,
+-- that can be send over the addon comm channel. AceSerializer was designed to keep all data intact, especially 
+-- very large numbers or floating point numbers, and table structures. The only caveat currently is, that multiple
+-- references to the same table will be send individually.
+--
+-- **AceSerializer-3.0** can be embeded into your addon, either explicitly by calling AceSerializer:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceSerializer itself.\\
+-- It is recommended to embed AceSerializer, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceSerializer.
 -- @class file
 -- @name AceSerializer-3.0
 -- @release $Id$
@@ -25,7 +33,6 @@ local serInf = tostring(1/0)
 local serNegInf = tostring(-1/0)
 
 
------------------------------------------------------------------------
 -- Serialization functions
 
 local function SerializeStringHelper(ch)	-- Used by SerializeValue for strings
@@ -100,14 +107,14 @@ end
 
 
 
------------------------------------------------------------------------
--- API Serialize(...)
---
--- Takes a list of values (strings, numbers, booleans, nils, tables)
--- and returns it in serialized form (a string).
--- May throw errors on invalid data types.
---
 local serializeTbl = { "^1" }	-- "^1" = Hi, I'm data serialized by AceSerializer protocol rev 1
+
+--- Serialize the data passed into the function.
+-- Takes a list of values (strings, numbers, booleans, nils, tables)
+-- and returns it in serialized form (a string).\\
+-- May throw errors on invalid data types.
+-- @param ... List of values to serialize
+-- @return The data in its serialized form (string)
 function AceSerializer:Serialize(...)
 	local nres = 1
 	
@@ -121,11 +128,7 @@ function AceSerializer:Serialize(...)
 	return tconcat(serializeTbl, "", 1, nres+1)
 end
 
-
------------------------------------------------------------------------
 -- Deserialization functions
-
-
 local function DeserializeStringHelper(escape)
 	if escape<"~\123" then
 		return strchar(strbyte(escape,2,2)-64)
@@ -230,15 +233,10 @@ local function DeserializeValue(iter,single,ctl,data)
 	end
 end
 
-
------------------------------------------------------------------------
--- API Deserialize(str)
--- 
+--- Deserializes the data into its original values.
 -- Accepts serialized data, ignoring all control characters and whitespace.
---
--- Returns true followed by a list of values, OR false followed by a message
---
-
+-- @param str The serialized data (from :Serialize)
+-- @return true followed by a list of values, OR false followed by an error message
 function AceSerializer:Deserialize(str)
 	str = gsub(str, "[%c ]", "")	-- ignore all control characters; nice for embedding in email and stuff
 
