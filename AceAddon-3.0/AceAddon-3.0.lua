@@ -168,8 +168,11 @@ function AceAddon:GetAddon(name, silent)
 	return self.addons[name]
 end
 
---- Embed a list of libraries into the specified addon.
--- Note: This function is for internal use by :NewAddon/:NewModule
+-- - Embed a list of libraries into the specified addon.
+-- This function will try to embed all of the listed libraries into the addon
+-- and error if a single one fails.
+--
+-- **Note:** This function is for internal use by :NewAddon/:NewModule
 -- @paramsig addon, [lib, ...]
 -- @param addon addon object to embed the libs in
 -- @param lib List of libraries to embed into the addon
@@ -180,8 +183,12 @@ function AceAddon:EmbedLibraries(addon, ...)
 	end
 end
 
---- Embed a library into the addon object.
--- Note: This function is for internal use by :EmbedLibraries
+-- - Embed a library into the addon object.
+-- This function will check if the specified library is registered with LibStub
+-- and if it has a :Embed function to call. It'll error if any of those conditions
+-- fails.
+--
+-- **Note:** This function is for internal use by :EmbedLibraries
 -- @paramsig addon, libname[, silent[, offset]]
 -- @param addon addon object to embed the library in
 -- @param libname name of the library to embed
@@ -495,11 +502,12 @@ function Embed(target)
 end
 
 
---- Initialize the addon after creation.
--- Note: This function is only used internally during the ADDON_LOADED event
+-- - Initialize the addon after creation.
+-- This function is only used internally during the ADDON_LOADED event
 -- It will call the **OnInitialize** function on the addon object (if present), 
--- and the **OnEmbedInitialize** function on all embeded libraries. \\
--- Do not call this function manually, unless you're absolutely sure that you know what you are doing.
+-- and the **OnEmbedInitialize** function on all embeded libraries.
+-- 
+-- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- @param addon addon object to intialize
 function AceAddon:InitializeAddon(addon)
 	safecall(addon.OnInitialize, addon)
@@ -514,13 +522,15 @@ function AceAddon:InitializeAddon(addon)
 	-- from the event handler and only done _once_
 end
 
---- Enable the addon after creation.
+-- - Enable the addon after creation.
 -- Note: This function is only used internally during the PLAYER_LOGIN event, or during ADDON_LOADED,
 -- if IsLoggedIn() already returns true at that point, e.g. for LoD Addons.
 -- It will call the **OnEnable** function on the addon object (if present), 
 -- and the **OnEmbedEnable** function on all embeded libraries.\\
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.\\
--- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing. Use :Enable on the addon itself instead.
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is disabled.
+--
+-- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing.
+-- Use :Enable on the addon itself instead.
 -- @param addon addon object to enable
 function AceAddon:EnableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
@@ -547,12 +557,14 @@ function AceAddon:EnableAddon(addon)
 	return self.statuses[addon.name] -- return true if we're disabled
 end
 
---- Disable the addon
+-- - Disable the addon
 -- Note: This function is only used internally.
 -- It will call the **OnDisable** function on the addon object (if present), 
 -- and the **OnEmbedDisable** function on all embeded libraries.\\
--- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.\\
--- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing. Use :Disable on the addon itself instead.
+-- This function does not toggle the enable state of the addon itself, and will return early if the addon is still enabled.
+--
+-- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing. 
+-- Use :Disable on the addon itself instead.
 -- @param addon addon object to enable
 function AceAddon:DisableAddon(addon)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
@@ -578,9 +590,6 @@ function AceAddon:DisableAddon(addon)
 	
 	return not self.statuses[addon.name] -- return true if we're disabled
 end
-
---The next few funcs are just because no one should be reaching into the internal registries
---Thoughts?
 
 --- Get an iterator over all registered addons.
 -- @usage 
