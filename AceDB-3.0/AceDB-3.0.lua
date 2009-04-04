@@ -590,7 +590,7 @@ end
 
 --- Creates a new database object that can be used to handle database settings
 -- and profiles.
--- @param name The name of variable, or table to use for the database
+-- @param tbl The name of variable, or table to use for the database
 -- @param defaults A table of database defaults
 -- @param defaultProfile The name of the default profile
 function AceDB:New(tbl, defaults, defaultProfile)

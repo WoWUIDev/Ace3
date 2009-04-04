@@ -202,6 +202,7 @@ end
 
 --- Return the specified module from an addon object.
 -- Throws an error if the addon object cannot be found (except if silent is set)
+-- @name //addon//:GetModule
 -- @paramsig name[, silent]
 -- @param name unique name of the module
 -- @param silent if true, the module is optional, silently return nil if its not found (optional)
@@ -224,6 +225,7 @@ local function IsModuleTrue(self) return true end
 -- The new module can have its own embeded libraries and/or use a module prototype to be mixed into the module.\\
 -- A module has the same functionality as a real addon, it can have modules of its own, and has the same API as
 -- an addon object.
+-- @name //addon//:NewModule
 -- @paramsig name[, prototype|lib[, lib, ...]]
 -- @param name unique name of the module
 -- @param prototype object to derive this module from, methods and values from this table will be mixed into the module (optional)
@@ -274,6 +276,7 @@ function NewModule(self, name, prototype, ...)
 end
 
 --- Returns the real name of the addon or module, without any prefix.
+-- @name //addon//:GetName
 -- @paramsig 
 -- @usage 
 -- print(MyAddon:GetName())
@@ -287,6 +290,7 @@ end
 -- This internally calls AceAddon:EnableAddon(), thus dispatching a OnEnable callback
 -- and enabling all modules of the addon (unless explicitly disabled).\\
 -- :Enable() also sets the internal `enableState` variable to true
+-- @name //addon//:Enable
 -- @paramsig 
 -- @usage 
 -- -- Enable MyModule
@@ -303,6 +307,7 @@ end
 -- This internally calls AceAddon:DisableAddon(), thus dispatching a OnDisable callback
 -- and disabling all modules of the addon.\\
 -- :Disable() also sets the internal `enableState` variable to false
+-- @name //addon//:Disable
 -- @paramsig 
 -- @usage 
 -- -- Disable MyAddon
@@ -316,6 +321,7 @@ end
 
 --- Enables the Module, if possible, return true or false depending on success.
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Enable` on the module object.
+-- @name //addon//:EnableModule
 -- @paramsig name
 -- @usage 
 -- -- Enable MyModule using :GetModule
@@ -335,6 +341,7 @@ end
 
 --- Disables the Module, if possible, return true or false depending on success.
 -- Short-hand function that retrieves the module via `:GetModule` and calls `:Disable` on the module object.
+-- @name //addon//:DisableModule
 -- @paramsig name
 -- @usage 
 -- -- Disable MyModule using :GetModule
@@ -354,6 +361,7 @@ end
 
 --- Set the default libraries to be mixed into all modules created by this object.
 -- Note that you can only change the default module libraries before any module is created.
+-- @name //addon//:SetDefaultModuleLibraries
 -- @paramsig lib[, lib, ...]
 -- @param lib List of libraries to embed into the addon
 -- @usage 
@@ -372,6 +380,7 @@ end
 
 --- Set the default state in which new modules are being created.
 -- Note that you can only change the default state before any module is created.
+-- @name //addon//:SetDefaultModuleState
 -- @paramsig state
 -- @param state Default state for new modules, true for enabled, false for disabled
 -- @usage 
@@ -391,6 +400,7 @@ end
 
 --- Set the default prototype to use for new modules on creation.
 -- Note that you can only change the default prototype before any module is created.
+-- @name //addon//:SetDefaultModulePrototype
 -- @paramsig prototype
 -- @param prototype Default prototype for the new modules (table)
 -- @usage 
@@ -414,7 +424,8 @@ function SetDefaultModulePrototype(self, prototype)
 end
 
 --- Set the state of an addon or module
--- This should only be caleld before any enabling actually happend, aka in/before OnInitialize.
+-- This should only be called before any enabling actually happend, e.g. in/before OnInitialize.
+-- @name //addon//:SetEnabledState
 -- @paramsig state
 -- @param state the state of an addon or module  (enabled=true, disabled=false)
 function SetEnabledState(self, state)
@@ -423,6 +434,7 @@ end
 
 
 --- Return an iterator of all modules associated to the addon.
+-- @name //addon//:IterateModules
 -- @paramsig 
 -- @usage 
 -- -- Enable all modules
@@ -433,11 +445,13 @@ end
 local function IterateModules(self) return pairs(self.modules) end
 
 -- Returns an iterator of all embeds in the addon
+-- @name //addon//:IterateEmbeds
 -- @paramsig 
 -- @return Iterator of all embeded libraries
 local function IterateEmbeds(self) return pairs(AceAddon.embeds[self]) end
 
 --- Query the enabledState of an addon.
+-- @name //addon//:IsEnabled
 -- @paramsig 
 -- @usage 
 -- if MyAddon:IsEnabled() then
