@@ -1,4 +1,19 @@
 --- AceGUI-3.0 provides access to numerous widgets which can be used to create GUIs.
+-- @usage
+-- local AceGUI = LibStub("AceGUI-3.0")
+-- -- Create a container frame
+-- local f = AceGUI:Create("Frame")
+-- f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+-- f:SetTitle("AceGUI-3.0 Example")
+-- f:SetStatusText("Status Bar")
+-- f:SetLayout("Flow")
+-- -- Create a button
+-- local btn = AceGUI:Create("Button")
+-- btn:SetWidth(170)
+-- btn:SetText("Button !")
+-- btn:SetCallback("OnClick", function() print("Click!") end)
+-- -- Add the button to the container
+-- f:AddChild(btn)
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
@@ -154,7 +169,8 @@ end
 
 --- Releases a widget Object.
 -- This function calls OnRelease on the widget and places it back in the widget pool.
--- Any data on the widget is being erased, and the widget will be hidden.
+-- Any data on the widget is being erased, and the widget will be hidden.\\
+-- If this widget is a Container-Widget, all of its Child-Widgets will be releases as well.
 -- @param widget The widget to release
 function AceGUI:Release(widget)
 	safecall( widget.PauseLayout, widget )
@@ -503,7 +519,7 @@ function AceGUI:RegisterLayout(Name, LayoutFunc)
 end
 
 --- Get a Layout Function from the registry
--- @name Name The name of the layout
+-- @param Name The name of the layout
 function AceGUI:GetLayout(Name)
 	if type(Name) == "string" then
 		Name = Name:upper()
