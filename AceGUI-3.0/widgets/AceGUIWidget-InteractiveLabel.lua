@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "InteractiveLabel"
-	local Version = 1
+	local Version = 2
 	
 	local function OnAcquire(self)
 		self:SetText("")
@@ -13,6 +13,7 @@ do
 		self:SetColor()
 		self:SetFontObject()
 		self:SetHighlight()
+		self:SetHighlightTexCoord()
 	end
 	
 	local function OnRelease(self)
@@ -106,8 +107,11 @@ do
 		UpdateImageAnchor(self)
 	end
 	
-	local function SetHighlight(self, texture, ...)
-		self.highlight:SetTexture(texture)
+	local function SetHighlight(self, ...)
+		self.highlight:SetTexture(...)
+	end
+	
+	local function SetHighlightTexCoord(self, ...)
 		if select('#', ...) >= 1 then
 			self.highlight:SetTexCoord(...)
 		else
@@ -151,6 +155,7 @@ do
 		self.SetFont = SetFont
 		self.SetFontObject = SetFontObject
 		self.SetHighlight = SetHighlight
+		self.SetHighlightTexCoord = SetHighlightTexCoord
 		frame.obj = self
 		
 		frame:SetHeight(18)
