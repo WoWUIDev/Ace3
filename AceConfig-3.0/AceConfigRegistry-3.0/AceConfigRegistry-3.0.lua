@@ -7,7 +7,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 8
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 9
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
@@ -90,6 +90,7 @@ local typedkeys={
 		imageCoords=optmethodtable,
 		imageHeight=optnumber,
 		imageWidth=optnumber,
+		fontSize=optstringfunc,
 	},
 	group={
 		args=istable,

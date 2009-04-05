@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 31
+local MAJOR, MINOR = "AceConfigDialog-3.0", 32
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -179,6 +179,7 @@ local stringIsLiteral = {
 	usage = true,
 	width = true,
 	image = true,
+	fontSize = true,
 }
 
 --Is Never a function or method
@@ -1258,6 +1259,16 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 				elseif v.type == "description" then
 					control = gui:Create("Label")
 					control:SetText(name)
+					
+					local fontSize = GetOptionsMemberValue("fontSize",v, options, path, appName)
+					if fontSize == "medium" then
+						control:SetFontObject(GameFontHighlight)
+					elseif fontSize == "large" then
+						control:SetFontObject(GameFontHighlightLarge)
+					else -- small or invalid
+						control:SetFontObject(GameFontHighlightSmall)
+					end
+					
 					local imageCoords = GetOptionsMemberValue("imageCoords",v, options, path, appName)
 					local image, width, height = GetOptionsMemberValue("image",v, options, path, appName)
 					
