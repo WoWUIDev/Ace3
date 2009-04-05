@@ -19,11 +19,12 @@
 -- It is recommended to embed AceBucket, otherwise you'll have to specify a custom `self` on all calls you
 -- make into AceBucket.
 -- @usage
--- local MyAddon = LibStub("AceAddon-3.0"):NewAddon("BucketExample", "AceBucket-3.0")
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon("BucketExample", "AceBucket-3.0")
 -- 
 -- function MyAddon:OnEnable()
---   -- Register a bucket that listens to all the HP related events, and fires once per second
---   self.hpBucket = self:RegisterBucketEvent({"UNIT_HEALTH", "UNIT_MAXHEALTH"}, 1, "UpdateHealth")
+--   -- Register a bucket that listens to all the HP related events, 
+--   -- and fires once per second
+--   self:RegisterBucketEvent({"UNIT_HEALTH", "UNIT_MAXHEALTH"}, 1, "UpdateHealth")
 -- end
 --
 -- function MyAddon:UpdateHealth(units)
