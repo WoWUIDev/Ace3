@@ -37,7 +37,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 12
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 13
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -256,6 +256,9 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	
 	-- Make a container for profile keys
 	if not sv.profileKeys then sv.profileKeys = {} end
+	
+	-- map "true" to our "Default" profile
+	if defaultProfile == true then defaultProfile = "Default" end
 	
 	-- Try to get the profile selected from the char db
 	local profileKey = sv.profileKeys[charKey] or defaultProfile or charKey
@@ -623,12 +626,24 @@ end
 	AceDB Exposed Methods
 ---------------------------------------------------------------------------]]
 
---- Creates a new database object that can be used to handle database settings
--- and profiles.
+--- Creates a new database object that can be used to handle database settings and profiles.
+-- By default, an empty DB is created, using a character specific profile.
+--
+-- You can override the default profile used by passing any profile name as the third argument,
+-- or by passing //true// as the third argument to use a globally shared profile called "Default".
+--
+-- Note that there is no token replacement in the default profile name, passing a defaultProfile as "char"
+-- will use a profile named "char", and not a character-specific profile.
 -- @param tbl The name of variable, or table to use for the database
 -- @param defaults A table of database defaults
--- @param defaultProfile The name of the default profile
--- @usage self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, "Default")
+-- @param defaultProfile The name of the default profile. If not set, a character specific profile will be used as the default.
+-- You can also pass //true// to use a shared global profile called "Default".
+-- @usage
+-- -- Create an empty DB using a character-specific default profile.
+-- self.db = LibStub("AceDB-3.0"):New("MyAddonDB")
+-- @usage
+-- -- Create a DB using defaults and using a shared default profile
+-- self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, true)
 function AceDB:New(tbl, defaults, defaultProfile)
 	if type(tbl) == "string" then
 		local name = tbl
@@ -647,8 +662,8 @@ function AceDB:New(tbl, defaults, defaultProfile)
 		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'defaults' - table expected.", 2)
 	end
 	
-	if defaultProfile and type(defaultProfile) ~= "string" then
-		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'defaultProfile' - string expected.", 2)
+	if defaultProfile and type(defaultProfile) ~= "string" and defaultProfile ~= true then
+		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'defaultProfile' - string or true expected.", 2)
 	end
 	
 	return initdb(tbl, defaults, defaultProfile)
@@ -662,5 +677,6 @@ for db in pairs(AceDB.db_registry) do
 		end
 	else
 		db.RegisterDefaults = DBObjectLib.RegisterDefaults
+		db.ResetProfile = DBObjectLib.ResetProfile
 	end
 end
