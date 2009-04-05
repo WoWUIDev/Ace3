@@ -4,7 +4,7 @@
 -- The most common data-type is the `profile` type, which allows the user to choose
 -- the active profile, and manage the profiles of all of his characters.\\
 -- The following data types are available:
--- * **char** Character-specific data. No other characters can access or change this data, it is specific to one character and one character alone.
+-- * **char** Character-specific data. Every character has its own database.
 -- * **realm** Realm-specific data. All of the players characters on the same realm share this database.
 -- * **class** Class-specific data. All of the players characters of the same class share this database.
 -- * **race** Race-specific data. All of the players characters of the same race share this database.
@@ -14,9 +14,12 @@
 -- * **profile** Profile-specific data. All characters using the same profile share this database. The user can control which profile should be used.
 --
 -- Creating a new Database using the `:New` function will return a new DBObject. A database will inherit all functions
--- of the DBObjectLib listed here. If you create a new namespaced child-database (`:RegisterNamespace`), you'll get a DBObject as well, but note
+-- of the DBObjectLib listed here. \\
+-- If you create a new namespaced child-database (`:RegisterNamespace`), you'll get a DBObject as well, but note
 -- that the child-databases cannot individually change their profile, and are linked to their parents profile - and because of that,
 -- the profile related APIs are not available. Only `:RegisterDefaults` and `:ResetProfile` are available on child-databases.
+--
+-- For more details on how to use AceDB-3.0, see the [[AceDB-3.0 Tutorial]].
 -- @usage
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon("DBExample")
 --
