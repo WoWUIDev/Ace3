@@ -678,7 +678,7 @@ end
 -- @usage
 -- MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon", "AceConsole-3.0")
 -- -- Use AceConsole-3.0 to register a Chat Command
--- MyAddon:RegisterChatCommand("mychat", "ChatCommand)
+-- MyAddon:RegisterChatCommand("mychat", "ChatCommand")
 -- 
 -- -- Show the GUI if no input is supplied, otherwise handle the chat input.
 -- function MyAddon:ChatCommand(input)

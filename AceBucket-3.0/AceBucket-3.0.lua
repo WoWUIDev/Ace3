@@ -1,17 +1,17 @@
 --- A bucket to catch events in. **AceBucket-3.0** provides throttling of events that fire in bursts and
 -- your addon only needs to know about the full burst.
 -- 
--- This Bucket implementation works as follows:
---    Initially, no schedule is running, and its waiting for the first event to happen.\\
---    The first event will start the bucket, and get the scheduler running, which will collect all
---    events in the given interval. When that interval is reached, the bucket is pushed to the 
---    callback and a new schedule is started. When a bucket is empty after its interval, the scheduler is 
---    stopped, and the bucket is only listening for the next event to happen, basicly back in initial state.
+-- This Bucket implementation works as follows:\\
+-- : Initially, no schedule is running, and its waiting for the first event to happen.\\
+-- : The first event will start the bucket, and get the scheduler running, which will collect all
+--   events in the given interval. When that interval is reached, the bucket is pushed to the 
+--   callback and a new schedule is started. When a bucket is empty after its interval, the scheduler is 
+--   stopped, and the bucket is only listening for the next event to happen, basicly back in initial state.
 -- 
 -- In addition, the buckets collect information about the "arg1" argument of the events that fire, and pass those as a 
 -- table to your callback. This functionality was mostly designed for the UNIT_* events.\\
 -- The table will have the different values of "arg1" as keys, and the number of occurances as their value, e.g.\\
---   { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
+-- : { ["player"] = 2, ["target"] = 1, ["party1"] = 1 }
 --
 -- **AceBucket-3.0** can be embeded into your addon, either explicitly by calling AceBucket:Embed(MyAddon) or by 
 -- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
