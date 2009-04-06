@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
 		self:SetLabel("")
@@ -55,8 +55,8 @@ do
 		end
 	end
 	
-	local function OnClick(this)
-		this.obj:Fire("OnClick")
+	local function OnClick(this, button)
+		this.obj:Fire("OnClick", button)
 		AceGUI:ClearFocus()
 	end
 	
