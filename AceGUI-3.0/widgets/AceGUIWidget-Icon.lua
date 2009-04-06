@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 6
+	local Version = 7
 	
 	local function OnAcquire(self)
 		self:SetLabel("")
@@ -62,10 +62,12 @@ do
 	
 	local function OnEnter(this)
 		this.obj.highlight:Show()
+		this.obj:Fire("OnEnter")
 	end
 	
 	local function OnLeave(this)
 		this.obj.highlight:Hide()
+		this.obj:Fire("OnLeave")
 	end
 
 	local function Constructor()
