@@ -5,10 +5,10 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 5
+	local Version = 6
 	
 	local function OnAcquire(self)
-		self:SetText("")
+		self:SetLabel("")
 		self:SetImage(nil)
 		self:SetImageSize(64, 64)
 	end
@@ -18,7 +18,7 @@ do
 		self.frame:Hide()
 	end
 	
-	local function SetText(self, text)
+	local function SetLabel(self, text)
 		if text and text ~= "" then
 			self.label:Show()
 			self.label:SetText(text)
@@ -75,10 +75,13 @@ do
 		
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
-		self.SetText = SetText
+		self.SetLabel = SetLabel
 		self.frame = frame
 		self.SetImage = SetImage
 		self.SetImageSize = SetImageSize
+		
+		-- SetText should be deprecated along the way
+		self.SetText = SetLabel
 
 		frame.obj = self
 		

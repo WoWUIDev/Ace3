@@ -11,7 +11,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 9
+	local Version = 10
 
 	local function OnAcquire(self)
 		self:SetDisabled(false)
@@ -114,10 +114,6 @@ do
 		HideButton(self)
 	end
 	
-	local function SetWidth(self, width)
-		self.frame:SetWidth(width)
-	end
-	
 	local function SetLabel(self, text)
 		if text and text ~= "" then
 			self.label:SetText(text)
@@ -149,7 +145,6 @@ do
 
 		self.SetDisabled = SetDisabled
 		self.SetText = SetText
-		self.SetWidth = SetWidth
 		self.SetLabel = SetLabel
 		
 		self.frame = frame

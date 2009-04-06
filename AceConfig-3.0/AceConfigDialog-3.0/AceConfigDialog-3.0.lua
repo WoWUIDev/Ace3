@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 32
+local MAJOR, MINOR = "AceConfigDialog-3.0", 33
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1092,10 +1092,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							height = 32
 						end
 						control:SetImageSize(width, height)
+						control:SetLabel(name)
 					else
 						control = gui:Create("Button")
+						control:SetText(name)
 					end
-					control:SetText(name)
 					control:SetCallback("OnClick",ActivateControl)
 
 				elseif v.type == "input" then
