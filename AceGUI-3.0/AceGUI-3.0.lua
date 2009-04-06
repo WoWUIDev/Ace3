@@ -196,7 +196,7 @@ function AceGUI:Release(widget)
 	for k in pairs(widget.events) do
 		widget.events[k] = nil
 	end
-	widget.width = nil	
+	widget.width = nil
 	--widget.frame:SetParent(nil)
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()

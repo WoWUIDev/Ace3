@@ -32,7 +32,7 @@
 --
 -- function MyAddon:OnInitialize()
 --   -- Assuming the .toc says ## SavedVariables: MyAddonDB
---   self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, "Default")
+--   self.db = LibStub("AceDB-3.0"):New("MyAddonDB", defaults, true)
 -- end
 -- @class file
 -- @name AceDB-3.0.lua

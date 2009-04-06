@@ -31,7 +31,6 @@ do
 		local frame = CreateFrame("Frame",nil,UIParent)
 		local self = {}
 		self.type = Type
-		self.width = "fill"
 		
 		self.OnRelease = OnRelease
 		self.OnAcquire = OnAcquire
