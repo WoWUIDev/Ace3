@@ -16,7 +16,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		self.dropdown:SetText("")
@@ -89,6 +89,10 @@ do
 		content.height = contentheight
 	end
 	
+	local function LayoutFinished(self, width, height)
+		self:SetHeight((height or 0) + 63)
+	end
+	
 	local function Constructor()
 		local frame = CreateFrame("Frame")
 		local self = {}
@@ -103,6 +107,7 @@ do
 		self.SetStatusTable = SetStatusTable
 		self.OnWidthSet = OnWidthSet
 		self.OnHeightSet = OnHeightSet
+		self.LayoutFinished = LayoutFinished
 		
 		self.localstatus = {}
 
