@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 8
+	local Version = 9
 	
 	local function OnAcquire(self)
 		-- restore default values
@@ -47,11 +47,25 @@ do
 	
 	local function Constructor()
 		local num  = AceGUI:GetNextWidgetNum(Type)
-		local frame = CreateFrame("Button","AceGUI30Button"..num,UIParent,"UIPanelButtonTemplate2")
+		local name = "AceGUI30Button"..num
+		local frame = CreateFrame("Button",name,UIParent,"UIPanelButtonTemplate2")
 		local self = {}
 		self.num = num
 		self.type = Type
 		self.frame = frame
+		
+		local left = _G[name .. "Left"]
+		local right = _G[name .. "Right"]
+		local middle = _G[name .. "Middle"]
+		
+		left:SetPoint("TOP", frame, "TOP", 0, -1)
+		left:SetPoint("BOTTOM", frame, "BOTTOM", 0, 1)
+		
+		right:SetPoint("TOP", frame, "TOP", 0, -1)
+		right:SetPoint("BOTTOM", frame, "BOTTOM", 0, 1)
+		
+		middle:SetPoint("TOP", frame, "TOP", 0, -1)
+		middle:SetPoint("BOTTOM", frame, "BOTTOM", 0, 1)
 
 		local text = frame:GetFontString()
 		self.text = text
