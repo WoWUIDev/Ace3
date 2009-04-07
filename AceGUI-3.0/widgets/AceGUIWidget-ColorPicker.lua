@@ -5,11 +5,13 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		self.HasAlpha = false
 		self:SetColor(0,0,0,1)
+		self:SetHeight(24)
+		self:SetWidth(200)
 	end
 	
 	local function SetLabel(self, text)

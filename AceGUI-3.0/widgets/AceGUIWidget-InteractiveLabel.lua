@@ -5,9 +5,11 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "InteractiveLabel"
-	local Version = 2
+	local Version = 3
 	
 	local function OnAcquire(self)
+		self:SetHeight(18)
+		self:SetWidth(200)
 		self:SetText("")
 		self:SetImage(nil)
 		self:SetColor()

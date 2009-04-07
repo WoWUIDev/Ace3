@@ -10,11 +10,13 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 4
+	local Version = 5
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
 		self.tristate = nil
+		self:SetHeight(24)
+		self:SetWidth(200)
 	end
 	
 	local function OnRelease(self)

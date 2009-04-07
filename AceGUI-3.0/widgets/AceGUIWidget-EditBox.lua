@@ -11,10 +11,13 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "EditBox"
-	local Version = 10
+	local Version = 11
 
 	local function OnAcquire(self)
+		self:SetHeight(26)
+		self:SetWidth(200)
 		self:SetDisabled(false)
+		self:SetLabel()
 		self.showbutton = true
 	end
 	
@@ -119,13 +122,13 @@ do
 			self.label:SetText(text)
 			self.label:Show()
 			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",7,-18)
-			self.frame:SetHeight(44)
+			self:SetHeight(44)
 			self.alignoffset = 30
 		else
 			self.label:SetText("")
 			self.label:Hide()
 			self.editbox:SetPoint("TOPLEFT",self.frame,"TOPLEFT",7,0)
-			self.frame:SetHeight(26)
+			self:SetHeight(26)
 			self.alignoffset = 12
 		end
 	end

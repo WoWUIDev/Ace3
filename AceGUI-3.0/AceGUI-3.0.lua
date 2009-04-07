@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 20
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 21
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -199,10 +199,14 @@ function AceGUI:Release(widget)
 		widget.events[k] = nil
 	end
 	widget.width = nil
-	--widget.frame:SetParent(nil)
+	widget.relWidth = nil
+	widget.height = nil
+	widget.relHeight = nil
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()
 	widget.frame:SetParent(nil)
+	widget.frame.width = nil
+	widget.frame.height = nil
 	if widget.content then
 		widget.content.width = nil
 		widget.content.height = nil
@@ -312,6 +316,14 @@ do
 		end
 	end
 	
+	WidgetBase.SetRelativeWidth = function(self, width)
+		if width <= 0 or width > 1 then
+			error(":SetRelativeWidth(width): Invalid relative width.", 2)
+		end
+		self.relWidth = width
+		self.width = "relative"
+	end
+	
 	WidgetBase.SetHeight = function(self, height)
 		self.frame:SetHeight(height)
 		self.frame.height = height
@@ -319,6 +331,14 @@ do
 			self:OnHeightSet(height)
 		end
 	end
+	
+	--[[ WidgetBase.SetRelativeHeight = function(self, height)
+		if height <= 0 or height > 1 then
+			error(":SetRelativeHeight(height): Invalid relative height.", 2)
+		end
+		self.relHeight = height
+		self.height = "relative"
+	end ]]
 
 	WidgetBase.IsVisible = function(self)
 		return self.frame:IsVisible()
@@ -633,6 +653,14 @@ AceGUI:RegisterLayout("List",
 				if child.DoLayout then
 					child:DoLayout()
 				end
+			elseif child.width == "relative" then
+				child:SetWidth(width * child.relWidth)
+				if child.OnWidthSet then
+					child:OnWidthSet(content.width or content:GetWidth())
+				end
+				if child.DoLayout then
+					child:DoLayout()
+				end
 			end
 			
 			height = height + (frame.height or frame:GetHeight() or 0)
@@ -684,6 +712,10 @@ AceGUI:RegisterLayout("Flow",
 			lastframeoffset = frameoffset
 			frameoffset = child.alignoffset or (frameheight / 2)
 			
+			if child.width == "relative" then
+				framewidth = width * child.relWidth
+			end
+			
 			frame:Show()
 			frame:ClearAllPoints()
 			if i == 1 then
@@ -709,7 +741,7 @@ AceGUI:RegisterLayout("Flow",
 					rowstartoffset = frameoffset
 					rowheight = frameheight
 					rowoffset = frameoffset
-					usedwidth = frame.width or frame:GetWidth()
+					usedwidth = framewidth
 					if usedwidth > width then
 						oversize = true
 					end
@@ -735,12 +767,25 @@ AceGUI:RegisterLayout("Flow",
 				rowstart = frame
 				rowstartoffset = frameoffset
 				
+				if child.OnWidthSet then
+					child:OnWidthSet(width)
+				end
 				if child.DoLayout then
 					child:DoLayout()
 				end
 				rowheight = frame.height or frame:GetHeight() or 0
 				rowoffset = child.alignoffset or (rowheight / 2)
 				rowstartoffset = rowoffset
+			elseif child.width == "relative" then
+				child:SetWidth(width * child.relWidth)
+				
+				if child.OnWidthSet then
+					child:OnWidthSet(width)
+				end
+				
+				if child.DoLayout then
+					child:DoLayout()
+				end
 			elseif oversize then
 				if width > 1 then
 					frame:SetPoint("RIGHT",content,"RIGHT",0,0)

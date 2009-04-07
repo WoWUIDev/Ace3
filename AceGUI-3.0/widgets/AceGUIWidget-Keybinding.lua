@@ -6,7 +6,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "Keybinding"
-	local Version = 11
+	local Version = 12
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -100,6 +100,8 @@ do
 	end
 	
 	local function OnAcquire(self)
+		self:SetWidth(200)
+		self:SetHeight(44)
 		self:SetLabel("")
 		self:SetKey("")
 	end

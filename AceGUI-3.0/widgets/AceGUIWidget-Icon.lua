@@ -5,9 +5,11 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 8
+	local Version = 9
 	
 	local function OnAcquire(self)
+		self:SetHeight(110)
+		self:SetWidth(110)
 		self:SetLabel("")
 		self:SetImage(nil)
 		self:SetImageSize(64, 64)

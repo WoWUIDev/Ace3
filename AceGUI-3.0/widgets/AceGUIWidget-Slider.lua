@@ -5,9 +5,11 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 6
+	local Version = 7
 	
 	local function OnAcquire(self)
+		self:SetWidth(200)
+		self:SetHeight(44)
 		self:SetDisabled(false)
 		self:SetIsPercent(nil)
 		self:SetSliderValues(0,100,1)

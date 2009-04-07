@@ -5,9 +5,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
+		-- restore default values
+		self:SetHeight(24)
+		self:SetWidth(200)
 	end
 	
 	local function OnRelease(self)

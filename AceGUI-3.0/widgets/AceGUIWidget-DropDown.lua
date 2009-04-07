@@ -344,7 +344,7 @@ end
 
 do 
 	local widgetType = "Dropdown"
-	local widgetVersion = 18
+	local widgetVersion = 19
 	
 	--[[ Static data ]]--
 	
@@ -444,6 +444,9 @@ do
 		pullout:SetCallback("OnOpen", OnPulloutOpen)
 		self.pullout.frame:SetFrameLevel(self.frame:GetFrameLevel() + 1)
 		fixlevels(self.pullout.frame, self.pullout.frame:GetChildren())
+		
+		self:SetHeight(44)
+		self:SetWidth(200)
 	end
 	
 	-- exported, AceGUI callback

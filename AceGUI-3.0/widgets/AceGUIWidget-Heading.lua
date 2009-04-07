@@ -5,10 +5,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Heading"
-	local Version = 4
+	local Version = 5
 	
 	local function OnAcquire(self)
 		self:SetText("")
+		self:SetFullWidth()
+		self:SetHeight(18)
 	end
 	
 	local function OnRelease(self)

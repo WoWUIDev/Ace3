@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 9
+local Version = 10
 ---------------------
 -- Common Elements --
 ---------------------
@@ -106,6 +106,9 @@ do
 	end
 	
 	function MultiLineEditBox:OnAcquire()
+		self:SetWidth(200)
+		self:SetHeight(116)
+		self:SetNumLines(4)
 		self:SetDisabled(false)
 		self:ShowButton(true)
 	end
@@ -154,6 +157,11 @@ do
 			self.label:Show()
 			self.label:SetText(text)
 		end
+	end
+	
+	function MultiLineEditBox:SetNumLines(number)
+		number = number or 4
+		self:SetHeight(60 + (14*number))
 	end
 
 	function MultiLineEditBox:GetText()
