@@ -29,7 +29,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ScrollFrame"
-	local Version = 3
+	local Version = 4
 	
 	local function OnAcquire(self)
 
@@ -194,7 +194,7 @@ do
 		
 		scrollframe:SetScrollChild(content)
 		scrollframe:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
-		scrollframe:SetPoint("BOTTOMRIGHT",self.frame,"BOTTOMRIGHT",-16,0)
+		scrollframe:SetPoint("BOTTOMRIGHT",self.frame,"BOTTOMRIGHT",-20,0)
 		scrollframe:EnableMouseWheel(true)
 		scrollframe:SetScript("OnMouseWheel", OnMouseWheel)
 		scrollframe:SetScript("OnSizeChanged", OnSizeChanged)
@@ -204,8 +204,8 @@ do
 		content:SetPoint("TOPRIGHT",scrollframe,"TOPRIGHT",0,0)
 		content:SetHeight(400)
 		
-		scrollbar:SetPoint("TOPLEFT",scrollframe,"TOPRIGHT",0,-16)
-		scrollbar:SetPoint("BOTTOMLEFT",scrollframe,"BOTTOMRIGHT",0,16)
+		scrollbar:SetPoint("TOPLEFT",scrollframe,"TOPRIGHT",4,-16)
+		scrollbar:SetPoint("BOTTOMLEFT",scrollframe,"BOTTOMRIGHT",4,16)
 		scrollbar:SetScript("OnValueChanged", OnScrollValueChanged)
 		scrollbar:SetMinMaxValues(0,1000)
 		scrollbar:SetValueStep(1)

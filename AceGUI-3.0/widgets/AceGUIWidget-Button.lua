@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		-- restore default values
@@ -69,8 +69,10 @@ do
 
 		local text = frame:GetFontString()
 		self.text = text
-		text:SetPoint("LEFT",frame,"LEFT",15,0)
-		text:SetPoint("RIGHT",frame,"RIGHT",-15,0)
+		text:ClearAllPoints()
+		text:SetPoint("TOPLEFT",frame,"TOPLEFT", 15, -1)
+		text:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT", -15, 1)
+		text:SetJustifyV("MIDDLE")
 
 		frame:SetScript("OnClick",Button_OnClick)
 		frame:SetScript("OnEnter",Button_OnEnter)
