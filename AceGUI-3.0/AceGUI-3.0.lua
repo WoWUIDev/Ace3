@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 21
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 22
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -202,6 +202,7 @@ function AceGUI:Release(widget)
 	widget.relWidth = nil
 	widget.height = nil
 	widget.relHeight = nil
+	widget.noAutoHeight = nil
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()
 	widget.frame:SetParent(nil)
@@ -462,6 +463,14 @@ do
 	
 	WidgetContainerBase.SetLayout = function(self, Layout)
 		self.LayoutFunc = AceGUI:GetLayout(Layout)
+	end
+
+	WidgetContainerBase.SetAutoAdjustHeight = function(self, adjust)
+		if adjust then
+			self.noAutoHeight = nil
+		else
+			self.noAutoHeight = true
+		end
 	end
 
 	local function FrameResize(this)

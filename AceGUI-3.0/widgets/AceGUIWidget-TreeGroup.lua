@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 19
+	local Version = 20
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -599,6 +599,11 @@ do
 		local status = self.status or self.localstatus
 		status.treewidth = treeframe:GetWidth()
 	end
+	
+	local function LayoutFinished(self, width, height)
+		if self.noAutoHeight then return end
+		self:SetHeight((height or 0) + 20)
+	end
 
 	local createdcount = 0
 	local function Constructor()
@@ -662,6 +667,7 @@ do
 		self.OnHeightSet = OnHeightSet		
 		self.EnableButtonTooltips = EnableButtonTooltips
 		self.Filter = Filter
+		self.LayoutFinished = LayoutFinished
 		
 		self.frame = frame
 		frame.obj = self

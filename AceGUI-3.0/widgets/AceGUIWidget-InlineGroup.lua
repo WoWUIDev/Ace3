@@ -35,7 +35,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "InlineGroup"
-	local Version = 4
+	local Version = 5
 	
 	local function OnAcquire(self)
 		self:SetWidth(300)
@@ -60,6 +60,7 @@ do
 
 
 	local function LayoutFinished(self, width, height)
+		if self.noAutoHeight then return end
 		self:SetHeight((height or 0) + 40)
 	end
 	

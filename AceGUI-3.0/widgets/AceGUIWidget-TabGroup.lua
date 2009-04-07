@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 18
+	local Version = 19
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -293,6 +293,11 @@ do
 		content:SetHeight(contentheight)
 		content.height = contentheight
 	end
+	
+	local function LayoutFinished(self, width, height)
+		if self.noAutoHeight then return end
+		self:SetHeight((height or 0) + (self.borderoffset + 23))
+	end
 
 	local function Constructor()
 		local frame = CreateFrame("Frame",nil,UIParent)
@@ -311,6 +316,7 @@ do
 		self.BuildTabs = BuildTabs
 		self.SetStatusTable = SetStatusTable
 		self.SetTabs = SetTabs
+		self.LayoutFinished = LayoutFinished
 		self.frame = frame
 		
 		self.OnWidthSet = OnWidthSet
