@@ -16,10 +16,11 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 10
+	local Version = 11
 	
 	local function OnAcquire(self)
 		self.dropdown:SetText("")
+		self:SetDropdownWidth(200)
 	end
 	
 	local function OnRelease(self)
@@ -93,6 +94,10 @@ do
 		self:SetHeight((height or 0) + 63)
 	end
 	
+	local function SetDropdownWidth(self, width)
+		self.dropdown:SetWidth(width)
+	end
+	
 	local function Constructor()
 		local frame = CreateFrame("Frame")
 		local self = {}
@@ -105,6 +110,7 @@ do
 		self.SetGroupList = SetGroupList
 		self.SetGroup = SetGroup
 		self.SetStatusTable = SetStatusTable
+		self.SetDropdownWidth = SetDropdownWidth
 		self.OnWidthSet = OnWidthSet
 		self.OnHeightSet = OnHeightSet
 		self.LayoutFinished = LayoutFinished
@@ -120,13 +126,13 @@ do
 		frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		
 		local titletext = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
-		titletext:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)
-		titletext:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-14,0)
+		titletext:SetPoint("TOPLEFT",frame,"TOPLEFT",4,0)
+		titletext:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-4,0)
 		titletext:SetJustifyH("LEFT")
 		titletext:SetHeight(18)
 		
 		
-		self.titletext = titletext	
+		self.titletext = titletext
 		
 		local dropdown = AceGUI:Create("Dropdown")
 		self.dropdown = dropdown
@@ -134,7 +140,7 @@ do
 		dropdown.parentgroup = self
 		dropdown:SetCallback("OnValueChanged",SelectedGroup)
 		
-		dropdown.frame:SetPoint("TOPLEFT",titletext,"BOTTOMLEFT",-7,3)
+		dropdown.frame:SetPoint("TOPLEFT",titletext,"BOTTOMLEFT",-3,3)
 		dropdown.frame:Show()
 		dropdown:SetLabel("")
 		
