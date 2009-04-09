@@ -17,7 +17,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 8
+local MAJOR, MINOR = "AceConfigCmd-3.0", 9
 local AceConfigCmd = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigCmd then return end
@@ -458,16 +458,27 @@ local function handle(info, inputpos, tab, depth, retfalse)
 	elseif tab.type=="select" then
 		------------ select ------------------------------------
 		local str = strtrim(strlower(str))
-		if str == "" then
-			--TODO: Show current selection and possible values
-			return
-		end
 		
 		local values = tab.values
 		if type(values) == "function" or type(values) == "string" then
 			info.values = values
 			values = callmethod(info, inputpos, tab, "values")
 			info.values = nil
+		end
+		
+		if str == "" then
+			local b = callmethod(info, inputpos, tab, "get")
+			local fmt = "|cffffff78- [%s]|r %s"
+			local fmt_sel = "|cffffff78- [%s]|r %s |cffff0000*|r"
+			print(L["Options for |cffffff78"..info[#info].."|r:"])
+			for k, v in pairs(values) do
+				if b == k then
+					print(fmt_sel:format(k, v))
+				else
+					print(fmt:format(k, v))
+				end
+			end
+			return
 		end
 
 		local ok
@@ -488,17 +499,27 @@ local function handle(info, inputpos, tab, depth, retfalse)
 	elseif tab.type=="multiselect" then
 		------------ multiselect -------------------------------------------
 		local str = strtrim(strlower(str))
-		if str == "" then
-			--TODO: Show current values
-			return
-		end
 		
 		local values = tab.values
 		if type(values) == "function" or type(values) == "string" then
 			info.values = values
 			values = callmethod(info, inputpos, tab, "values")
 			info.values = nil
-		end		
+		end
+		
+		if str == "" then
+			local fmt = "|cffffff78- [%s]|r %s"
+			local fmt_sel = "|cffffff78- [%s]|r %s |cffff0000*|r"
+			print(L["Options for |cffffff78"..info[#info].."|r (multiple possible):"])
+			for k, v in pairs(values) do
+				if callmethod(info, inputpos, tab, "get", k) then
+					print(fmt_sel:format(k, v))
+				else
+					print(fmt:format(k, v))
+				end
+			end
+			return
+		end
 		
 		--build a table of the selections, checking that they exist
 		--parse for =on =off =default in the process
