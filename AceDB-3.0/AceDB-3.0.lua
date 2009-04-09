@@ -619,6 +619,7 @@ function DBObjectLib:GetNamespace(name, silent)
 	if not silent and not (self.children and self.children[name]) then
 		error ("Usage: AceDBObject:GetNamespace(name): 'name' - namespace does not exist.", 2)
 	end
+	if not self.children then self.children = {} end
 	return self.children[name]
 end
 
