@@ -10,8 +10,6 @@ AceConfig-3.0
 
 Very light wrapper library that combines all the AceConfig subcomponents into one more easily used whole.
 
-Also automatically adds "config", "enable" and "disable" commands to options table as appropriate.
-
 ]]
 
 local MAJOR, MINOR = "AceConfig-3.0", 2
