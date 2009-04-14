@@ -1,3 +1,23 @@
+Ace3 Beta - Revision 803 (April 14th, 2009)
+--------------------------------------------
+- AceConfig-3.0: Allow spaces in the keys of config tables. Spaces will be changed on the fly to underscores in AceConfigCmd-3.0 - there is no collision check in place, yet.
+- AceConfig-3.0: Support a "fontSize" attribute to the description type. Possible values are "small" (default), "medium" and "large".
+- AceConfigDialog-3.0: Fixed an error that would occur when calling InterfaceOptionsFrame_OpenToCategory from within an event handler in a Blizzard Options integrated frame. (Ticket #33)
+- AceConfigDialog-3.0: The "execute" type does now recognize the "image" attributes, and will display a clickable icon instead of the button when an image is supplied. (Ticket #35)
+- AceConfigDialog-3.0: Pass icons defined in the option table to the TreeGroup widget (Ticket #20)
+- AceConfigDialog-3.0: Fixed a bug that caused an empty group widget to be drawn if all groups were hidden.
+- AceConfigCmd-3.0: Improved the behaviour of select and multiselect elements. (Ticket #26)
+- AceDB-3.0: Add a GetNamespace function to the DB Objects which returns an existing namespace from the DB object.
+- AceGUI-3.0 Slider Widget: Properly show percentage values as min/max if isPercent is true. (Ticket #32)
+- AceGUI-3.0: Fixed an error in the TreeGroup Widget that caused execution to stop if no name was provided.
+- AceGUI-3.0: Fixed the behaviour of the MultiLineEditbox Widget (Accept button not clickable). (Ticket #28)
+- AceGUI-3.0: TabGroup: Set a maximum width for tabs based on the size of the widget. (Ticket #34)
+- AceGUI-3.0: Added a new InteractiveLabel with OnEnter/OnLeave/OnClick callbacks and a highlight texture
+- AceGUI-3.0: Add SetFont and SetFontObject functions to the Label widget (and the new InteractiveLabel)
+- AceGUI-3.0: Support icons in the TreeGroup display. (Ticket #20)
+- AceGUI-3.0: Added a new :SetRelativeWidth Widget-API that allows you to set the width of widgets relative to their container.
+- AceGUI-3.0: Alot of fixes, tweaks and consistency changes.
+
 Ace3 Beta - Revision 741 (Feb 15th, 2009)
 --------------------------------------------
 - AceDBOptions-3.0: Disable the "Copy From" and "Delete" dropdowns if there are no profiles to choose from. (Ticket #19)
