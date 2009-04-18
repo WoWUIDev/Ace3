@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 19
+	local Version = 20
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -51,6 +51,9 @@ do
 			self.localstatus[k] = nil
 		end
 		self.tablist = nil
+		for _, tab in pairs(self.tabs) do
+			tab:Hide()
+		end
 	end
 	
 	local function Tab_SetText(self, text)
@@ -142,7 +145,7 @@ do
 				v:SetSelected(true)
 				found = true
 			else
-				v:SetSelected(false)	
+				v:SetSelected(false)
 			end
 		end
 		status.selected = value
@@ -159,18 +162,13 @@ do
 
 	local widths = {}
 	local rowwidths = {}
-	local rowends = {}		
+	local rowends = {}
 	local function BuildTabs(self)
 		local status = self.status or self.localstatus
 		local tablist = self.tablist
-		
 		local tabs = self.tabs
 		
-		for i, v in ipairs(tabs) do
-			v:Hide()
-		end
 		if not tablist then return end
-
 		
 		local width = self.frame.width or self.frame:GetWidth() or 0
 		
@@ -191,13 +189,17 @@ do
 				tab = self:CreateTab(i)
 				tabs[i] = tab
 			end
-		
+			
 			tab:Show()
 			tab:SetText(v.text)
 			tab:SetDisabled(v.disabled)
 			tab.value = v.value
 			
 			widths[i] = tab:GetWidth() - 6 --tabs are anchored 10 pixels from the right side of the previous one to reduce spacing, but add a fixed 4px padding for the text
+		end
+		
+		for i = (#tablist)+1, #tabs, 1 do
+			tabs[i]:Hide()
 		end
 		
 		--First pass, find the minimum number of rows needed to hold all tabs and the initial tab layout
@@ -334,7 +336,7 @@ do
 		titletext:SetJustifyH("LEFT")
 		titletext:SetHeight(18)
 		
-		self.titletext = titletext	
+		self.titletext = titletext
 		
 		local border = CreateFrame("Frame",nil,frame)
 		self.border = border
