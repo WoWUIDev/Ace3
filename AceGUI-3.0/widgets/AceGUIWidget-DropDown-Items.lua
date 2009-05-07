@@ -365,7 +365,7 @@ end
 -- Does not close the pullout on click
 do
 	local widgetType = "Dropdown-Item-Menu"
-	local widgetVersion = 1
+	local widgetVersion = 2
 	
 	local function OnEnter(this)
 		local self = this.obj
@@ -390,13 +390,13 @@ do
 	end
 	
 	-- exported
-	function SetMenu(self, menu)
+	local function SetMenu(self, menu)
 		assert(menu.type == "Dropdown-Pullout")
 		self.submenu = menu
 	end
 		
 	-- exported
-	function CloseMenu(self)
+	local function CloseMenu(self)
 		self.submenu:Close()
 	end
 		
