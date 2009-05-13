@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 5
+	local Version = 6
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -92,8 +92,8 @@ do
 			--Nil is the unknown tristate value
 			if self.tristate and value == nil then
 				SetDesaturation(self.check, true)
-				check:SetWidth(20)
-				check:SetHeight(20)
+				check:SetWidth(24)
+				check:SetHeight(24)
 				self.check:Show()
 			else
 				SetDesaturation(self.check, false)
