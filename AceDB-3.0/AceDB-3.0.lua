@@ -651,7 +651,7 @@ end
 function AceDB:New(tbl, defaults, defaultProfile)
 	if type(tbl) == "string" then
 		local name = tbl
-		tbl = getglobal(name)
+		tbl = _G[name]
 		if not tbl then
 			tbl = {}
 			setglobal(name, tbl)
