@@ -40,10 +40,12 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 14
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 15
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
+
+local _G = getfenv(0)
 
 local type = type
 local pairs, next = pairs, next
