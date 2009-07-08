@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 6
+	local Version = 7
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -32,17 +32,13 @@ do
   
 	local function CheckBox_OnEnter(this)
 		local self = this.obj
-		if not self.disabled then
-			self.highlight:Show()
-		end
+		self.highlight:Show()
 		self:Fire("OnEnter")
 	end
 	
 	local function CheckBox_OnLeave(this)
 		local self = this.obj
-		if not self.down then
-			self.highlight:Hide()
-		end
+		self.highlight:Hide()
 		self:Fire("OnLeave")
 	end
 	
@@ -68,9 +64,11 @@ do
 	local function SetDisabled(self,disabled)
 		self.disabled = disabled
 		if disabled then
+			self.frame:Disable()
 			self.text:SetTextColor(0.5,0.5,0.5)
 			SetDesaturation(self.check, true)
 		else
+			self.frame:Enable()
 			self.text:SetTextColor(1,1,1)
 			if self.tristate and self.checked == nil then
 				SetDesaturation(self.check, true)

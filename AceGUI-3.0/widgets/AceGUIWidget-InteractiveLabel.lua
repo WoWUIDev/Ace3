@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "InteractiveLabel"
-	local Version = 3
+	local Version = 4
 	
 	local function OnAcquire(self)
 		self:SetHeight(18)
@@ -19,6 +19,7 @@ do
 	end
 	
 	local function OnRelease(self)
+		self:SetDisabled(false)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
@@ -121,6 +122,17 @@ do
 		end
 	end
 	
+	local function SetDisabled(self,disabled)
+		self.disabled = disabled
+		if disabled then
+			self.frame:Disable()
+			self.label:SetTextColor(0.5, 0.5, 0.5)
+		else
+			self.frame:Enable()
+			self.label:SetTextColor(1, 1, 1)
+		end
+	end
+	
 	local function OnEnter(this)
 		this.obj.highlight:Show()
 		this.obj:Fire("OnEnter")
@@ -158,6 +170,7 @@ do
 		self.SetFontObject = SetFontObject
 		self.SetHighlight = SetHighlight
 		self.SetHighlightTexCoord = SetHighlightTexCoord
+		self.SetDisabled = SetDisabled
 		frame.obj = self
 		
 		frame:SetHeight(18)

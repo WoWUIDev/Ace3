@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		self:SetHeight(110)
@@ -18,6 +18,7 @@ do
 	local function OnRelease(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
+		self:SetDisabled(false)
 	end
 	
 	local function SetLabel(self, text)
@@ -57,6 +58,19 @@ do
 		end
 	end
 	
+	local function SetDisabled(self, disabled)
+		self.disabled = disabled
+		if disabled then
+			self.frame:Disable()
+			self.label:SetTextColor(0.5,0.5,0.5)
+			self.image:SetVertexColor(0.5, 0.5, 0.5, 0.5)
+		else
+			self.frame:Enable()
+			self.label:SetTextColor(1,1,1)
+			self.image:SetVertexColor(1, 1, 1)
+		end
+	end
+	
 	local function OnClick(this, button)
 		this.obj:Fire("OnClick", button)
 		AceGUI:ClearFocus()
@@ -86,6 +100,7 @@ do
 		
 		-- SetText should be deprecated along the way
 		self.SetText = SetLabel
+		self.SetDisabled = SetDisabled
 
 		frame.obj = self
 		

@@ -342,7 +342,7 @@ do
 	AceGUI:RegisterWidgetType(widgetType, Constructor, widgetVersion)
 end
 
-do 
+do
 	local widgetType = "Dropdown"
 	local widgetVersion = 19
 	

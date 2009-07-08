@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ColorPicker"
-	local Version = 10
+	local Version = 11
 	
 	local function OnAcquire(self)
 		self.HasAlpha = false
@@ -96,8 +96,10 @@ do
 	local function SetDisabled(self, disabled)
 		self.disabled = disabled
 		if self.disabled then
+			self.frame:Disable()
 			self.text:SetTextColor(0.5,0.5,0.5)
 		else
+			self.frame:Enable()
 			self.text:SetTextColor(1,1,1)
 		end
 	end

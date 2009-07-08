@@ -6,7 +6,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "Keybinding"
-	local Version = 12
+	local Version = 13
 
 	local ControlBackdrop  = {
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -111,6 +111,7 @@ do
 		self.frame:Hide()
 		self.waitingForKey = nil
 		self.msgframe:Hide()
+		self:SetDisabled(false)
 	end
 	
 	local function SetDisabled(self, disabled)

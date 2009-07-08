@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 23
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 24
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -739,7 +739,7 @@ AceGUI:RegisterLayout("Flow",
 			frame:ClearAllPoints()
 			if i == 1 then
 				-- anchor the first control to the top left
-				--frame:SetPoint("TOPLEFT",content,"TOPLEFT",0,0)
+				frame:SetPoint("TOPLEFT",content,"TOPLEFT",0,0)
 				rowheight = frameheight
 				rowoffset = frameoffset
 				rowstart = frame
