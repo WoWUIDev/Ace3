@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "InteractiveLabel"
-	local Version = 4
+	local Version = 5
 	
 	local function OnAcquire(self)
 		self:SetHeight(18)
@@ -125,10 +125,10 @@ do
 	local function SetDisabled(self,disabled)
 		self.disabled = disabled
 		if disabled then
-			self.frame:Disable()
+			self.frame:EnableMouse(false)
 			self.label:SetTextColor(0.5, 0.5, 0.5)
 		else
-			self.frame:Enable()
+			self.frame:EnableMouse(true)
 			self.label:SetTextColor(1, 1, 1)
 		end
 	end
