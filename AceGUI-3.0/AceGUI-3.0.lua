@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 24
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 25
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -205,7 +205,7 @@ function AceGUI:Release(widget)
 	widget.noAutoHeight = nil
 	widget.frame:ClearAllPoints()
 	widget.frame:Hide()
-	widget.frame:SetParent(nil)
+	widget.frame:SetParent(UIParent)
 	widget.frame.width = nil
 	widget.frame.height = nil
 	if widget.content then
@@ -465,7 +465,7 @@ do
 	
 	WidgetContainerBase.ReleaseChildren = function(self)
 		local children = self.children
-		for i in ipairs(children) do
+		for i = 1,#children do
 			AceGUI:Release(children[i])
 			children[i] = nil
 		end
