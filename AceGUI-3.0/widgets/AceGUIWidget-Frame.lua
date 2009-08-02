@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "Frame"
-	local Version = 7
+	local Version = 8
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -183,7 +183,7 @@ do
 		closebutton:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-27,17)
 		closebutton:SetHeight(20)
 		closebutton:SetWidth(100)
-		closebutton:SetText("Close")
+		closebutton:SetText(CLOSE)
 		
 		self.closebutton = closebutton
 		closebutton.obj = self
