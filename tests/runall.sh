@@ -6,7 +6,7 @@ if [ -z $lua ]; then
 	lua=lua
 fi
 
-for i in *-?.*.lua; do 
+for i in *-?.*.lua ChatThrottleLib*.lua; do 
 	echo ----- Running $i:
 	$lua $i
 done

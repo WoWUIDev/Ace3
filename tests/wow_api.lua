@@ -189,6 +189,11 @@ time = os.clock
 
 strmatch = string.match
 
+function SendChatMessage(text, chattype, language, destination)
+	assert(#text<255)
+	WoWAPI_FireEvent("CHAT_MSG_"..strupper(chattype), text, "Sender", language or "Common")
+end
+
 function SendAddonMessage(prefix, message, distribution, target)
 	assert(#prefix + #message < 255,
 	       string.format("SendAddonMessage: message too long (%d bytes)",
@@ -199,6 +204,7 @@ end
 
 function hooksecurefunc(func_name, post_hook_func)
 	local orig_func = _G[func_name]
+	assert(type(orig_func)=="function")
 
 	_G[func_name] = function (...)
 				local ret = { orig_func(...) }		-- yeahyeah wasteful, see if i care, it's a test framework
@@ -233,6 +239,9 @@ function WoWAPI_FireUpdate(forceNow)
 	local now = GetTime()
 	for frame,props in pairs(frames) do
 		if props.isShow and props.scripts.OnUpdate then
+			if now == 0 then
+				props.timer = 0	-- reset back in case we reset the clock for more testing
+			end
 			_G.arg1=now-props.timer
 			props.scripts.OnUpdate(frame,now-props.timer)
 			props.timer = now
