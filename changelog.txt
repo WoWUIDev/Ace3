@@ -1,3 +1,12 @@
+Ace3 Beta - Revision 820 (August 7th, 2009)
+--------------------------------------------
+- AceComm-3.0: Updated ChatThrottleLib to v21
+- AceGUI-3.0: Fixed a glitch in the TabGroup code that caused tabs to be unresponsive under rare conditions. (Ticket #38)
+- AceGUI-3.0: Consistent "disabled" behaviour of all widgets. (Ticket #47)
+- AceGUI-3.0: Changed the way widgets are handled on release to avoid a crash in the game client. (Ticket #49)
+- AceGUI-3.0: Fixed a glitch in the button graphics. (Ticket #58)
+- AceGUI-3.0: Localized the "Close" Text on the Frame widget.
+
 Ace3 Beta - Revision 803 (April 14th, 2009)
 --------------------------------------------
 - AceConfig-3.0: Allow spaces in the keys of config tables. Spaces will be changed on the fly to underscores in AceConfigCmd-3.0 - there is no collision check in place, yet.
