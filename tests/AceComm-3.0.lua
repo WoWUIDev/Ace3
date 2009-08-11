@@ -9,6 +9,20 @@ switches = arg[1] or ""
 local VERBOSE,n = strfind(switches, "vv*")	-- "v" anywhere in the first arg
 if VERBOSE then VERBOSE = n-VERBOSE+1 end -- "v"=1, "vv"=2, ...
 
+
+
+
+
+
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+--
+-- Basic AceComm splitting/queueing tests
+--
+
 local NOCTL = strfind(switches, "t")
 
 if NOCTL then	-- "t" anywhere in the first arg
@@ -128,6 +142,8 @@ end
 
 assert(#received==MSGS*2)
 assert(#received1==MSGS and #received2==MSGS)
+
+
 
 -----------------------------------------------------------------------
 print "OK"

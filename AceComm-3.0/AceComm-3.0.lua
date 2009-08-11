@@ -17,7 +17,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 
 ]]
 
-local MAJOR, MINOR = "AceComm-3.0", 5
+local MAJOR, MINOR = "AceComm-3.0", 6
 	
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -34,7 +34,7 @@ local tconcat = table.concat
 
 AceComm.embeds = AceComm.embeds or {}
 
--- for my sanity and yours, let's give the message type bytes names
+-- for my sanity and yours, let's give the message type bytes some names
 local MSG_MULTI_FIRST = "\001"
 local MSG_MULTI_NEXT  = "\002"
 local MSG_MULTI_LAST  = "\003"
@@ -56,13 +56,17 @@ function AceComm:RegisterComm(prefix, method)
 	return AceComm._RegisterComm(self, prefix, method)	-- created by CallbackHandler
 end
 
+local warnedPrefix=false
+
 --- Send a message over the Addon Channel
 -- @param prefix A printable character (\032-\255) classification of the message (typically AddonName or AddonNameEvent)
 -- @param text Data to send, nils (\000) not allowed. Any length.
 -- @param distribution Addon channel, e.g. "RAID", "GUILD", etc; see SendAddonMessage API
 -- @param target Destination for some distributions; see SendAddonMessage API
 -- @param prio OPTIONAL: ChatThrottleLib priority, "BULK", "NORMAL" or "ALERT". Defaults to "NORMAL".
-function AceComm:SendCommMessage(prefix, text, distribution, target, prio)
+-- @param callbackFn OPTIONAL: callback function to be called as each chunk is sent. receives 3 args: the user supplied arg (see next), the number of bytes sent so far, and the number of bytes total to send.
+-- @param callbackArg: OPTIONAL: first arg to the callback function. nil will be passed if not specified.
+function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callbackFn, callbackArg)
 	prio = prio or "NORMAL"	-- pasta's reference implementation had different prio for singlepart and multipart, but that's a very bad idea since that can easily lead to out-of-sequence delivery!
 	if not( type(prefix)=="string" and
 			type(text)=="string" and
@@ -70,11 +74,17 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio)
 			(target==nil or type(target)=="string") and
 			(prio=="BULK" or prio=="NORMAL" or prio=="ALERT") 
 		) then
-		error('Usage: SendCommMessage(addon, "prefix", "text", "distribution"[, "target"[, "prio"]])', 2)
+		error('Usage: SendCommMessage(addon, "prefix", "text", "distribution"[, "target"[, "prio"[, callbackFn, callbackarg]]])', 2)
 	end
 	
-	if strfind(prefix, "[\001-\003]") then
-		error("SendCommMessage: Characters \\001--\\003) in prefix are reserved for AceComm metadata", 2)
+	if strfind(prefix, "[\001-\009]") then
+		if strfind(prefix, "[\001-\003]") then
+			error("SendCommMessage: Characters \\001--\\003 in prefix are reserved for AceComm metadata", 2)
+		elseif not warnedPrefix then
+			-- I have some ideas about future extensions that require more control characters /mikk, 20090808
+			geterrorhandler()("SendCommMessage: Heads-up developers: Characters \\004--\\009 in prefix are reserved for AceComm future extension")
+			warnedPrefix = true
+		end
 	end
 
 
@@ -82,15 +92,22 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio)
 	local maxtextlen = 254 - #prefix	-- 254 is the max length of prefix + text that can be sent in one message
 	local queueName = prefix..distribution..(target or "")
 
+	local ctlCallback = nil
+	if callbackFn then
+		ctlCallback = function(sent)
+			return callbackFn(callbackArg, sent, textlen)
+		end
+	end
+
 	if textlen <= maxtextlen then
 		-- fits all in one message
-		CTL:SendAddonMessage(prio, prefix, text, distribution, target, queueName)
+		CTL:SendAddonMessage(prio, prefix, text, distribution, target, queueName, ctlCallback, textlen)
 	else
-		maxtextlen = maxtextlen - 1	-- 1 extra byte for part indicator in suffix
+		maxtextlen = maxtextlen - 1	-- 1 extra byte for part indicator in prefix
 
 		-- first part
 		local chunk = strsub(text, 1, maxtextlen)
-		CTL:SendAddonMessage(prio, prefix..MSG_MULTI_FIRST, chunk, distribution, target, queueName)
+		CTL:SendAddonMessage(prio, prefix..MSG_MULTI_FIRST, chunk, distribution, target, queueName, ctlCallback, maxtextlen)
 
 		-- continuation
 		local pos = 1+maxtextlen
@@ -98,13 +115,13 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio)
 
 		while pos+maxtextlen <= textlen do
 			chunk = strsub(text, pos, pos+maxtextlen-1)
-			CTL:SendAddonMessage(prio, prefix2, chunk, distribution, target, queueName)
+			CTL:SendAddonMessage(prio, prefix2, chunk, distribution, target, queueName, ctlCallback, pos+maxtextlen-1)
 			pos = pos + maxtextlen
 		end
-		
+
 		-- final part
 		chunk = strsub(text, pos)
-		CTL:SendAddonMessage(prio, prefix..MSG_MULTI_LAST, chunk, distribution, target, queueName)
+		CTL:SendAddonMessage(prio, prefix..MSG_MULTI_LAST, chunk, distribution, target, queueName, ctlCallback, textlen)
 	end
 end
 
