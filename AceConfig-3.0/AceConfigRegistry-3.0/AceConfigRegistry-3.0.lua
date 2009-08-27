@@ -274,8 +274,8 @@ end
 
 --- Register an options table with the config registry.
 -- @param appName The application name as given to `:RegisterOptionsTable()`
--- @param options The options table, or a function reference that generates it on demand. \\
--- If a function is given, it will be called as func(uiType, uiName, appName). uiType can be "dialog", "cmd", "dropdown". uiName is the name of the configuration UI, e.g. "AceConfigDialog-3.0", "AceConfigCmd-3.0". Having this information lets you customize the returned table according to where it will be displayed.
+-- @param options The options table, OR a function reference that generates it on demand. \\
+-- See the top of the page for info on arguments passed to such functions.
 function AceConfigRegistry:RegisterOptionsTable(appName, options)
 	if type(options)=="table" then
 		if options.type~="group" then	-- quick sanity checker
