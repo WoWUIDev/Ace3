@@ -293,7 +293,7 @@ function AceConfigRegistry:RegisterOptionsTable(appName, options)
 		AceConfigRegistry.tables[appName] = function(uiType, uiName, errlvl)
 			errlvl=(errlvl or 0)+1
 			validateGetterArgs(uiType, uiName, errlvl)
-			local tab = assert(options(uiType, uiName))
+			local tab = assert(options(uiType, uiName, appName))
 			if not AceConfigRegistry.validated[uiType][appName] then
 				AceConfigRegistry:ValidateOptionsTable(tab, appName, errlvl)	-- upgradable
 				AceConfigRegistry.validated[uiType][appName] = true
