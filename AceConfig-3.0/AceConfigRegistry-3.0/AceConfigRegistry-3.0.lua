@@ -1,9 +1,10 @@
---- AceConfigRegistry-3.0 handles central registration of options tables in use by addons and modules.
--- Options tables can be registered as raw tables, or as function refs that return a table.\\
--- These functions receive three arguments: "uiType", "uiName", "appName". \\
--- Valid "uiTypes": "cmd", "dropdown", "dialog". This is verified by the library at call time. \\
--- The "uiName" field is expected to contain the full name of the calling addon, including version, e.g. "FooBar-1.0". This is verified by the library at call time.\\
--- The "appName" field is the options table name as given at registration time \\
+--- AceConfigRegistry-3.0 handles central registration of options tables in use by addons and modules.\\
+-- Options tables can be registered as raw tables, OR as function refs that return a table.\\
+-- Such functions receive three arguments: "uiType", "uiName", "appName". \\
+-- * Valid **uiTypes**: "cmd", "dropdown", "dialog". This is verified by the library at call time. \\
+-- * The **uiName** field is expected to contain the full name of the calling addon, including version, e.g. "FooBar-1.0". This is verified by the library at call time.\\
+-- * The **appName** field is the options table name as given at registration time \\
+-- 
 -- :IterateOptionsTables() (and :GetOptionsTable() if only given one argument) return a function reference that the requesting config handling addon must call with valid "uiType", "uiName".
 -- @class file
 -- @name AceConfigRegistry-3.0
@@ -236,7 +237,7 @@ end
 -- Does NOT verify that get/set etc actually exist, since they can be defined at any depth
 -- @param options The table to be validated
 -- @param name The name of the table to be validated (shown in any error message)
--- @param errlevel (optional number) error level offset, default 0 (=errors point to the function calling :ValidateOptionsTable)
+-- @param errlvl (optional number) error level offset, default 0 (=errors point to the function calling :ValidateOptionsTable)
 function AceConfigRegistry:ValidateOptionsTable(options,name,errlvl)
 	errlvl=(errlvl or 0)+1
 	name = name or "Optionstable"
