@@ -27,12 +27,12 @@ end
 
 do
 	local widgetType = "Dropdown-Pullout"
-	local widgetVersion = 2
+	local widgetVersion = 3
 	
 	--[[ Static data ]]--
 	
 	local backdrop = {
-		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
 		edgeSize = 32,
 		tileSize = 32,
