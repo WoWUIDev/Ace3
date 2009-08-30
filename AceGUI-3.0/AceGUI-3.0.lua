@@ -264,7 +264,7 @@ end
 		:OnHeightSet(height) - Called when the height of the widget is changed
 			Widgets should not use the OnSizeChanged events of thier frame or content members, use these methods instead
 			AceGUI already sets a handler to the event
-		:OnLayoutFinished(width, height) - called after a layout has finished, the width and height will be the width and height of the
+		:LayoutFinished(width, height) - called after a layout has finished, the width and height will be the width and height of the
 			area used for controls. These can be nil if the layout used the existing size to layout the controls.
 
 ]]
