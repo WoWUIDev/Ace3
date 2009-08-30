@@ -242,4 +242,33 @@ do
 	local data2 = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
 	assert(data2.profile.boo[true] == "not so true")
 	assert(data2.profile.boo[false] == "not so false")
-end 
+end
+
+do
+	local db = {}
+	-- test case for ticket 66
+	local defaults = {
+		profile = {
+			Positions = { 
+				["**"] = { 
+					point = "CENTER", relativeTo = "UIParent", relativePoint = "CENTER", xOfs = 0, yOfs = 0 
+				}, 
+			},
+		},
+	}
+	
+	local data = LibStub("AceDB-3.0"):New(db, defaults)
+	
+	local v1 = data.profile.Positions.foo
+	
+	defaults.profile.Positions["TestFrame"] = {
+		point = "TOP",
+		relativeTo = "UIParent",
+		relativePoint = "TOP",
+		xOfs = 100,
+		yOfs = 200,
+	}
+	
+	data:RegisterDefaults(defaults)
+	assert(data.profile.Positions.TestFrame.xOfs == 100)
+end
