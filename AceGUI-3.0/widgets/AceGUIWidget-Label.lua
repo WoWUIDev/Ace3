@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Label"
-	local Version = 10
+	local Version = 11
 	
 	local function OnAcquire(self)
 		self:SetHeight(18)
@@ -43,7 +43,7 @@ do
 			else
 				--image on the left
 				image:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
-				label:SetPoint("TOPLEFT",image,"TOPRIGHT",0,0)
+				label:SetPoint("TOPLEFT",image,"TOPRIGHT",4,0)
 				label:SetWidth(width - imagewidth)
 				height = math.max(image:GetHeight(), label:GetHeight())
 			end
