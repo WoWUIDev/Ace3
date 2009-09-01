@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 35
+local MAJOR, MINOR = "AceConfigDialog-3.0", 36
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -534,6 +534,9 @@ local function OptionOnMouseOver(widget, event)
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
 	local usage = GetOptionsMemberValue("usage", opt, options, path, appName)
+	local descStyle = opt.descStyle
+	
+	if descStyle and descStyle ~= "tooltip" then return end
 	
 	GameTooltip:SetText(name, 1, .82, 0, 1)
 	
