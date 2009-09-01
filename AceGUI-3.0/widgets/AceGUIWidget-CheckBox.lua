@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 8
+	local Version = 9
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -158,7 +158,7 @@ do
 	
 	local function SetDescription(self, desc)
 		if desc then
-			if not self.desc then 
+			if not self.desc then
 				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 				desc:ClearAllPoints()
 				desc:SetPoint("TOPLEFT", self.check, "TOPRIGHT", 5, -20)
@@ -172,7 +172,7 @@ do
 			self.desc:SetText(desc)
 			self:SetHeight(24 + self.desc:GetHeight())
 		else
-			if self.desc then 
+			if self.desc then
 				self.desc:SetText("")
 				self.desc:Hide()
 			end
@@ -182,7 +182,7 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
-		if self.desc then
+		if self.desc and self.desc:GetText() ~= "" then
 			self.desc:SetWidth(width - 25)
 			self:SetHeight(24 + self.desc:GetHeight())
 		end
@@ -244,11 +244,6 @@ do
 		text:SetPoint("LEFT",check,"RIGHT",0,0)
 		text:SetPoint("RIGHT",frame,"RIGHT",0,0)
 		
-		local t = frame:CreateTexture(nil, "HIGHLIGHT")
-		t:SetAllPoints(frame)
-		t:SetTexture(1, 0, 0, 0.2)
-		
-
 		AceGUI:RegisterAsWidget(self)
 		return self
 	end
