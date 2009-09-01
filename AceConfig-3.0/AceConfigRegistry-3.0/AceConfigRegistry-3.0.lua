@@ -9,7 +9,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 10
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 11
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
@@ -65,6 +65,7 @@ local basekeys={
 	type=isstring,
 	name=isstringfunc,
 	desc=optstringfunc,
+	descStyle=optstring,
 	order=optmethodnumber,
 	validate=optmethodfalse,
 	confirm=optmethodbool,

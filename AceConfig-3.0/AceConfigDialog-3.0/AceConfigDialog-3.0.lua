@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 34
+local MAJOR, MINOR = "AceConfigDialog-3.0", 35
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -185,6 +185,7 @@ local stringIsLiteral = {
 --Is Never a function or method
 local allIsLiteral = {
 	type = true,
+	descStyle = true,
 	imageWidth = true,
 	imageHeight = true,
 }
@@ -691,6 +692,8 @@ local function ActivateControl(widget, event, ...)
 		--validate function returned a message to display
 		if rootframe.SetStatusText then
 			rootframe:SetStatusText(validated)
+		else
+			-- TODO: do something else.
 		end
 		PlaySound("igPlayerInviteDecline")
 		del(info)
@@ -707,6 +710,8 @@ local function ActivateControl(widget, event, ...)
 					rootframe:SetStatusText(name..": Invalid Value")
 				end
 			end
+		else
+			-- TODO: do something else
 		end
 		PlaySound("igPlayerInviteDecline")
 		del(info)
@@ -1128,6 +1133,11 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local value = GetOptionsMemberValue("get",v, options, path, appName)
 					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateControl)
+					
+					if v.descStyle == "inline" then
+						local desc = GetOptionsMemberValue("desc", v, options, path, appName)
+						control:SetDescription(desc)
+					end
 
 				elseif v.type == "range" then
 					control = gui:Create("Slider")

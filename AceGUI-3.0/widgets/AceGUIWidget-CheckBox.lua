@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -28,6 +28,7 @@ do
 		self.checked = nil
 		self:SetType()
 		self:SetDisabled(false)
+		self:SetDescription(nil)
 	end
   
 	local function CheckBox_OnEnter(this)
@@ -155,6 +156,38 @@ do
 		self.text:SetText(label)
 	end
 	
+	local function SetDescription(self, desc)
+		if desc then
+			if not self.desc then 
+				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+				desc:ClearAllPoints()
+				desc:SetPoint("TOPLEFT", self.check, "TOPRIGHT", 5, -20)
+				desc:SetWidth(self.frame.width - 25)
+				desc:SetJustifyH("LEFT")
+				desc:SetJustifyV("TOP")
+				self.desc = desc
+			end
+			self.desc:Show()
+			--self.text:SetFontObject(GameFontNormal)
+			self.desc:SetText(desc)
+			self:SetHeight(24 + self.desc:GetHeight())
+		else
+			if self.desc then 
+				self.desc:SetText("")
+				self.desc:Hide()
+			end
+			self.text:SetFontObject(GameFontHighlight)
+			self:SetHeight(24)
+		end
+	end
+	
+	local function OnWidthSet(self, width)
+		if self.desc then
+			self.desc:SetWidth(width - 25)
+			self:SetHeight(24 + self.desc:GetHeight())
+		end
+	end
+	
 	local function Constructor()
 		local frame = CreateFrame("Button",nil,UIParent)
 		local self = {}
@@ -170,6 +203,8 @@ do
 		self.ToggleChecked = ToggleChecked
 		self.SetLabel = SetLabel
 		self.SetTriState = SetTriState
+		self.SetDescription = SetDescription
+		self.OnWidthSet = OnWidthSet
 		
 		self.frame = frame
 		frame.obj = self
@@ -186,7 +221,7 @@ do
 		self.checkbg = checkbg
 		checkbg:SetWidth(24)
 		checkbg:SetHeight(24)
-		checkbg:SetPoint("LEFT",frame,"LEFT",0,0)
+		checkbg:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		checkbg:SetTexture("Interface\\Buttons\\UI-CheckBox-Up")
 		local check = frame:CreateTexture(nil,"OVERLAY")
 		self.check = check
@@ -208,6 +243,11 @@ do
 		text:SetHeight(18)
 		text:SetPoint("LEFT",check,"RIGHT",0,0)
 		text:SetPoint("RIGHT",frame,"RIGHT",0,0)
+		
+		local t = frame:CreateTexture(nil, "HIGHLIGHT")
+		t:SetAllPoints(frame)
+		t:SetTexture(1, 0, 0, 0.2)
+		
 
 		AceGUI:RegisterAsWidget(self)
 		return self
