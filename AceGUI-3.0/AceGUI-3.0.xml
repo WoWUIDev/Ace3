@@ -9,6 +9,7 @@
 	<Script file="widgets\AceGUIWidget-DropDown-Items.lua"/>
 	<Script file="widgets\AceGUIWidget-EditBox.lua"/>
 	<Script file="widgets\AceGUIWidget-Frame.lua"/>
+	<Script file="widgets\AceGUIWidget-Window.lua"/>
 	<Script file="widgets\AceGUIWidget-Heading.lua"/>	
 	<Script file="widgets\AceGUIWidget-InlineGroup.lua"/>	
 	<Script file="widgets\AceGUIWidget-Keybinding.lua"/>	
