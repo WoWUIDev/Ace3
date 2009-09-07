@@ -1765,6 +1765,9 @@ function AceConfigDialog:Open(appName, container, ...)
 		if f.SetStatusTable then
 			f:SetStatusTable(status)
 		end
+		if f.SetTitle then
+			f:SetTitle(name or "")
+		end
 	else
 		if not self.OpenFrames[appName] then
 			f = gui:Create("Frame")
