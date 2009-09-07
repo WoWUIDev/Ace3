@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
 		self:SetWidth(200)
@@ -128,6 +128,9 @@ do
 		frame:SetMinMaxValues(min or 0,max or 100)
 		UpdateLabels(self)
 		frame:SetValueStep(step or 1)
+		if self.value then
+			frame:SetValue(self.value)
+		end
 		frame.setup = nil
 	end
 	
