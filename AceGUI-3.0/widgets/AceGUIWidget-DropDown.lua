@@ -344,7 +344,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 20
+	local widgetVersion = 21
 	
 	--[[ Static data ]]--
 	
@@ -521,6 +521,11 @@ do
 	end
 	
 	-- exported
+	local function GetValue(self)
+		return self.value
+	end
+	
+	-- exported
 	local function SetItemValue(self, item, value)
 		if not self.multiselect then return end
 		for i, widget in self.pullout:IterateItems() do
@@ -627,6 +632,7 @@ do
 
 		self.SetText     = SetText
 		self.SetValue    = SetValue
+		self.GetValue    = GetValue
 		self.SetList     = SetList
 		self.SetLabel    = SetLabel
 		self.SetDisabled = SetDisabled
