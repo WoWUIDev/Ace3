@@ -5,7 +5,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "Button"
-	local Version = 11
+	local Version = 12
 	
 	local function OnAcquire(self)
 		-- restore default values
@@ -19,8 +19,8 @@ do
 		self:SetDisabled(false)
 	end
 	
-	local function Button_OnClick(this)
-		this.obj:Fire("OnClick")
+	local function Button_OnClick(this, ...)
+		this.obj:Fire("OnClick", ...)
 		AceGUI:ClearFocus()
 	end
 	

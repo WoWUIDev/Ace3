@@ -10,7 +10,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -230,7 +230,7 @@ do
 		check:SetPoint("CENTER",checkbg,"CENTER",0,0)
 		check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 	
-		local highlight = frame:CreateTexture(nil, "BACKGROUND")
+		local highlight = frame:CreateTexture(nil, "OVERLAY")
 		self.highlight = highlight
 		highlight:SetTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
 		highlight:SetBlendMode("ADD")
