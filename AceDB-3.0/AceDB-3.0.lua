@@ -40,7 +40,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 16
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 17
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -266,8 +266,14 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	-- map "true" to our "Default" profile
 	if defaultProfile == true then defaultProfile = "Default" end
 	
-	-- Try to get the profile selected from the char db
-	local profileKey = sv.profileKeys[charKey] or defaultProfile or charKey
+	local profileKey 
+	if not parent then
+		-- Try to get the profile selected from the char db
+		profileKey = sv.profileKeys[charKey] or defaultProfile or charKey
+	else
+		-- Use the profile of the parents DB
+		profileKey = parent.keys.profile or defaultProfile or charKey
+	end
 	sv.profileKeys[charKey] = profileKey
 	
 	-- This table contains keys that enable the dynamic creation 
