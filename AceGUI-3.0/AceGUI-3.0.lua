@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 26
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 27
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -731,8 +731,10 @@ AceGUI:RegisterLayout("Flow",
 			lastframeoffset = frameoffset
 			-- HACK: Why did we set a frameoffset of (frameheight / 2) ? 
 			-- That was moving all widgets half the widgets size down, is that intended?
-			-- TODO: Investigate!
-			frameoffset = child.alignoffset or 0 -- (frameheight / 2)
+			-- Actually, it seems to be neccessary for many cases, we'll leave it in for now.
+			-- If widgets seem to anchor weirdly with this, provide a valid alignoffset for them.
+			-- TODO: Investigate moar!
+			frameoffset = child.alignoffset or (frameheight / 2)
 			
 			if child.width == "relative" then
 				framewidth = width * child.relWidth
