@@ -729,7 +729,10 @@ AceGUI:RegisterLayout("Flow",
 			local frameheight = frame.height or frame:GetHeight() or 0
 			local framewidth = frame.width or frame:GetWidth() or 0
 			lastframeoffset = frameoffset
-			frameoffset = child.alignoffset or (frameheight / 2)
+			-- HACK: Why did we set a frameoffset of (frameheight / 2) ? 
+			-- That was moving all widgets half the widgets size down, is that intended?
+			-- TODO: Investigate!
+			frameoffset = child.alignoffset or 0 -- (frameheight / 2)
 			
 			if child.width == "relative" then
 				framewidth = width * child.relWidth
@@ -773,6 +776,7 @@ AceGUI:RegisterLayout("Flow",
 					rowoffset = math.max(rowoffset, frameoffset)
 					
 					rowheight = math.max(rowheight,rowoffset+(frameheight/2))
+					--print("type:", child.type, "offset:",frameoffset-lastframeoffset)
 					frame:SetPoint("TOPLEFT",children[i-1].frame,"TOPRIGHT",0,frameoffset-lastframeoffset)
 					usedwidth = framewidth + usedwidth
 				end

@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 21
+	local Version = 22
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -54,7 +54,7 @@ do
 		for _, tab in pairs(self.tabs) do
 			tab:Hide()
 		end
-		self.titletext:SetText("")
+		self:SetTitle()
 	end
 	
 	local function Tab_SetText(self, text)
@@ -129,6 +129,11 @@ do
 	
 	local function SetTitle(self, text)
 		self.titletext:SetText(text or "")
+		if text and text ~= "" then
+			self.alignoffset = 25
+		else
+			self.alignoffset = 18
+		end
 		self:BuildTabs()
 	end
 	
@@ -332,6 +337,8 @@ do
 		frame:SetHeight(100)
 		frame:SetWidth(100)
 		frame:SetFrameStrata("FULLSCREEN_DIALOG")
+		
+		self.alignoffset = 18
 		
 		local titletext = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 		titletext:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)
