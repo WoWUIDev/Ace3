@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 20
+	local Version = 21
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -54,6 +54,7 @@ do
 		for _, tab in pairs(self.tabs) do
 			tab:Hide()
 		end
+		self.titletext:SetText("")
 	end
 	
 	local function Tab_SetText(self, text)
@@ -128,6 +129,7 @@ do
 	
 	local function SetTitle(self, text)
 		self.titletext:SetText(text or "")
+		self:BuildTabs()
 	end
 	
 	-- called to set an external table to store status in
@@ -164,6 +166,7 @@ do
 	local rowwidths = {}
 	local rowends = {}
 	local function BuildTabs(self)
+		local hastitle = (self.titletext:GetText() and self.titletext:GetText() ~= "")
 		local status = self.status or self.localstatus
 		local tablist = self.tablist
 		local tabs = self.tabs
@@ -244,7 +247,7 @@ do
 				local tab = tabs[tabno]
 				tab:ClearAllPoints()
 				if first then
-					tab:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, -7-(row-1)*20 )
+					tab:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, -(hastitle and 14 or 7)-(row-1)*20 )
 					first = false
 				else
 					tab:SetPoint("LEFT", tabs[tabno-1], "RIGHT", -10, 0)
@@ -264,7 +267,7 @@ do
 			starttab = endtab + 1
 		end
 		
-		self.borderoffset = 10+((numrows)*20)
+		self.borderoffset = (hastitle and 17 or 10)+((numrows)*20)
 		self.border:SetPoint("TOPLEFT",self.frame,"TOPLEFT",3,-self.borderoffset)
 	end
 	
@@ -335,6 +338,7 @@ do
 		titletext:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-14,0)
 		titletext:SetJustifyH("LEFT")
 		titletext:SetHeight(18)
+		titletext:SetText("")
 		
 		self.titletext = titletext
 		
