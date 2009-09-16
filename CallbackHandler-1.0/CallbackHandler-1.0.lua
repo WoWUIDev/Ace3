@@ -1,5 +1,5 @@
 --[[ $Id$ ]]
-local MAJOR, MINOR = "CallbackHandler-1.0", 3
+local MAJOR, MINOR = "CallbackHandler-1.0", 4
 local CallbackHandler = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not CallbackHandler then return end -- No upgrade needed
@@ -80,7 +80,8 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 	-- Create the registry object
 	local events = setmetatable({}, meta)
-	local registry = { recurse=0, events=events }
+	local methods = setmetatable({}, meta)
+	local registry = { recurse=0, events=events, methods=methods }
 
 	-- registry:Fire() - fires the given event/message into the registry
 	function registry:Fire(eventname, ...)
@@ -125,6 +126,11 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 
 		if type(method) ~= "string" and type(method) ~= "function" then
 			error("Usage: "..RegisterName.."(\"eventname\", \"methodname\"): 'methodname' - string or function expected.", 2)
+		end
+
+		-- return early if we're trying to register the same function again
+		if method == methods[eventname][self] then
+			return
 		end
 
 		local regfunc
@@ -174,6 +180,7 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 			registry.insertQueue = registry.insertQueue or setmetatable({},meta)
 			registry.insertQueue[eventname][self] = regfunc
 		end
+		methods[eventname][self] = method
 	end
 
 	-- Unregister a callback
@@ -186,6 +193,7 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 		end
 		if rawget(events, eventname) and events[eventname][self] then
 			events[eventname][self] = nil
+			methods[eventname][self] = nil
 			-- Fire OnUnused callback?
 			if registry.OnUnused and not next(events[eventname]) then
 				registry.OnUnused(registry, target, eventname)
@@ -219,6 +227,7 @@ function CallbackHandler:New(target, RegisterName, UnregisterName, UnregisterAll
 				for eventname, callbacks in pairs(events) do
 					if callbacks[self] then
 						callbacks[self] = nil
+						methods[eventname][self] = nil
 						-- Fire OnUnused callback?
 						if registry.OnUnused and not next(callbacks) then
 							registry.OnUnused(registry, target, eventname)
