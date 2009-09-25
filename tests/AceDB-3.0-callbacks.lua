@@ -44,3 +44,15 @@ do
 	assert(triggers.OnProfileCopied == 1)
 	assert(triggers.OnNewProfile == 2)
 end
+
+do
+	local dbDefaults = {
+		profile = { bla = 0, },
+	}
+	local db = LibStub("AceDB-3.0"):New({}, dbDefaults, true)
+	db:RegisterCallback("OnNewProfile", function()
+		db.profile.bla = 1
+	end)
+	db:SetProfile("blatest")
+	assert(db.profile.bla == 1)
+end
