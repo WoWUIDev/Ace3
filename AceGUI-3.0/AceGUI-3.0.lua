@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 27
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 28
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -757,6 +757,11 @@ AceGUI:RegisterLayout("Flow",
 				-- if there isn't available width for the control start a new row
 				-- if a control is "fill" it will be on a row of its own full width
 				if usedwidth == 0 or ((framewidth) + usedwidth > width) or child.width == "fill" then
+					if isfullheight then
+						-- a previous row has already filled the entire height, there's nothing we can usefully do anymore
+						-- (maybe error/warn about this?)
+						break
+					end
 					--anchor the previous row, we will now know its height and offset
 					rowstart:SetPoint("TOPLEFT",content,"TOPLEFT",0,-(height+(rowoffset-rowstartoffset)+3))
 					height = height + rowheight + 3
@@ -820,7 +825,6 @@ AceGUI:RegisterLayout("Flow",
 			if child.height == "fill" then
 				frame:SetPoint("BOTTOM",content,"BOTTOM")
 				isfullheight = true
-				break
 			end
 		end
 		
