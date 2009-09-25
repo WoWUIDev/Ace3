@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 20
+	local Version = 21
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -506,6 +506,7 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
+		self.width = width
 		local content = self.content
 		local treeframe = self.treeframe
 		local status = self.status or self.localstatus
@@ -568,6 +569,9 @@ do
 		local status = self.status or self.localstatus
 		status.treewidth = treewidth
 		status.treesizable = resizable
+		
+		-- recalculate the content width
+		self:OnWidthSet(self.width)
 	end
 	
 	local function draggerLeave(this)
@@ -594,10 +598,15 @@ do
 		treeframe:SetHeight(0)
 		treeframe:SetPoint("TOPLEFT",frame,"TOPLEFT",0,0)
 		treeframe:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
-		treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
 		
 		local status = self.status or self.localstatus
 		status.treewidth = treeframe:GetWidth()
+		
+		treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
+		-- recalculate the content width
+		treeframe.obj:OnWidthSet(treeframe.obj.width)
+		-- update the layout of the content
+		treeframe.obj:DoLayout()
 	end
 	
 	local function LayoutFinished(self, width, height)
