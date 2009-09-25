@@ -27,7 +27,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 21
+	local Version = 22
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -506,10 +506,10 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
-		self.width = width
 		local content = self.content
 		local treeframe = self.treeframe
 		local status = self.status or self.localstatus
+		status.fullwidth = width
 		
 		local contentwidth = width - status.treewidth - 20
 		if contentwidth < 0 then
@@ -571,8 +571,8 @@ do
 		status.treesizable = resizable
 		
 		-- recalculate the content width
-		if self.width then
-			self:OnWidthSet(self.width)
+		if status.fullwidth then
+			self:OnWidthSet(status.fullwidth)
 		end
 	end
 	
@@ -606,7 +606,7 @@ do
 		
 		treeframe.obj:Fire("OnTreeResize",treeframe:GetWidth())
 		-- recalculate the content width
-		treeframe.obj:OnWidthSet(treeframe.obj.width)
+		treeframe.obj:OnWidthSet(status.fullwidth)
 		-- update the layout of the content
 		treeframe.obj:DoLayout()
 	end
