@@ -571,7 +571,9 @@ do
 		status.treesizable = resizable
 		
 		-- recalculate the content width
-		self:OnWidthSet(self.width)
+		if self.width then
+			self:OnWidthSet(self.width)
+		end
 	end
 	
 	local function draggerLeave(this)
