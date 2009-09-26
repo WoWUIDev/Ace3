@@ -16,7 +16,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ]]
 do
 	local Type = "DropdownGroup"
-	local Version = 11
+	local Version = 12
 	
 	local function OnAcquire(self)
 		self.dropdown:SetText("")
@@ -140,14 +140,14 @@ do
 		dropdown.parentgroup = self
 		dropdown:SetCallback("OnValueChanged",SelectedGroup)
 		
-		dropdown.frame:SetPoint("TOPLEFT",titletext,"BOTTOMLEFT",-3,3)
+		dropdown.frame:SetPoint("TOPLEFT",titletext,"BOTTOMLEFT",-6,3)
 		dropdown.frame:Show()
 		dropdown:SetLabel("")
 		
 		local border = CreateFrame("Frame",nil,frame)
 		self.border = border
-		border:SetPoint("TOPLEFT",frame,"TOPLEFT",3,-40)
-		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-3,3)
+		border:SetPoint("TOPLEFT",frame,"TOPLEFT",0,-40)
+		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,3)
 		
 		border:SetBackdrop(PaneBackdrop)
 		border:SetBackdropColor(0.1,0.1,0.1,0.5)
