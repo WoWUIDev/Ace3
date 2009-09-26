@@ -34,7 +34,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "BlizOptionsGroup"
-	local Version = 6
+	local Version = 7
 	
 	local function OnAcquire(self)
 
@@ -96,10 +96,10 @@ do
 		local content = self.content
 		content:ClearAllPoints()
 		if not title or title == "" then
-			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",15,-10)
+			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",10,-10)
 			self.label:SetText("")
 		else
-			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",15,-40)
+			content:SetPoint("TOPLEFT",self.frame,"TOPLEFT",10,-40)
 			self.label:SetText(title)
 		end
 		content:SetPoint("BOTTOMRIGHT",self.frame,"BOTTOMRIGHT",-10,10)
