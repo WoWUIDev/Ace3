@@ -29,7 +29,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ScrollFrame"
-	local Version = 5
+	local Version = 6
 	
 	local function OnAcquire(self)
 
@@ -45,6 +45,7 @@ do
 		self.scrollframe:SetPoint("BOTTOMRIGHT",self.frame,"BOTTOMRIGHT",0,0)
 		self.scrollbar:Hide()
 		self.scrollBarShown = nil
+		self.content.height, self.content.width = nil, nil
 	end
 	
 	local function SetScroll(self, value)
