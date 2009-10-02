@@ -89,7 +89,7 @@ do
 	local function EditBox_OnTextChanged(this)
 		local self = this.obj
 		local value = this:GetText()
-		if value ~= self.lasttext then
+		if tostring(value) ~= tostring(self.lasttext) then
 			self:Fire("OnTextChanged",value)
 			self.lasttext = value
 			ShowButton(self)
