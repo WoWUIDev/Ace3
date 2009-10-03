@@ -128,11 +128,11 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 			f = _G[f]
 		end
 		if type(f) ~= 'table' or type(f[0]) ~= 'userdata' or type(f.IsFrameType) ~= 'function' then
-			self:error("Cannot register frame %q; it does not exist", f:GetName())
+			error(format(ACETAB_MAJOR..": Cannot register frame %q; it does not exist", f:GetName()))
 		end
 		if f then
 			if f:GetFrameType() ~= 'EditBox' then
-				self:error("Cannot register frame %q; it is not an EditBox", f:GetName())
+				error(format(ACETAB_MAJOR..": Cannot register frame %q; it is not an EditBox", f:GetName()))
 			else
 				hookFrame(f)
 			end
