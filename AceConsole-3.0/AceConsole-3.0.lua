@@ -10,7 +10,7 @@
 -- @class file
 -- @name AceConsole-3.0
 -- @release $Id$
-local MAJOR,MINOR = "AceConsole-3.0", 6
+local MAJOR,MINOR = "AceConsole-3.0", 7
 
 local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -29,27 +29,53 @@ local tostring = tostring
 local strfind = string.find
 local strsub = string.sub
 local max = math.max
+local format = format
+local tconcat = table.concat
+-- GLOBALS: DEFAULT_CHAT_FRAME, error, SlashCmdList, hash_SlashCmdList
+
+local tmp={}
+local function Print(self,frame,...)
+	local n=0
+	if self ~= AceConsole then
+		n=n+1
+		tmp[n] = "|cff33ff99"..tostring( self ).."|r:"
+	end
+	for i=1, select("#", ...) do
+		n=n+1
+		tmp[n] = tostring(select(i, ...))
+	end
+	frame:AddMessage( tconcat(tmp," ",1,n) )
+end
 
 --- Print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
 -- @paramsig [chatframe ,] ...
 -- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
 -- @param ... List of any values to be printed
 function AceConsole:Print(...)
-	local text = ""
-	if self ~= AceConsole then
-		text = "|cff33ff99"..tostring( self ).."|r: "
+	local frame = ...
+	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
+		return Print(self, frame, select(2,...))
+	else
+		return Print(self, DEFAULT_CHAT_FRAME, ...)
 	end
-
-	local frame = select(1, ...)
-	if not ( type(frame) == "table" and frame.AddMessage ) then	-- Is first argument something with an .AddMessage member?
-		frame=nil
-	end
-	
-	for i=(frame and 2 or 1), select("#", ...) do
-		text = text .. tostring( select( i, ...) ) .." "
-	end
-	(frame or DEFAULT_CHAT_FRAME):AddMessage( text )
 end
+
+
+--- Formatted (using format()) print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
+-- @paramsig [chatframe ,] "format"[, ...]
+-- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
+-- @param format Format string - same syntax as standard Lua format()
+-- @param ... Arguments to the format string
+function AceConsole:Printf(...)
+	local frame = ...
+	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
+		return Print(self, frame, format(select(2,...)))
+	else
+		return Print(self, DEFAULT_CHAT_FRAME, format(...))
+	end
+end
+
+
 
 
 --- Register a simple chat command
@@ -187,6 +213,7 @@ end
 
 local mixins = {
 	"Print",
+	"Printf",
 	"RegisterChatCommand", 
 	"UnregisterChatCommand",
 	"GetArgs",
