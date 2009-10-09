@@ -1,5 +1,26 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+local Type = "EditBox"
+local Version = 12
+
+local _G=_G
+
+if not AceGUIEditBoxInsertLink then
+	-- upgradeable hook
+	hooksecurefunc("ChatEdit_InsertLink", function(...) return _G.AceGUIEditBoxInsertLink(...) end)
+end
+
+function _G.AceGUIEditBoxInsertLink(text)
+	for i = 1, AceGUI:GetNextWidgetNum(Type)-1 do
+		local editbox = _G["AceGUI-3.0EditBox"..i]
+		if editbox and editbox:IsVisible() and editbox:HasFocus() then
+			editbox:Insert(text)
+			return true
+		end
+	end
+end
+
+
 --------------------------
 -- Edit box			 --
 --------------------------
@@ -10,9 +31,6 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 ]]
 do
-	local Type = "EditBox"
-	local Version = 11
-
 	local function OnAcquire(self)
 		self:SetHeight(26)
 		self:SetWidth(200)
