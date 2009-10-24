@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 36
+local MAJOR, MINOR = "AceConfigDialog-3.0", 37
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -32,6 +32,7 @@ local string = string
 local next = next
 local math = math
 local _
+local emptyTbl = {}
 
 --[[
 	 xpcall safecall implementation
@@ -582,14 +583,14 @@ local function confirmPopup(appName, rootframe, basepath, info, message, func, .
 		if dialog and oldstrata then
 			dialog:SetFrameStrata(oldstrata)
 		end
-		AceConfigDialog:Open(appName, rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(appName, rootframe, unpack(basepath or emptyTbl))
 		del(info)
 	end
 	t.OnCancel = function()
 		if dialog and oldstrata then
 			dialog:SetFrameStrata(oldstrata)
 		end
-		AceConfigDialog:Open(appName, rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(appName, rootframe, unpack(basepath or emptyTbl))
 		del(info)
 	end
 	for i = 1, select('#', ...) do
@@ -797,23 +798,23 @@ local function ActivateControl(widget, event, ...)
 
 
 		local iscustom = user.rootframe:GetUserData('iscustom')
-		local basepath = user.rootframe:GetUserData('basepath')
+		local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 		--full refresh of the frame, some controls dont cause this on all events
 		if option.type == "color" then
 			if event == "OnValueConfirmed" then
 				
 				if iscustom then
-					AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 				else
-					AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, unpack(basepath))
 				end
 			end
 		elseif option.type == "range" then
 			if event == "OnMouseUp" then
 				if iscustom then
-					AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 				else
-					AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+					AceConfigDialog:Open(user.appName, unpack(basepath))
 				end
 			end
 		--multiselects don't cause a refresh on 'OnValueChanged' only 'OnClosed'
@@ -821,9 +822,9 @@ local function ActivateControl(widget, event, ...)
 			user.valuechanged = true
 		else
 			if iscustom then
-				AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+				AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 			else
-				AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+				AceConfigDialog:Open(user.appName, unpack(basepath))
 			end
 		end
 
@@ -848,11 +849,11 @@ local function ActivateMultiControl(widget, event, ...)
 	ActivateControl(widget, event, widget:GetUserData('value'), ...)
 	local user = widget:GetUserDataTable()
 	local iscustom = user.rootframe:GetUserData('iscustom')
-	local basepath = user.rootframe:GetUserData('basepath')
+	local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 	if iscustom then
-		AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+		AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 	else
-		AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+		AceConfigDialog:Open(user.appName, unpack(basepath))
 	end
 end
 
@@ -860,11 +861,11 @@ local function MultiControlOnClosed(widget, event, ...)
 	local user = widget:GetUserDataTable()
 	if user.valuechanged then
 		local iscustom = user.rootframe:GetUserData('iscustom')
-		local basepath = user.rootframe:GetUserData('basepath')
+		local basepath = user.rootframe:GetUserData('basepath') or emptyTbl
 		if iscustom then
-			AceConfigDialog:Open(user.appName, user.rootframe, basepath and unpack(basepath))
+			AceConfigDialog:Open(user.appName, user.rootframe, unpack(basepath))
 		else
-			AceConfigDialog:Open(user.appName, basepath and unpack(basepath))
+			AceConfigDialog:Open(user.appName, unpack(basepath))
 		end
 	end
 end
@@ -1657,13 +1658,13 @@ local function RefreshOnUpdate(this)
 	for appName in pairs(this.apps) do
 		if AceConfigDialog.OpenFrames[appName] then
 			local user = AceConfigDialog.OpenFrames[appName]:GetUserDataTable()
-			AceConfigDialog:Open(appName, user.basepath and unpack(user.basepath))
+			AceConfigDialog:Open(appName, unpack(user.basepath or emptyTbl))
 		end
 		if AceConfigDialog.BlizOptions and AceConfigDialog.BlizOptions[appName] then
 			local widget = AceConfigDialog.BlizOptions[appName]
 			local user = widget:GetUserDataTable()
 			if widget:IsVisible() then
-				AceConfigDialog:Open(widget:GetUserData('appName'), widget, user.basepath and unpack(user.basepath))
+				AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(user.basepath or emptyTbl))
 			end
 		end
 		this.apps[appName] = nil
