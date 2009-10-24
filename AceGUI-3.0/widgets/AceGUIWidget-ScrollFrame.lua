@@ -29,13 +29,14 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ScrollFrame"
-	local Version = 6
+	local Version = 7
 	
 	local function OnAcquire(self)
 
 	end
 	
 	local function OnRelease(self)
+		self:SetScroll(0)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self.status = nil
