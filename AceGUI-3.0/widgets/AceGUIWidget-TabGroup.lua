@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 23
+	local Version = 24
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -273,7 +273,7 @@ do
 		end
 		
 		self.borderoffset = (hastitle and 17 or 10)+((numrows)*20)
-		self.border:SetPoint("TOPLEFT",self.frame,"TOPLEFT",3,-self.borderoffset)
+		self.border:SetPoint("TOPLEFT",self.frame,"TOPLEFT",1,-self.borderoffset)
 	end
 	
 	local function BuildTabsOnUpdate(this)
@@ -352,8 +352,8 @@ do
 		local border = CreateFrame("Frame",nil,frame)
 		self.border = border
 		self.borderoffset = 27
-		border:SetPoint("TOPLEFT",frame,"TOPLEFT",3,-27)
-		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-3,3)
+		border:SetPoint("TOPLEFT",frame,"TOPLEFT",1,-27)
+		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-1,3)
 		
 		border:SetBackdrop(PaneBackdrop)
 		border:SetBackdropColor(0.1,0.1,0.1,0.5)
