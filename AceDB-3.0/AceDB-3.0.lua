@@ -40,7 +40,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 18
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 19
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -522,7 +522,7 @@ function DBObjectLib:CopyProfile(name, silent)
 	end
 
 	-- Reset the profile before copying
-	DBObjectLib.ResetProfile(self)
+	DBObjectLib.ResetProfile(self, nil, true)
 
 	local profile = self.profile
 	local source = self.sv.profiles[name]
@@ -542,7 +542,8 @@ end
 
 --- Resets the current profile to the default values (if specified).
 -- @param noChildren if set to true, the reset will not be populated to the child namespaces of this DB object
-function DBObjectLib:ResetProfile(noChildren)
+-- @param noCallbacks if set to true, won't fire the OnProfileReset callback
+function DBObjectLib:ResetProfile(noChildren, noCallbacks)
 	local profile = self.profile
 
 	for k,v in pairs(profile) do
@@ -557,12 +558,14 @@ function DBObjectLib:ResetProfile(noChildren)
 	-- populate to child namespaces
 	if self.children and not noChildren then
 		for _, db in pairs(self.children) do
-			DBObjectLib.ResetProfile(db)
+			DBObjectLib.ResetProfile(db, nil, noCallbacks)
 		end
 	end
 
 	-- Callback: OnProfileReset, database
-	self.callbacks:Fire("OnProfileReset", self)
+	if not noCallbacks then
+		self.callbacks:Fire("OnProfileReset", self)
+	end
 end
 
 --- Resets the entire database, using the string defaultProfile as the new default
