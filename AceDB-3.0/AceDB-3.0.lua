@@ -148,7 +148,7 @@ local function removeDefaults(db, defaults, blocker)
 								db[key] = nil
 							end
 						-- if it was specified, only strip ** content, but block values which were set in the key table
-						elseif k == "**" then 
+						elseif k == "**" then
 							removeDefaults(value, v, defaults[key])
 						end
 					end
@@ -179,21 +179,21 @@ end
 -- This is called when a table section is first accessed, to set up the defaults
 local function initSection(db, section, svstore, key, defaults)
 	local sv = rawget(db, "sv")
-	
+
 	local tableCreated
 	if not sv[svstore] then sv[svstore] = {} end
 	if not sv[svstore][key] then
 		sv[svstore][key] = {}
 		tableCreated = true
 	end
-	
+
 	local tbl = sv[svstore][key]
-	
+
 	if defaults then
 		copyDefaults(tbl, defaults)
 	end
 	rawset(db, section, tbl)
-	
+
 	return tableCreated, tbl
 end
 
@@ -205,7 +205,7 @@ local dbmt = {
 			if key then
 				local defaultTbl = rawget(t, "defaults")
 				local defaults = defaultTbl and defaultTbl[section]
-				
+
 				if section == "profile" then
 					local new = initSection(t, section, "profiles", key, defaults)
 					if new then
@@ -227,7 +227,7 @@ local dbmt = {
 					initSection(t, section, section, key, defaults)
 				end
 			end
-			
+
 			return rawget(t, section)
 		end
 }
@@ -259,29 +259,29 @@ local factionrealmKey = factionKey .. " - " .. realmKey
 -- Actual database initialization function
 local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	-- Generate the database keys for each section
-	
+
 	-- map "true" to our "Default" profile
 	if defaultProfile == true then defaultProfile = "Default" end
-	
-	local profileKey 
+
+	local profileKey
 	if not parent then
 		-- Make a container for profile keys
 		if not sv.profileKeys then sv.profileKeys = {} end
-		
+
 		-- Try to get the profile selected from the char db
 		profileKey = sv.profileKeys[charKey] or defaultProfile or charKey
-		
+
 		-- save the selected profile for later
 		sv.profileKeys[charKey] = profileKey
 	else
 		-- Use the profile of the parents DB
 		profileKey = parent.keys.profile or defaultProfile or charKey
-		
+
 		-- clear the profileKeys in the DB, namespaces don't need to store them
 		sv.profileKeys = nil
 	end
-	
-	-- This table contains keys that enable the dynamic creation 
+
+	-- This table contains keys that enable the dynamic creation
 	-- of each section of the table.  The 'global' and 'profiles'
 	-- have a key of true, since they are handled in a special case
 	local keyTbl= {
@@ -295,27 +295,27 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 		["global"] = true,
 		["profiles"] = true,
 	}
-	
+
 	validateDefaults(defaults, keyTbl, 1)
-	
+
 	-- This allows us to use this function to reset an entire database
 	-- Clear out the old database
 	if olddb then
 		for k,v in pairs(olddb) do if not preserve_keys[k] then olddb[k] = nil end end
 	end
-	
+
 	-- Give this database the metatable so it initializes dynamically
 	local db = setmetatable(olddb or {}, dbmt)
-	
-	if not rawget(db, "callbacks") then 
+
+	if not rawget(db, "callbacks") then
 		-- try to load CallbackHandler-1.0 if it loaded after our library
 		if not CallbackHandler then CallbackHandler = LibStub:GetLibrary("CallbackHandler-1.0", true) end
 		db.callbacks = CallbackHandler and CallbackHandler:New(db) or CallbackDummy
 	end
-	
+
 	-- Copy methods locally into the database object, to avoid hitting
 	-- the metatable when calling methods
-	
+
 	if not parent then
 		for name, func in pairs(DBObjectLib) do
 			db[name] = func
@@ -325,7 +325,7 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 		db.RegisterDefaults = DBObjectLib.RegisterDefaults
 		db.ResetProfile = DBObjectLib.ResetProfile
 	end
-	
+
 	-- Set some properties in the database object
 	db.profiles = sv.profiles
 	db.keys = keyTbl
@@ -333,10 +333,10 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	--db.sv_name = name
 	db.defaults = defaults
 	db.parent = parent
-	
+
 	-- store the DB in the registry
 	AceDB.db_registry[db] = true
-	
+
 	return db
 end
 
@@ -370,9 +370,9 @@ function DBObjectLib:RegisterDefaults(defaults)
 	if defaults and type(defaults) ~= "table" then
 		error("Usage: AceDBObject:RegisterDefaults(defaults): 'defaults' - table or nil expected.", 2)
 	end
-	
+
 	validateDefaults(defaults, self.keys)
-	
+
 	-- Remove any currently set defaults
 	if self.defaults then
 		for section,key in pairs(self.keys) do
@@ -381,10 +381,10 @@ function DBObjectLib:RegisterDefaults(defaults)
 			end
 		end
 	end
-	
+
 	-- Set the DBObject.defaults table
 	self.defaults = defaults
-	
+
 	-- Copy in any defaults, only touching those sections already created
 	if defaults then
 		for section,key in pairs(self.keys) do
@@ -402,37 +402,37 @@ function DBObjectLib:SetProfile(name)
 	if type(name) ~= "string" then
 		error("Usage: AceDBObject:SetProfile(name): 'name' - string expected.", 2)
 	end
-	
+
 	-- changing to the same profile, dont do anything
 	if name == self.keys.profile then return end
-	
+
 	local oldProfile = self.profile
 	local defaults = self.defaults and self.defaults.profile
-	
+
 	-- Callback: OnProfileShutdown, database
 	self.callbacks:Fire("OnProfileShutdown", self)
-	
+
 	if oldProfile and defaults then
 		-- Remove the defaults from the old profile
 		removeDefaults(oldProfile, defaults)
 	end
-	
+
 	self.profile = nil
 	self.keys["profile"] = name
-	
+
 	-- if the storage exists, save the new profile
 	-- this won't exist on namespaces.
 	if self.sv.profileKeys then
 		self.sv.profileKeys[charKey] = name
 	end
-	
+
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
 			DBObjectLib.SetProfile(db, name)
 		end
 	end
-	
+
 	-- Callback: OnProfileChanged, database, newProfileKey
 	self.callbacks:Fire("OnProfileChanged", self, name)
 end
@@ -453,7 +453,7 @@ function DBObjectLib:GetProfiles(tbl)
 	end
 
 	local curProfile = self.keys.profile
-	
+
 	local i = 0
 	for profileKey in pairs(self.profiles) do
 		i = i + 1
@@ -466,7 +466,7 @@ function DBObjectLib:GetProfiles(tbl)
 		i = i + 1
 		tbl[i] = curProfile
 	end
-	
+
 	return tbl, i
 end
 
@@ -482,24 +482,24 @@ function DBObjectLib:DeleteProfile(name, silent)
 	if type(name) ~= "string" then
 		error("Usage: AceDBObject:DeleteProfile(name): 'name' - string expected.", 2)
 	end
-	
+
 	if self.keys.profile == name then
 		error("Cannot delete the active profile in an AceDBObject.", 2)
 	end
-	
+
 	if not rawget(self.sv.profiles, name) and not silent then
 		error("Cannot delete profile '" .. name .. "'. It does not exist.", 2)
 	end
-	
+
 	self.sv.profiles[name] = nil
-	
+
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
 			DBObjectLib.DeleteProfile(db, name, true)
 		end
 	end
-	
+
 	-- Callback: OnProfileDeleted, database, profileKey
 	self.callbacks:Fire("OnProfileDeleted", self, name)
 end
@@ -512,30 +512,30 @@ function DBObjectLib:CopyProfile(name, silent)
 	if type(name) ~= "string" then
 		error("Usage: AceDBObject:CopyProfile(name): 'name' - string expected.", 2)
 	end
-	
+
 	if name == self.keys.profile then
 		error("Cannot have the same source and destination profiles.", 2)
 	end
-	
+
 	if not rawget(self.sv.profiles, name) and not silent then
 		error("Cannot copy profile '" .. name .. "'. It does not exist.", 2)
 	end
-	
+
 	-- Reset the profile before copying
 	DBObjectLib.ResetProfile(self)
-	
+
 	local profile = self.profile
 	local source = self.sv.profiles[name]
-	
+
 	copyTable(source, profile)
-	
+
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
 			DBObjectLib.CopyProfile(db, name, true)
 		end
 	end
-	
+
 	-- Callback: OnProfileCopied, database, sourceProfileKey
 	self.callbacks:Fire("OnProfileCopied", self, name)
 end
@@ -544,23 +544,23 @@ end
 -- @param noChildren if set to true, the reset will not be populated to the child namespaces of this DB object
 function DBObjectLib:ResetProfile(noChildren)
 	local profile = self.profile
-	
+
 	for k,v in pairs(profile) do
 		profile[k] = nil
 	end
-	
+
 	local defaults = self.defaults and self.defaults.profile
 	if defaults then
 		copyDefaults(profile, defaults)
 	end
-	
+
 	-- populate to child namespaces
 	if self.children and not noChildren then
 		for _, db in pairs(self.children) do
 			DBObjectLib.ResetProfile(db)
 		end
 	end
-	
+
 	-- Callback: OnProfileReset, database
 	self.callbacks:Fire("OnProfileReset", self)
 end
@@ -572,16 +572,16 @@ function DBObjectLib:ResetDB(defaultProfile)
 	if defaultProfile and type(defaultProfile) ~= "string" then
 		error("Usage: AceDBObject:ResetDB(defaultProfile): 'defaultProfile' - string or nil expected.", 2)
 	end
-	
+
 	local sv = self.sv
 	for k,v in pairs(sv) do
 		sv[k] = nil
 	end
-	
+
 	local parent = self.parent
-	
+
 	initdb(sv, self.defaults, defaultProfile, self)
-	
+
 	-- fix the child namespaces
 	if self.children then
 		if not sv.namespaces then sv.namespaces = {} end
@@ -590,12 +590,12 @@ function DBObjectLib:ResetDB(defaultProfile)
 			initdb(sv.namespaces[name], db.defaults, self.keys.profile, db, self)
 		end
 	end
-	
-		-- Callback: OnDatabaseReset, database
+
+	-- Callback: OnDatabaseReset, database
 	self.callbacks:Fire("OnDatabaseReset", self)
 	-- Callback: OnProfileChanged, database, profileKey
 	self.callbacks:Fire("OnProfileChanged", self, self.keys["profile"])
-	
+
 	return self
 end
 
@@ -614,15 +614,15 @@ function DBObjectLib:RegisterNamespace(name, defaults)
 	if self.children and self.children[name] then
 		error ("Usage: AceDBObject:RegisterNamespace(name, defaults): 'name' - a namespace with that name already exists.", 2)
 	end
-	
+
 	local sv = self.sv
 	if not sv.namespaces then sv.namespaces = {} end
 	if not sv.namespaces[name] then
 		sv.namespaces[name] = {}
 	end
-	
+
 	local newDB = initdb(sv.namespaces[name], defaults, self.keys.profile, nil, self)
-	
+
 	if not self.children then self.children = {} end
 	self.children[name] = newDB
 	return newDB
@@ -630,7 +630,7 @@ end
 
 --- Returns an already existing namespace from the database object.
 -- @param name The name of the new namespace
--- @param silent if true, the addon is optional, silently return nil if its not found 
+-- @param silent if true, the addon is optional, silently return nil if its not found
 -- @usage
 -- local namespace = self.db:GetNamespace('namespace')
 -- @return the namespace object if found
@@ -676,19 +676,19 @@ function AceDB:New(tbl, defaults, defaultProfile)
 			setglobal(name, tbl)
 		end
 	end
-	
+
 	if type(tbl) ~= "table" then
 		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'tbl' - table expected.", 2)
 	end
-	
+
 	if defaults and type(defaults) ~= "table" then
 		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'defaults' - table expected.", 2)
 	end
-	
+
 	if defaultProfile and type(defaultProfile) ~= "string" and defaultProfile ~= true then
 		error("Usage: AceDB:New(tbl, defaults, defaultProfile): 'defaultProfile' - string or true expected.", 2)
 	end
-	
+
 	return initdb(tbl, defaults, defaultProfile)
 end
 
