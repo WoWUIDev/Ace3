@@ -29,7 +29,7 @@ local _G = getfenv()
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local Version = 10
+local Version = 11
 ---------------------
 -- Common Elements --
 ---------------------
@@ -127,11 +127,13 @@ do
 			self.editbox:ClearFocus()
 			self.editbox:SetTextColor(0.5, 0.5, 0.5)
 			self.label:SetTextColor(0.5,0.5,0.5)
+			self.button:Disable()
 		else
 			self.editbox:EnableMouse(true)
 			self.scrollframe:EnableMouse(true)
 			self.editbox:SetTextColor(1, 1, 1)
 			self.label:SetTextColor(1,.82,0)
+			self.button:Enable()
 		end
 	end
 
@@ -263,7 +265,9 @@ do
 			if value ~= self.lasttext then
 				self:Fire("OnTextChanged", value)
 				self.lasttext = value
-				self.button:Enable()
+				if not self.disabled then
+					self.button:Enable()
+				end
 			end
 		end)
 	
