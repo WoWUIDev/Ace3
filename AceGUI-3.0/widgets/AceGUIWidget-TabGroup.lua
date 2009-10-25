@@ -30,7 +30,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "TabGroup"
-	local Version = 22
+	local Version = 23
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -365,8 +365,8 @@ do
 		local content = CreateFrame("Frame",nil,border)
 		self.content = content
 		content.obj = self
-		content:SetPoint("TOPLEFT",border,"TOPLEFT",10,-10)
-		content:SetPoint("BOTTOMRIGHT",border,"BOTTOMRIGHT",-10,10)
+		content:SetPoint("TOPLEFT",border,"TOPLEFT",10,-7)
+		content:SetPoint("BOTTOMRIGHT",border,"BOTTOMRIGHT",-10,7)
 		
 		AceGUI:RegisterAsContainer(self)
 		return self

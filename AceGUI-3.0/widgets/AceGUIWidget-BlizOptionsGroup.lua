@@ -34,7 +34,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 do
 	local Type = "BlizOptionsGroup"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
 
@@ -130,7 +130,7 @@ do
 		
 		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormalLarge")
 		self.label = label
-		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -15)
+		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -15)
 		label:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 10, -45)
 		label:SetJustifyH("LEFT")
 		label:SetJustifyV("TOP")
