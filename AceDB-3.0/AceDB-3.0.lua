@@ -40,7 +40,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 17
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 18
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -260,21 +260,26 @@ local factionrealmKey = factionKey .. " - " .. realmKey
 local function initdb(sv, defaults, defaultProfile, olddb, parent)
 	-- Generate the database keys for each section
 	
-	-- Make a container for profile keys
-	if not sv.profileKeys then sv.profileKeys = {} end
-	
 	-- map "true" to our "Default" profile
 	if defaultProfile == true then defaultProfile = "Default" end
 	
 	local profileKey 
 	if not parent then
+		-- Make a container for profile keys
+		if not sv.profileKeys then sv.profileKeys = {} end
+		
 		-- Try to get the profile selected from the char db
 		profileKey = sv.profileKeys[charKey] or defaultProfile or charKey
+		
+		-- save the selected profile for later
+		sv.profileKeys[charKey] = profileKey
 	else
 		-- Use the profile of the parents DB
 		profileKey = parent.keys.profile or defaultProfile or charKey
+		
+		-- clear the profileKeys in the DB, namespaces don't need to store them
+		sv.profileKeys = nil
 	end
-	sv.profileKeys[charKey] = profileKey
 	
 	-- This table contains keys that enable the dynamic creation 
 	-- of each section of the table.  The 'global' and 'profiles'
@@ -414,8 +419,13 @@ function DBObjectLib:SetProfile(name)
 	
 	self.profile = nil
 	self.keys["profile"] = name
-	self.sv.profileKeys[charKey] = name
-
+	
+	-- if the storage exists, save the new profile
+	-- this won't exist on namespaces.
+	if self.sv.profileKeys then
+		self.sv.profileKeys[charKey] = name
+	end
+	
 	-- populate to child namespaces
 	if self.children then
 		for _, db in pairs(self.children) do
