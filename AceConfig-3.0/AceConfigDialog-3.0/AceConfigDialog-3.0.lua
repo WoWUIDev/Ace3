@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 37
+local MAJOR, MINOR = "AceConfigDialog-3.0", 38
 local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1511,7 +1511,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 
 	--Add a scrollframe if we are not going to add a group control, this is the inverse of the conditions for that later on
 	if (not (hasChildGroups and not inline)) or (grouptype ~= "tab" and grouptype ~= "select" and (parenttype == "tree" and not isRoot)) then
-		if container.type ~= "InlineGroup" then
+		if container.type ~= "InlineGroup" and container.type ~= "SimpleGroup" then
 			scroll = gui:Create("ScrollFrame")
 			scroll:SetLayout("flow")
 			scroll.width = "fill"
