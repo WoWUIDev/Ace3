@@ -29,17 +29,19 @@ local AceGUI = LibStub("AceGUI-3.0")
 --------------------------
 do
 	local Type = "ScrollFrame"
-	local Version = 7
+	local Version = 8
 	
 	local function OnAcquire(self)
 
 	end
 	
 	local function OnRelease(self)
-		self:SetScroll(0)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self.status = nil
+		-- do SetScroll after niling status, but before clearing localstatus
+		-- so the scroll value isnt populated back into status, but not kept in localstatus either
+		self:SetScroll(0)
 		for k in pairs(self.localstatus) do
 			self.localstatus[k] = nil
 		end
