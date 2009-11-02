@@ -1,3 +1,21 @@
+Ace3 Beta - Revision xxx (October xth, 2009)
+--------------------------------------------
+- AceGUI-3.0: Alot of visual fixes regarding margins and general widget styles.
+- AceGUI-3.0: Ability to accept links for EditBox Widget (Ticket #21)
+- AceGUI-3.0: ScrollFrame: Hide the scrollbar when there is no overflowing content, and allow the Layout functions to use that space for widgets.
+- AceGUI-3.0: DropDown: Added a GetValue() API to the Widget (Ticket #69)
+- AceGUI-3.0: Button: Pass the arguments of the OnClick handler to the OnClick callback (Ticket #57)
+- AceGUI-3.0: add a Window container, basically a plain window with close button
+- AceGUI-3.0: Add support for inline descriptions to the checkbox widget.
+- AceConfig-3.0: Added an experimental "descStyle" member to all option table nodes that allows you to control the way the description is presented. 
+                 Supported values are "tooltip" for the old behaviour, and "inline" for a inline display of the description, pending support in AceGUI-3.0 widgets.
+- AceConfigDialog-3.0: Fix the unpacking of the basepath arguments when internally calling :Open (Fixes #90)
+- AceDB-3.0: Remove the metatable from the DB before removing defaults, so we don't accidentally invoke it in the process. (Ticket #66)
+- AceDB-3.0: Don't save the profileKeys for namespaces, since we use the profile of the parent DB anyway. This will cut down on SV complexity when using alot of namespaces.
+- AceDB-3.0: Don't fire the OnProfileReset callback when copying a profile.
+- AceComm-3.0: Add callbacks for message chunks going out the wire (via CTL). Useful for displaying progress for very large messages.
+- AceConsole-3.0: Add :Printf() so you don't have to do Print(format())
+
 Ace3 Beta - Revision 820 (August 7th, 2009)
 --------------------------------------------
 - AceComm-3.0: Updated ChatThrottleLib to v21
