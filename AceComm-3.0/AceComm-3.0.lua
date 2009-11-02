@@ -33,10 +33,11 @@ local tinsert, tconcat = table.insert, table.concat
 local error, assert = error, assert
 
 -- WoW APIs
+local geterrorhandler = geterrorhandler
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
--- GLOBALS: geterrorhandler, LibStub, DEFAULT_CHAT_FRAME
+-- GLOBALS: LibStub, DEFAULT_CHAT_FRAME
 
 AceComm.embeds = AceComm.embeds or {}
 

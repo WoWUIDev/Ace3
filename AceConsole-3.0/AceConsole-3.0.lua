@@ -20,18 +20,18 @@ AceConsole.embeds = AceConsole.embeds or {} -- table containing objects AceConso
 AceConsole.commands = AceConsole.commands or {} -- table containing commands registered
 AceConsole.weakcommands = AceConsole.weakcommands or {} -- table containing self, command => func references for weak commands that don't persist through enable/disable
 
--- local upvalues
-local _G = _G
-local pairs = pairs
-local select = select
-local type = type
-local tostring = tostring
-local strfind = string.find
-local strsub = string.sub
+-- Lua APIs
+local tconcat, tostring, select = table.concat, tostring, select
+local type, pairs, error = type, pairs, error
+local format, strfind, strsub = string.format, string.find, string.sub
 local max = math.max
-local format = format
-local tconcat = table.concat
--- GLOBALS: DEFAULT_CHAT_FRAME, error, SlashCmdList, hash_SlashCmdList
+
+-- WoW APIs
+local _G = _G
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: DEFAULT_CHAT_FRAME, SlashCmdList, hash_SlashCmdList
 
 local tmp={}
 local function Print(self,frame,...)
