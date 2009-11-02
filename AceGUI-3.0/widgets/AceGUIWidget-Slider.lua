@@ -1,5 +1,16 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local min, max, floor = math.min, math.max, math.floor
+local tonumber = tonumber
+
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: GameFontHighlightSmall
+
 --------------------------
 -- Slider  	            --
 --------------------------
@@ -34,9 +45,9 @@ do
 	local function UpdateText(self)
 		local value = self.value or 0
 		if self.ispercent then
-			self.editbox:SetText(("%s%%"):format(math.floor(value*1000+0.5)/10))
+			self.editbox:SetText(("%s%%"):format(floor(value*1000+0.5)/10))
 		else
-			self.editbox:SetText(math.floor(value*100+0.5)/100)
+			self.editbox:SetText(floor(value*100+0.5)/100)
 		end
 	end
 	
@@ -77,9 +88,9 @@ do
 		if not self.disabled then
 			local value = self.value
 			if v > 0 then
-				value = math.min(value + (self.step or 1),self.max)
+				value = min(value + (self.step or 1),self.max)
 			else
-				value = math.max(value - (self.step or 1), self.min)
+				value = max(value - (self.step or 1), self.min)
 			end
 			self.slider:SetValue(value)
 		end

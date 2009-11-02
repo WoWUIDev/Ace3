@@ -1,5 +1,13 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local pairs, assert, type = pairs, assert, type
+local min, max, floor = math.min, math.max, math.floor
+
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+
 -------------
 -- Widgets --
 -------------
@@ -84,7 +92,7 @@ do
 			if value < 0 then
 				delta = -1
 			end
-			self.scrollbar:SetValue(math.min(math.max(status.scrollvalue + delta*(1000/(diff/45)),0), 1000))
+			self.scrollbar:SetValue(min(max(status.scrollvalue + delta*(1000/(diff/45)),0), 1000))
 		end
 	end
 	

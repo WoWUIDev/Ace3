@@ -16,16 +16,12 @@ local AceSerializer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceSerializer then return end
 
-local strbyte = string.byte
-local strchar = string.char
+-- Lua APIs
+local strbyte, strchar, gsub, gmatch, format = string.byte, string.char, string.gsub, string.gmatch, string.format
+local assert, error, pcall = assert, error, pcall
+local type, tostring, tonumber = type, tostring, tonumber
+local pairs, select, frexp = pairs, select, math.frexp
 local tconcat = table.concat
-local gsub = string.gsub
-local gmatch = string.gmatch
-local pcall = pcall
-local format = string.format
-local type = type
-local tostring, tonumber = tostring, tonumber
-local select = select
 
 -- quick copies of string representations of wonky numbers
 local serNaN = tostring(0/0)

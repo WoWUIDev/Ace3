@@ -1,5 +1,17 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local next, pairs, ipairs, assert, type = next, pairs, ipairs, assert, type
+local math_min, math_max, floor = math.min, math.max, floor
+local select, tremove = select, table.remove
+
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: GameTooltip, FONT_COLOR_CODE_CLOSE
+
 -- Recycling functions
 local new, del
 do
@@ -396,7 +408,7 @@ do
 		
 		local numlines = #lines
 		
-		local maxlines = (math.floor(((self.treeframe:GetHeight()or 0) - 20 ) / 18))
+		local maxlines = (floor(((self.treeframe:GetHeight()or 0) - 20 ) / 18))
 		
 		local first, last
 		
@@ -486,7 +498,7 @@ do
 	
 	--Selects a tree node by UniqueValue
 	local function SelectByValue(self, uniquevalue)
-		self:Select(uniquevalue,string.split("\001", uniquevalue))
+		self:Select(uniquevalue, ("\001"):split(uniquevalue))
 	end
 	
 
@@ -518,7 +530,7 @@ do
 		content:SetWidth(contentwidth)
 		content.width = contentwidth
 		
-		local maxtreewidth = math.min(400, width - 50)
+		local maxtreewidth = math_min(400, width - 50)
 		
 		if maxtreewidth > 100 and status.treewidth > maxtreewidth then
 			self:SetTreeWidth(maxtreewidth, status.treesizable)
@@ -544,7 +556,7 @@ do
 			local scrollbar = self.scrollbar
 			local min, max = scrollbar:GetMinMaxValues()
 			local value = scrollbar:GetValue()
-			local newvalue = math.min(max,math.max(min,value - delta))
+			local newvalue = math_min(max,math_max(min,value - delta))
 			if value ~= newvalue then
 				scrollbar:SetValue(newvalue)
 			end
@@ -675,9 +687,9 @@ do
 		self.SelectByValue = SelectByValue
 		self.SelectByPath = SelectByPath
 		self.OnWidthSet = OnWidthSet
-		self.OnHeightSet = OnHeightSet		
+		self.OnHeightSet = OnHeightSet
 		self.EnableButtonTooltips = EnableButtonTooltips
-		self.Filter = Filter
+		--self.Filter = Filter
 		self.LayoutFinished = LayoutFinished
 		
 		self.frame = frame

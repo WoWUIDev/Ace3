@@ -32,6 +32,9 @@ local AceGUI = LibStub("AceGUI-3.0")
 	Group Designed to be added to the bliz interface options panel
 ]]
 
+-- WoW APIs
+local CreateFrame = CreateFrame
+
 do
 	local Type = "BlizOptionsGroup"
 	local Version = 10

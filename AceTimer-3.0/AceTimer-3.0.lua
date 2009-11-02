@@ -46,13 +46,20 @@ AceTimer.hash = AceTimer.hash or {}         -- Array of [0..BUCKET-1] = linked l
 AceTimer.selfs = AceTimer.selfs or {}       -- Array of [self]={[handle]=timerobj, [handle2]=timerobj2, ...}
 AceTimer.frame = AceTimer.frame or CreateFrame("Frame", "AceTimer30Frame")
 
-local type = type
-local next = next
-local pairs = pairs
-local select = select
-local tostring = tostring
-local floor = floor
-local max = max
+-- Lua APIs
+local assert, error, loadstring = assert, error, loadstring
+local setmetatable, rawset, rawget = setmetatable, rawset, rawget
+local select, pairs, type, next, tostring = select, pairs, type, next, tostring
+local floor, max, min = math.floor, math.max, math.min
+local tconcat = table.concat
+
+-- WoW APIs
+local geterrorhandler = geterrorhandler
+local GetTime = GetTime
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: DEFAULT_CHAT_FRAME
 
 -- Simple ONE-SHOT timer cache. Much more efficient than a full compost for our purposes.
 local timerCache = nil
@@ -103,7 +110,7 @@ local function CreateDispatcher(argCount)
 	
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", table.concat(ARGS, ", "))
+	code = code:gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
 

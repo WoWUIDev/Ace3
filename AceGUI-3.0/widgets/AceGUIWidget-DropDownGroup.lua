@@ -1,5 +1,11 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local assert, pairs, type = assert, pairs, type
+
+-- WoW APIs
+local CreateFrame = CreateFrame
+
 --[[
 	Selection Group controls all have an interface to select a group for thier contents
 	None of them will auto size to thier contents, and should usually be used with a scrollframe

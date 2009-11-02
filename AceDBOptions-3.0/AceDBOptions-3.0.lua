@@ -7,6 +7,12 @@ local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
 
+-- Lua APIs
+local pairs, next = pairs, next
+
+-- WoW APIs
+local UnitClass = UnitClass
+
 AceDBOptions.optionTables = AceDBOptions.optionTables or {}
 AceDBOptions.handlers = AceDBOptions.handlers or {}
 

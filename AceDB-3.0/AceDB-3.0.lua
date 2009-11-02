@@ -45,12 +45,16 @@ local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
 
-local _G = getfenv(0)
+-- Lua APIs
+local type, pairs, next, error = type, pairs, next, error
+local setmetatable, getmetatable, rawset, rawget = setmetatable, getmetatable, rawset, rawget
 
-local type = type
-local pairs, next = pairs, next
-local rawget, rawset = rawget, rawset
-local setmetatable = setmetatable
+-- WoW APIs
+local _G = _G
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: LibStub
 
 AceDB.db_registry = AceDB.db_registry or {}
 AceDB.frame = AceDB.frame or CreateFrame("Frame")
@@ -676,7 +680,7 @@ function AceDB:New(tbl, defaults, defaultProfile)
 		tbl = _G[name]
 		if not tbl then
 			tbl = {}
-			setglobal(name, tbl)
+			_G[name] = tbl
 		end
 	end
 

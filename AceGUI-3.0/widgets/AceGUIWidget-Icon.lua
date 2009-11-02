@@ -1,5 +1,11 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local select = select
+
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
 --------------------------
 -- Label 	 			--
 --------------------------

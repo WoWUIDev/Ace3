@@ -6,15 +6,15 @@ if not CallbackHandler then return end -- No upgrade needed
 
 local meta = {__index = function(tbl, key) tbl[key] = {} return tbl[key] end}
 
-local type = type
-local pcall = pcall
-local pairs = pairs
-local assert = assert
-local concat = table.concat
-local loadstring = loadstring
-local next = next
-local select = select
-local type = type
+-- Lua APIs
+local tconcat = table.concat
+local assert, error, loadstring = assert, error, loadstring
+local setmetatable, rawset, rawget = setmetatable, rawset, rawget
+local next, select, pairs, type, tostring = next, select, pairs, type, tostring
+
+-- WoW APIs
+local geterrorhandler = geterrorhandler
+
 local xpcall = xpcall
 
 local function errorhandler(err)
@@ -46,7 +46,7 @@ local function CreateDispatcher(argCount)
 
 	local ARGS, OLD_ARGS = {}, {}
 	for i = 1, argCount do ARGS[i], OLD_ARGS[i] = "arg"..i, "old_arg"..i end
-	code = code:gsub("OLD_ARGS", concat(OLD_ARGS, ", ")):gsub("ARGS", concat(ARGS, ", "))
+	code = code:gsub("OLD_ARGS", tconcat(OLD_ARGS, ", ")):gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(next, xpcall, errorhandler)
 end
 

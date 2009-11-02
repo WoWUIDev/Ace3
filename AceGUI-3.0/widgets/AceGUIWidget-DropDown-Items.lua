@@ -2,6 +2,12 @@
 
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local select, assert = select, assert
+
+-- WoW APIs
+local CreateFrame = CreateFrame
+
 local function fixlevels(parent,...)
 	local i = 1
 	local child = select(i, ...)

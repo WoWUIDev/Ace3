@@ -1,5 +1,12 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: ShowUIPanel, HideUIPanel, ColorPickerFrame, OpacitySliderFrame
+
 --------------------------
 -- ColorPicker		  --
 --------------------------

@@ -47,13 +47,17 @@ AceBucket.embeds = AceBucket.embeds or {}
 -- the libraries will be lazyly bound later, to avoid errors due to loading order issues
 local AceEvent, AceTimer
 
--- local upvalues
-local type = type
-local next = next
-local pairs = pairs
-local select = select
-local tonumber = tonumber
-local tostring = tostring
+-- Lua APIs
+local tconcat = table.concat
+local type, next, pairs, select = type, next, pairs, select
+local tonumber, tostring, rawset = tonumber, tostring, rawset
+local assert, loadstring, error = assert, loadstring, error
+
+-- WoW APIs
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: geterrorhandler, LibStub
 
 local bucketCache = setmetatable({}, {__mode='k'})
 
@@ -84,7 +88,7 @@ local function CreateDispatcher(argCount)
 	
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", table.concat(ARGS, ", "))
+	code = code:gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
 

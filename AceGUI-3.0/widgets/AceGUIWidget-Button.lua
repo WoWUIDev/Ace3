@@ -1,5 +1,9 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- WoW APIs
+local _G = _G
+local CreateFrame, UIParent = CreateFrame, UIParent
+
 --------------------------
 -- Button		        --
 --------------------------

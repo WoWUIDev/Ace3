@@ -22,6 +22,12 @@ if not AceConfigRegistry.callbacks then
 	AceConfigRegistry.callbacks = CallbackHandler:New(AceConfigRegistry)
 end
 
+-- Lua APIs
+local tinsert, tconcat = table.insert, table.concat
+local strfind, strmatch = string.find, string.match
+local type, tostring, select, pairs = type, tostring, select, pairs
+local error, assert = error, assert
+
 -----------------------------------------------------------------------
 -- Validating options table consistency:
 
@@ -41,7 +47,7 @@ local function err(msg, errlvl, ...)
 	for i=select("#",...),1,-1 do
 		tinsert(t, (select(i, ...)))
 	end
-	error(MAJOR..":ValidateOptionsTable(): "..table.concat(t,".")..msg, errlvl+2)
+	error(MAJOR..":ValidateOptionsTable(): "..tconcat(t,".")..msg, errlvl+2)
 end
 
 

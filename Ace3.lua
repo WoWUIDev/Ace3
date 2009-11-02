@@ -3,6 +3,9 @@
 -- for now only /rl to reload your UI :)
 -- note the complete overkill use of AceAddon and console, ain't it cool?
 
+-- GLOBALS: next, loadstring, ReloadUI, geterrorhandler
+-- GLOBALS: BINDING_HEADER_ACE3, BINDING_NAME_RELOADUI, Ace3, LibStub
+
 -- BINDINGs labels
 BINDING_HEADER_ACE3 = "Ace3"
 BINDING_NAME_RELOADUI = "ReloadUI"
@@ -39,6 +42,7 @@ end
 
 local old_CloseSpecialWindows
 
+-- GLOBALS: CloseSpecialWindows, next
 function Ace3:Open()
 	if not old_CloseSpecialWindows then
 		old_CloseSpecialWindows = CloseSpecialWindows

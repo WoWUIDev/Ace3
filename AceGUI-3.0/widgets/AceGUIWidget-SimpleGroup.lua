@@ -1,5 +1,7 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
 
 -------------
 -- Widgets --

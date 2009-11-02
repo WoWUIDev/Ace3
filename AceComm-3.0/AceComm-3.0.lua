@@ -18,7 +18,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 ]]
 
 local MAJOR, MINOR = "AceComm-3.0", 6
-	
+
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceComm then return end
@@ -26,11 +26,17 @@ if not AceComm then return end
 local CallbackHandler = LibStub:GetLibrary("CallbackHandler-1.0")
 local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
-local type = type
-local strsub = string.sub
-local strfind = string.find
-local tinsert = table.insert
-local tconcat = table.concat
+-- Lua APIs
+local type, next, pairs, tostring = type, next, pairs, tostring
+local strsub, strfind = string.sub, string.find
+local tinsert, tconcat = table.insert, table.concat
+local error, assert = error, assert
+
+-- WoW APIs
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: geterrorhandler, LibStub, DEFAULT_CHAT_FRAME
 
 AceComm.embeds = AceComm.embeds or {}
 

@@ -8,6 +8,17 @@ local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceLocale then return end -- no upgrade needed
 
+-- Lua APIs
+local assert, tostring, error = assert, tostring, error
+local setmetatable, rawset, rawget = setmetatable, rawset, rawget
+
+-- WoW APIs
+local geterrorhandler = geterrorhandler
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: GAME_LOCALE
+
 local gameLocale = GetLocale()
 if gameLocale == "enGB" then
 	gameLocale = "enUS"

@@ -29,6 +29,20 @@ local cfgreg = LibStub("AceConfigRegistry-3.0")
 local AceConsole -- LoD
 local AceConsoleName = "AceConsole-3.0"
 
+-- Lua APIs
+local strsub, strsplit, strlower, strmatch, strtrim = string.sub, string.split, string.lower, string.match, string.trim
+local format, tonumber, tostring = string.format, tonumber, tostring
+local tsort, tinsert = table.sort, table.insert
+local select, pairs, next, type = select, pairs, next, type
+local error, assert = error, assert
+
+-- WoW APIs
+local _G = _G
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: LibStub, SELECTED_CHAT_FRAME, DEFAULT_CHAT_FRAME
+
 
 local L = setmetatable({}, {	-- TODO: replace with proper locale
 	__index = function(self,k) return k end
@@ -179,12 +193,12 @@ local function showhelp(info, inputpos, tab, noHead)
 	
 	for k,v in iterateargs(tab) do
 		if not refTbl[k] then	-- a plugin overriding something in .args
-			table.insert(sortTbl, k)
+			tinsert(sortTbl, k)
 			refTbl[k] = v
 		end
 	end
 	
-	table.sort(sortTbl, function(one, two) 
+	tsort(sortTbl, function(one, two) 
 		local o1 = refTbl[one].order or 100
 		local o2 = refTbl[two].order or 100
 		if type(o1) == "function" or type(o1) == "string" then
@@ -208,7 +222,8 @@ local function showhelp(info, inputpos, tab, noHead)
 		return o1<o2
 	end)
 	
-	for _,k in ipairs(sortTbl) do
+	for i = 1, #sortTbl do
+		local k = sortTbl[i]
 		local v = refTbl[k]
 		if not pickfirstset(v.cmdHidden, v.hidden, false) then
 			-- recursively show all inline groups
@@ -327,7 +342,7 @@ local function handle(info, inputpos, tab, depth, retfalse)
 		if tab.plugins and type(tab.plugins)~="table" then err(info,inputpos) end
 		
 		-- grab next arg from input
-		local _,nextpos,arg = string.find(info.input, " *([^ ]+) *", inputpos)
+		local _,nextpos,arg = (info.input):find(" *([^ ]+) *", inputpos)
 		if not arg then
 			showhelp(info, inputpos, tab)
 			return
@@ -525,9 +540,9 @@ local function handle(info, inputpos, tab, depth, retfalse)
 		--parse for =on =off =default in the process
 		--table will be key = true for options that should toggle, key = [on|off|default] for options to be set
 		local sels = {}
-		for v in string.gmatch(str, "[^ ]+") do
+		for v in str:gmatch("[^ ]+") do
 			--parse option=on etc
-			local opt, val = string.match(v,'(.+)=(.+)')
+			local opt, val = v:match('(.+)=(.+)')
 			--get option if toggling
 			if not opt then 
 				opt = v 

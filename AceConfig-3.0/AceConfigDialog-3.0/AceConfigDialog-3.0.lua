@@ -19,19 +19,22 @@ AceConfigDialog.frame.closing = AceConfigDialog.frame.closing or {}
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local select = select
-local pairs = pairs
-local type = type
-local assert = assert
-local tinsert = tinsert
-local tremove = tremove
-local error = error
-local table = table
-local unpack = unpack
-local string = string
-local next = next
-local math = math
-local _
+-- Lua APIs
+local tconcat, tinsert, tsort, tremove = table.concat, table.insert, table.sort, table.remove
+local strmatch, format = string.match, string.format
+local assert, loadstring, error = assert, loadstring, error
+local pairs, next, select, type, unpack = pairs, next, select, type, unpack
+local rawset, tostring = rawset, tostring
+local math_min, math_max, math_floor = math.min, math.max, math.floor
+
+-- WoW APIs
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: NORMAL_FONT_COLOR, GameTooltip, geterrorhandler, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
+-- GLOBALS: PlaySound, GameFontHighlight, GameFontHighlightSmall, GameFontHighlightLarge
+-- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory
+
 local emptyTbl = {}
 
 --[[
@@ -61,7 +64,7 @@ local function CreateDispatcher(argCount)
 	
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", table.concat(ARGS, ", "))
+	code = code:gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
 
@@ -252,7 +255,7 @@ local function GetOptionsMemberValue(membername, option, options, path, appName,
 			if handler and handler[member] then
 				a,b,c,d = handler[member](handler, info, ...)
 			else
-				error(string.format("Method %s doesn't exist in handler for type %s", member, membername))
+				error(format("Method %s doesn't exist in handler for type %s", member, membername))
 			end
 		end
 		del(info)
@@ -373,7 +376,7 @@ local function BuildSortedOptionsTable(group, keySort, opts, options, path, appN
 		end
 	end
 
-	table.sort(keySort, compareOptions)
+	tsort(keySort, compareOptions)
 
 	del(tempOrders)
 	del(tempNames)
@@ -683,7 +686,7 @@ local function ActivateControl(widget, event, ...)
 				success, validated = safecall(handler[validate], handler, info, ...)
 				if not success then validated = false end
 			else
-				error(string.format("Method %s doesn't exist in handler for type execute", validate))
+				error(format("Method %s doesn't exist in handler for type execute", validate))
 			end
 		elseif type(validate) == "function" then
 			success, validated = safecall(validate, info, ...)
@@ -734,7 +737,7 @@ local function ActivateControl(widget, event, ...)
 					confirm = false
 				end
 			else
-				error(string.format("Method %s doesn't exist in handler for type confirm", confirm))
+				error(format("Method %s doesn't exist in handler for type confirm", confirm))
 			end
 		elseif type(confirm) == "function" then
 			success, confirm = safecall(confirm, info, ...)
@@ -774,7 +777,7 @@ local function ActivateControl(widget, event, ...)
 					if handler and handler[func] then
 						confirmPopup(user.appName, rootframe, basepath, info, confirmText, handler[func], handler, info, ...)
 					else
-						error(string.format("Method %s doesn't exist in handler for type func", func))
+						error(format("Method %s doesn't exist in handler for type func", func))
 					end
 				elseif type(func) == "function" then
 					confirmPopup(user.appName, rootframe, basepath, info, confirmText, func, info, ...)
@@ -789,7 +792,7 @@ local function ActivateControl(widget, event, ...)
 			if handler and handler[func] then
 				safecall(handler[func],handler, info, ...)
 			else
-				error(string.format("Method %s doesn't exist in handler for type func", func))
+				error(format("Method %s doesn't exist in handler for type func", func))
 			end
 		elseif type(func) == "function" then
 			safecall(func,info, ...)
@@ -836,9 +839,9 @@ local function ActivateSlider(widget, event, value)
 	local option = widget:GetUserData('option')
 	local min, max, step = option.min or 0, option.max or 100, option.step
 	if step then
-		value = math.floor((value - min) / step + 0.5) * step + min
+		value = math_floor((value - min) / step + 0.5) * step + min
 	else
-		value = math.max(math.min(value,max),min)
+		value = math_max(math_min(value,max),min)
 	end
 	ActivateControl(widget,event,value)
 end
@@ -1184,8 +1187,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							tinsert(valuesort, value)
 						end
 					end
-					table.sort(valuesort)	
-						
+					tsort(valuesort)
+					
 					if controlType then
 						control = gui:Create(controlType)
 						if not control then
@@ -1364,7 +1367,7 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 		feedpath[i] = path[i]
 	end
 
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	local group = options
 	for i = 1, #feedpath do
 		if not group then return end
@@ -1376,9 +1379,9 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 	
 	GameTooltip:SetOwner(button, "ANCHOR_NONE")
 	if widget.type == "TabGroup" then
-		GameTooltip:SetPoint("BOTTOM",button,"TOP")	
+		GameTooltip:SetPoint("BOTTOM",button,"TOP")
 	else
-		GameTooltip:SetPoint("LEFT",button,"RIGHT")	
+		GameTooltip:SetPoint("LEFT",button,"RIGHT")
 	end
 
 	GameTooltip:SetText(name, 1, .82, 0, 1)
@@ -1404,7 +1407,7 @@ local function GroupExists(appName, options, path, uniquevalue)
 		feedpath[i] = path[i]
 	end
 	
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	
 	local group = options
 	for i = 1, #feedpath do
@@ -1437,7 +1440,7 @@ local function GroupSelected(widget, event, uniquevalue)
 		feedpath[i] = path[i]
 	end
 
-	BuildPath(feedpath, string.split("\001", uniquevalue))
+	BuildPath(feedpath, ("\001"):split(uniquevalue))
 	local group = options
 	for i = 1, #feedpath do
 		group = GetSubOption(group, feedpath[i])

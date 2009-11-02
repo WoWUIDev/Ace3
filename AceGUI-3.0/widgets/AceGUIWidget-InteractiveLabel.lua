@@ -1,5 +1,15 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local select, max = select, math.max
+
+-- WoW APIs
+local CreateFrame, UIParent = CreateFrame, UIParent
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: GameFontHighlightSmall
+
 --------------------------
 -- Label 	 			--
 --------------------------
@@ -56,7 +66,7 @@ do
 					image:SetPoint("RIGHT",label,"LEFT",0,0)
 				end
 				label:SetWidth(width - imagewidth)
-				height = math.max(imageheight, labelheight)
+				height = max(imageheight, labelheight)
 			end
 		else
 			--no image shown

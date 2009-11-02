@@ -1,9 +1,19 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
+-- Lua APIs
+local tostring = tostring
+
+-- WoW APIs
+local GetCursorInfo, ClearCursor, GetSpellName = GetCursorInfo, ClearCursor, GetSpellName
+local CreateFrame, UIParent = CreateFrame, UIParent
+local _G = _G
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: AceGUIEditBoxInsertLink, ChatFontNormal, OKAY
+
 local Type = "EditBox"
 local Version = 12
-
-local _G=_G
 
 if not AceGUIEditBoxInsertLink then
 	-- upgradeable hook

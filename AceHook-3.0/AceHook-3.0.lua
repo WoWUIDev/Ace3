@@ -30,11 +30,14 @@ local actives = AceHook.actives
 local scripts = AceHook.scripts
 local onceSecure = AceHook.onceSecure
 
-local _G = _G
+-- Lua APIs
+local pairs, next, type = pairs, next, type
 local format = string.format
-local next = next
-local pairs = pairs
-local type = type
+local assert, error = assert, error
+
+-- WoW APIs
+local issecurevariable, hooksecurefunc = issecurevariable, hooksecurefunc
+local _G = _G
 
 -- functions for later definition
 local donothing, createHook, hook
