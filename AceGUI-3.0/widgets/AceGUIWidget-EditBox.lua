@@ -13,7 +13,7 @@ local _G = _G
 -- GLOBALS: AceGUIEditBoxInsertLink, ChatFontNormal, OKAY
 
 local Type = "EditBox"
-local Version = 12
+local Version = 13
 
 if not AceGUIEditBoxInsertLink then
 	-- upgradeable hook
@@ -53,6 +53,7 @@ do
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 		self:SetDisabled(false)
+		self:SetText()
 	end
 	
 	local function Control_OnEnter(this)
