@@ -4,8 +4,8 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 38
-local AceConfigDialog = LibStub:NewLibrary(MAJOR, MINOR)
+local MAJOR, MINOR = "AceConfigDialog-3.0", 39
+local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
 
@@ -1644,9 +1644,10 @@ local function RefreshOnUpdate(this)
 			AceConfigDialog.OpenFrames[appName]:Hide()
 		end
 		if AceConfigDialog.BlizOptions and AceConfigDialog.BlizOptions[appName] then
-			local widget = AceConfigDialog.BlizOptions[appName]
-			if not widget:IsVisible() then
-				widget:ReleaseChildren()
+			for key, widget in pairs(AceConfigDialog.BlizOptions[appName]) do
+				if not widget:IsVisible() then
+					widget:ReleaseChildren()
+				end
 			end
 		end
 		this.closing[appName] = nil
@@ -1665,10 +1666,11 @@ local function RefreshOnUpdate(this)
 			AceConfigDialog:Open(appName, unpack(user.basepath or emptyTbl))
 		end
 		if AceConfigDialog.BlizOptions and AceConfigDialog.BlizOptions[appName] then
-			local widget = AceConfigDialog.BlizOptions[appName]
-			local user = widget:GetUserDataTable()
-			if widget:IsVisible() then
-				AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(user.basepath or emptyTbl))
+			for key, widget in pairs(AceConfigDialog.BlizOptions[appName]) do
+				local user = widget:GetUserDataTable()
+				if widget:IsVisible() then
+					AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(user.basepath or emptyTbl))
+				end
 			end
 		end
 		this.apps[appName] = nil
@@ -1798,11 +1800,23 @@ function AceConfigDialog:Open(appName, container, ...)
 	del(path)
 end
 
-AceConfigDialog.BlizOptions = AceConfigDialog.BlizOptions or {}
+-- convert pre-39 BlizOptions structure to the new format
+if oldminor and oldminor < 39 and AceConfigDialog.BlizOptions then
+	local old = AceConfigDialog.BlizOptions
+	local new = {}
+	for key, widget in pairs(old) do
+		local appName = widget:GetUserData('appName')
+		if not new[appName] then new[appName] = {} end
+		new[appName][key] = widget
+	end
+	AceConfigDialog.BlizOptions = new
+else
+	AceConfigDialog.BlizOptions = AceConfigDialog.BlizOptions or {}
+end
 
 local function FeedToBlizPanel(widget, event)
 	local path = widget:GetUserData('path')
-	AceConfigDialog:Open(widget:GetUserData('appName'), widget, path and unpack(path))
+	AceConfigDialog:Open(widget:GetUserData('appName'), widget, unpack(path or emptyTbl))
 end
 
 local function ClearBlizPanel(widget, event)
@@ -1836,9 +1850,13 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 		key = key..'\001'..select(n, ...)
 	end
 	
-	if not BlizOptions[key] then
+	if not BlizOptions[appName] then
+		BlizOptions[appName] = {}
+	end
+	
+	if not BlizOptions[appName][key] then
 		local group = gui:Create("BlizOptionsGroup")
-		BlizOptions[key] = group
+		BlizOptions[appName][key] = group
 		group:SetName(name or appName, parent)
 
 		group:SetTitle(name or appName)
