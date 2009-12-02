@@ -103,7 +103,7 @@ elseif LOCALE == "koKR" then
 	L["profiles"] = "프로필"
 	L["profiles_sub"] = "프로필 설정"
 	--L["current"] = "Current Profile:"
-elseif LOCALE == "esES" then
+elseif LOCALE == "esES" or LOCALE == "esMX" then
 	L["default"] = "Por defecto"
 	L["intro"] = "Puedes cambiar el perfil activo de tal manera que cada personaje tenga diferentes configuraciones."
 	L["reset_desc"] = "Reinicia el perfil actual a los valores por defectos, en caso de que se haya estropeado la configuración o quieras volver a empezar de nuevo."
