@@ -16,7 +16,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 8
+	local Version = 9
 	
 	local function OnAcquire(self)
 		self:SetWidth(200)
@@ -164,6 +164,14 @@ do
 		end
 	end
 	
+	local function EditBox_OnEnter(this)
+		this:SetBackdropBorderColor(0.5,0.5,0.5,1)
+	end
+	
+	local function EditBox_OnLeave(this)
+		this:SetBackdropBorderColor(0.3,0.3,0.3,0.8)
+	end
+	
 	local function SetIsPercent(self, value)
 		self.ispercent = value
 		UpdateLabels(self)
@@ -180,6 +188,12 @@ do
 		edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
 		tile = true, tileSize = 8, edgeSize = 8,
 		insets = { left = 3, right = 3, top = 6, bottom = 6 }
+	}
+	
+	local ManualBackdrop = {
+		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+		edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+		tile = true, edgeSize = 1, tileSize = 5,
 	}
 	
 	local function Constructor()
@@ -240,14 +254,13 @@ do
 		editbox:EnableMouse(true)
 		editbox:SetScript("OnEscapePressed",EditBox_OnEscapePressed)
 		editbox:SetScript("OnEnterPressed",EditBox_OnEnterPressed)
+		editbox:SetScript("OnEnter",EditBox_OnEnter)
+		editbox:SetScript("OnLeave",EditBox_OnLeave)
+		editbox:SetBackdrop(ManualBackdrop)
+		editbox:SetBackdropColor(0,0,0,0.5)
+		editbox:SetBackdropBorderColor(0.3,0.3,0.30,0.80)
 		self.editbox = editbox
 		editbox.obj = self
-		
-		local bg = editbox:CreateTexture(nil,"BACKGROUND")
-		editbox.bg = bg
-		bg:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
-		bg:SetVertexColor(0,0,0,0.25)
-		bg:SetAllPoints(editbox)
 		
 		slider:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
 	
