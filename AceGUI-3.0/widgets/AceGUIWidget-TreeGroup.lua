@@ -39,7 +39,7 @@ end
 
 do
 	local Type = "TreeGroup"
-	local Version = 22
+	local Version = 23
 	
 	local DEFAULT_TREE_WIDTH = 175
 	local DEFAULT_TREE_SIZABLE = true
@@ -181,6 +181,7 @@ do
 		local frame = self.frame
 		local text = treeline.text or ""
 		local icon = treeline.icon
+		local iconCoords = treeline.iconCoords
 		local level = treeline.level
 		local value = treeline.value
 		local uniquevalue = treeline.uniquevalue
@@ -222,6 +223,12 @@ do
 			button.icon:SetPoint("LEFT", button, "LEFT", 8 * level, (level == 1) and 0 or 1)
 		else
 			button.icon:SetTexture(nil)
+		end
+		
+		if iconCoords then
+			button.icon:SetTexCoord(unpack(iconCoords))
+		else
+			button.icon:SetTexCoord(0, 1, 0, 1)
 		end
 		
 		if canExpand then
@@ -337,6 +344,7 @@ do
 		line.value = v.value
 		line.text = v.text
 		line.icon = v.icon
+		line.iconCoords = v.iconCoords
 		line.disabled = v.disabled
 		line.tree = tree
 		line.level = level
