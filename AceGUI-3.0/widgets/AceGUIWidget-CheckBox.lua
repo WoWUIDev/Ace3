@@ -17,13 +17,14 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 12
+	local Version = 13
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
 		self.tristate = nil
 		self:SetHeight(24)
 		self:SetWidth(200)
+		self:SetImage()
 	end
 	
 	local function OnRelease(self)
@@ -170,7 +171,7 @@ do
 			if not self.desc then
 				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 				desc:ClearAllPoints()
-				desc:SetPoint("TOPLEFT", self.check, "TOPRIGHT", 5, -20)
+				desc:SetPoint("TOPLEFT", self.check, "TOPRIGHT", 5, -21)
 				desc:SetWidth(self.frame.width - 30)
 				desc:SetJustifyH("LEFT")
 				desc:SetJustifyV("TOP")
@@ -179,7 +180,7 @@ do
 			self.desc:Show()
 			--self.text:SetFontObject(GameFontNormal)
 			self.desc:SetText(desc)
-			self:SetHeight(24 + self.desc:GetHeight())
+			self:SetHeight(28 + self.desc:GetHeight())
 		else
 			if self.desc then
 				self.desc:SetText("")
@@ -190,10 +191,37 @@ do
 		end
 	end
 	
+	local function SetImage(self, path, ...)
+		local image = self.image
+		image:SetTexture(path)
+		
+		if image:GetTexture() then
+			local n = select('#', ...)
+			if n == 4 or n == 8 then
+				image:SetTexCoord(...)
+			else
+				image:SetTexCoord(0, 1, 0, 1)
+			end
+		end
+		self:AlignImage()
+	end
+	
+	local function AlignImage(self)
+		local img = self.image:GetTexture()
+		self.text:ClearAllPoints()
+		if not img then
+			self.text:SetPoint("LEFT", self.check, "RIGHT", 0, 0)
+			self.text:SetPoint("RIGHT", self.frame, "RIGHT", 0, 0)
+		else
+			self.text:SetPoint("LEFT", self.image,"RIGHT", 1, 0)
+			self.text:SetPoint("RIGHT", self.frame,"RIGHT", 0, 0)
+		end
+	end
+	
 	local function OnWidthSet(self, width)
 		if self.desc and self.desc:GetText() ~= "" then
 			self.desc:SetWidth(width - 30)
-			self:SetHeight(24 + self.desc:GetHeight())
+			self:SetHeight(28 + self.desc:GetHeight())
 		end
 	end
 	
@@ -214,6 +242,8 @@ do
 		self.SetTriState = SetTriState
 		self.SetDescription = SetDescription
 		self.OnWidthSet = OnWidthSet
+		self.SetImage = SetImage
+		self.AlignImage = AlignImage
 		
 		self.frame = frame
 		frame.obj = self
@@ -245,6 +275,12 @@ do
 		highlight:SetBlendMode("ADD")
 		highlight:SetAllPoints(checkbg)
 		highlight:Hide()
+		
+		local image = frame:CreateTexture(nil, "OVERLAY")
+		self.image = image
+		image:SetHeight(16)
+		image:SetWidth(16)
+		image:SetPoint("LEFT", check, "RIGHT", 1, 0)
 		
 		text:SetJustifyH("LEFT")
 		frame:SetHeight(24)
