@@ -15,7 +15,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 10
+local MAJOR, MINOR = "AceConfigCmd-3.0", 11
 local AceConfigCmd = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigCmd then return end
@@ -182,12 +182,12 @@ local function iterateargs(tab)
 end
 
 local function checkhidden(info, inputpos, tab)
-	if tab.cmdHidden then
-		return true
+	if tab.cmdHidden~=nil then
+		return tab.cmdHidden
 	end
 	local hidden = tab.hidden
-	if type(tab.hidden) == "function" or type(tab.hidden) == "string" then
-		info.hidden = tab.hidden
+	if type(hidden) == "function" or type(hidden) == "string" then
+		info.hidden = hidden
 		hidden = callmethod(info, inputpos, tab, 'hidden')
 		info.hidden = nil
 	end
