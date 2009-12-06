@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 39
+local MAJOR, MINOR = "AceConfigDialog-3.0", 40
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1146,7 +1146,23 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						local desc = GetOptionsMemberValue("desc", v, options, path, appName)
 						control:SetDescription(desc)
 					end
-
+					
+					local image = GetOptionsMemberValue("image", v, options, path, appName)
+					local imageCoords = GetOptionsMemberValue("imageCoords", v, options, path, appName)
+					
+					if type(image) == 'string' then
+						if not width then
+							width = GetOptionsMemberValue("imageWidth", v, options, path, appName)
+						end
+						if not height then
+							height = GetOptionsMemberValue("imageHeight", v, options, path, appName)
+						end
+						if type(imageCoords) == 'table' then
+							control:SetImage(image, unpack(imageCoords))
+						else
+							control:SetImage(image)
+						end
+					end
 				elseif v.type == "range" then
 					control = gui:Create("Slider")
 					control:SetLabel(name)
