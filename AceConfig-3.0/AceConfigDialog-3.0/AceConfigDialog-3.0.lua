@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 40
+local MAJOR, MINOR = "AceConfigDialog-3.0", 41
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1554,7 +1554,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 	end
 
 	if hasChildGroups and not inline then
-
+		local name = GetOptionsMemberValue("name", group, options, path, appName)
 		if grouptype == "tab" then
 
 			local tab = gui:Create("TabGroup")
@@ -1588,6 +1588,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 		elseif grouptype == "select" then
 
 			local select = gui:Create("DropdownGroup")
+			select:SetTitle(name)
 			InjectInfo(select, options, group, path, rootframe, appName)
 			select:SetCallback("OnGroupSelected", GroupSelected)
 			local status = AceConfigDialog:GetStatusTable(appName, path)
@@ -1606,7 +1607,7 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 			end
 			
 			if firstgroup then
-				select:SetGroup( (GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or firstgroup)
+				select:SetGroup((GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or firstgroup)
 			end
 			
 			select.width = "fill"
