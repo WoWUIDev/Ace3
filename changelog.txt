@@ -1,4 +1,4 @@
-Ace3 Beta - Revision xxx (October xth, 2009)
+Ace3 Beta - Revision xxx (December xth, 2009)
 --------------------------------------------
 - AceGUI-3.0: Alot of visual fixes regarding margins and general widget styles.
 - AceGUI-3.0: Ability to accept links for EditBox Widget (Ticket #21)
@@ -7,12 +7,19 @@ Ace3 Beta - Revision xxx (October xth, 2009)
 - AceGUI-3.0: Button: Pass the arguments of the OnClick handler to the OnClick callback (Ticket #57)
 - AceGUI-3.0: add a Window container, basically a plain window with close button
 - AceGUI-3.0: Add support for inline descriptions to the checkbox widget.
+- AceGUI-3.0: Added an API to the Window container to disable the user-resizing of the same. (Ticket #80)
+- AceGUI-3.0: TreeGroup: Allow iconCoords to be passed for the tree elements. (Ticket #59)
+- AceGUI-3.0: Slider: Add a more visible backdrop/border around the manual input area (Ticket #98, #46)
+- AceGUI-3.0: Allow displaying a image in front of the checkbox label. (Ticket #82)
 - AceConfig-3.0: Added an experimental "descStyle" member to all option table nodes that allows you to control the way the description is presented. 
                  Supported values are "tooltip" for the old behaviour, and "inline" for a inline display of the description, pending support in AceGUI-3.0 widgets.
-- AceConfigDialog-3.0: Fix the unpacking of the basepath arguments when internally calling :Open (Fixes #90)
+- AceConfigDialog-3.0: Fix the unpacking of the basepath arguments when internally calling :Open (Ticket #90)
+- AceConfigDialog-3.0: Properly refresh BlizOptions Windows which are registered with a path on NotifyChange. (Ticket #93)
+- AceConfigDialog-3.0: Allow image/imageCoords on toogle elements (Note that the width/height of the image on the toggle cannot be changed) (Ticket #82)
 - AceDB-3.0: Remove the metatable from the DB before removing defaults, so we don't accidentally invoke it in the process. (Ticket #66)
 - AceDB-3.0: Don't save the profileKeys for namespaces, since we use the profile of the parent DB anyway. This will cut down on SV complexity when using alot of namespaces.
 - AceDB-3.0: Don't fire the OnProfileReset callback when copying a profile.
+- AceDBOptions-3.0: Show the current profile on the dialog. (Ticket #56)
 - AceComm-3.0: Add callbacks for message chunks going out the wire (via CTL). Useful for displaying progress for very large messages.
 - AceConsole-3.0: Add :Printf() so you don't have to do Print(format())
 
