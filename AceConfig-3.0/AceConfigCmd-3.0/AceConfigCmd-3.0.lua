@@ -12,12 +12,10 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 
 ]]
 
--- TODO: handle disabled / hidden
--- TODO: implement handlers for all types
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 9
+local MAJOR, MINOR = "AceConfigCmd-3.0", 10
 local AceConfigCmd = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigCmd then return end
@@ -183,6 +181,19 @@ local function iterateargs(tab)
 	end
 end
 
+local function checkhidden(info, inputpos, tab)
+	if tab.cmdHidden then
+		return true
+	end
+	local hidden = tab.hidden
+	if type(tab.hidden) == "function" or type(tab.hidden) == "string" then
+		info.hidden = tab.hidden
+		hidden = callmethod(info, inputpos, tab, 'hidden')
+		info.hidden = nil
+	end
+	return hidden
+end
+
 local function showhelp(info, inputpos, tab, noHead)
 	if not noHead then
 		print("|cff33ff99"..info.appName.."|r: Arguments to |cffffff78/"..info[0].."|r "..strsub(info.input,1,inputpos-1)..":")
@@ -225,7 +236,7 @@ local function showhelp(info, inputpos, tab, noHead)
 	for i = 1, #sortTbl do
 		local k = sortTbl[i]
 		local v = refTbl[k]
-		if not pickfirstset(v.cmdHidden, v.hidden, false) then
+		if not checkhidden(info, inputpos, v) then
 			-- recursively show all inline groups
 			local name, desc = v.name, v.desc
 			if type(name) == "function" then
