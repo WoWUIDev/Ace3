@@ -39,7 +39,7 @@ end
 local widget1 = AceGUI:Create("Example")
 AceGUI:Release(widget1)
 
-LibStub.minors["AceGUI-3.0"] = -1
+LibStub.minors["AceGUI-3.0"] = 29
 
 dofile("../AceGUI-3.0/AceGUI-3.0.lua")
 
