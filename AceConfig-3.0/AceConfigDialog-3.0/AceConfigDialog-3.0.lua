@@ -27,14 +27,11 @@ local pairs, next, select, type, unpack = pairs, next, select, type, unpack
 local rawset, tostring = rawset, tostring
 local math_min, math_max, math_floor = math.min, math.max, math.floor
 
--- WoW APIs
-local geterrorhandler = geterrorhandler
-
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
 -- GLOBALS: NORMAL_FONT_COLOR, GameTooltip, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
 -- GLOBALS: PlaySound, GameFontHighlight, GameFontHighlightSmall, GameFontHighlightLarge
--- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory
+-- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory, geterrorhandler
 
 local emptyTbl = {}
 
@@ -1151,12 +1148,6 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local imageCoords = GetOptionsMemberValue("imageCoords", v, options, path, appName)
 					
 					if type(image) == 'string' then
-						if not width then
-							width = GetOptionsMemberValue("imageWidth", v, options, path, appName)
-						end
-						if not height then
-							height = GetOptionsMemberValue("imageHeight", v, options, path, appName)
-						end
 						if type(imageCoords) == 'table' then
 							control:SetImage(image, unpack(imageCoords))
 						else

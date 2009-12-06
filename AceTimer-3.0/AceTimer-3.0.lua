@@ -54,12 +54,11 @@ local floor, max, min = math.floor, math.max, math.min
 local tconcat = table.concat
 
 -- WoW APIs
-local geterrorhandler = geterrorhandler
 local GetTime = GetTime
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
--- GLOBALS: DEFAULT_CHAT_FRAME
+-- GLOBALS: DEFAULT_CHAT_FRAME, geterrorhandler
 
 -- Simple ONE-SHOT timer cache. Much more efficient than a full compost for our purposes.
 local timerCache = nil

@@ -49,12 +49,9 @@ local select, pairs, next, type, unpack = select, pairs, next, type, unpack
 local loadstring, assert, error = loadstring, assert, error
 local setmetatable, getmetatable, rawset, rawget = setmetatable, getmetatable, rawset, rawget
 
--- WoW APIs
-local geterrorhandler = geterrorhandler
-
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
--- GLOBALS: LibStub, IsLoggedIn
+-- GLOBALS: LibStub, IsLoggedIn, geterrorhandler
 
 --[[
 	 xpcall safecall implementation

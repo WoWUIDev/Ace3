@@ -53,12 +53,9 @@ local type, next, pairs, select = type, next, pairs, select
 local tonumber, tostring, rawset = tonumber, tostring, rawset
 local assert, loadstring, error = assert, loadstring, error
 
--- WoW APIs
-local geterrorhandler = geterrorhandler
-
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
--- GLOBALS: LibStub
+-- GLOBALS: LibStub, geterrorhandler
 
 local bucketCache = setmetatable({}, {__mode='k'})
 

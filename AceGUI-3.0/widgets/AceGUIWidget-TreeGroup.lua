@@ -3,7 +3,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 -- Lua APIs
 local next, pairs, ipairs, assert, type = next, pairs, ipairs, assert, type
 local math_min, math_max, floor = math.min, math.max, floor
-local select, tremove = select, table.remove
+local select, tremove, unpack = select, table.remove, unpack
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
