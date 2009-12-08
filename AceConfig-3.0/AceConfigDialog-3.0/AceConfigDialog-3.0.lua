@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 41
+local MAJOR, MINOR = "AceConfigDialog-3.0", 42
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1684,6 +1684,11 @@ local function RefreshOnUpdate(this)
 		this.apps[appName] = nil
 	end
 	this:SetScript("OnUpdate", nil)
+end
+
+-- Upgrade the OnUpdate script as well, if needed.
+if AceConfigDialog.frame:GetScript("OnUpdate") then
+	AceConfigDialog.frame:SetScript("OnUpdate", RefreshOnUpdate)
 end
 
 --- Close all open options windows
