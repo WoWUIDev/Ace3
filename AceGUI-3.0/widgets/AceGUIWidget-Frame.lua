@@ -20,7 +20,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Frame"
-	local Version = 8
+	local Version = 9
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -77,10 +77,6 @@ do
 	local function sizereOnMouseDown(this)
 		this:GetParent():StartSizing("RIGHT")
 		AceGUI:ClearFocus()
-	end
-	
-	local function sizerOnMouseUp(this)
-		this:GetParent():StopMovingOrSizing()
 	end
 
 	local function SetTitle(self,title)
@@ -255,7 +251,7 @@ do
 		sizer_se:SetHeight(25)
 		sizer_se:EnableMouse()
 		sizer_se:SetScript("OnMouseDown",sizerseOnMouseDown)
-		sizer_se:SetScript("OnMouseUp", sizerOnMouseUp)
+		sizer_se:SetScript("OnMouseUp", frameOnMouseUp)
 		self.sizer_se = sizer_se
 
 		local line1 = sizer_se:CreateTexture(nil, "BACKGROUND")
@@ -282,7 +278,7 @@ do
 		sizer_s:SetHeight(25)
 		sizer_s:EnableMouse()
 		sizer_s:SetScript("OnMouseDown",sizersOnMouseDown)
-		sizer_s:SetScript("OnMouseUp", sizerOnMouseUp)
+		sizer_s:SetScript("OnMouseUp", frameOnMouseUp)
 		self.sizer_s = sizer_s
 		
 		local sizer_e = CreateFrame("Frame",nil,frame)
@@ -291,7 +287,7 @@ do
 		sizer_e:SetWidth(25)
 		sizer_e:EnableMouse()
 		sizer_e:SetScript("OnMouseDown",sizereOnMouseDown)
-		sizer_e:SetScript("OnMouseUp", sizerOnMouseUp)
+		sizer_e:SetScript("OnMouseUp", frameOnMouseUp)
 		self.sizer_e = sizer_e
 	
 		--Container Support
