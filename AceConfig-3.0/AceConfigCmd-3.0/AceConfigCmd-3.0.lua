@@ -15,7 +15,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 11
+local MAJOR, MINOR = "AceConfigCmd-3.0", 12
 local AceConfigCmd = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigCmd then return end
@@ -51,6 +51,14 @@ local L = setmetatable({}, {	-- TODO: replace with proper locale
 local function print(msg)
 	(SELECTED_CHAT_FRAME or DEFAULT_CHAT_FRAME):AddMessage(msg)
 end
+
+-- constants used by getparam() calls below
+
+local handlertypes = {["table"]=true}
+local handlermsg = "expected a table"
+
+local functypes = {["function"]=true, ["string"]=true}
+local funcmsg = "expected function or member name"
 
 
 -- pickfirstset() - picks the first non-nil value and returns it
@@ -194,7 +202,7 @@ local function checkhidden(info, inputpos, tab)
 	return hidden
 end
 
-local function showhelp(info, inputpos, tab, noHead)
+local function showhelp(info, inputpos, tab, depth, noHead)
 	if not noHead then
 		print("|cff33ff99"..info.appName.."|r: Arguments to |cffffff78/"..info[0].."|r "..strsub(info.input,1,inputpos-1)..":")
 	end
@@ -237,20 +245,24 @@ local function showhelp(info, inputpos, tab, noHead)
 		local k = sortTbl[i]
 		local v = refTbl[k]
 		if not checkhidden(info, inputpos, v) then
-			-- recursively show all inline groups
-			local name, desc = v.name, v.desc
-			if type(name) == "function" then
-				name = callfunction(info, v, 'name')
-			end
-			if type(desc) == "function" then
-				desc = callfunction(info, v, 'desc')
-			end
-			if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
-				print("  "..(desc or name)..":")
-				showhelp(info, inputpos, v, true)
-			elseif v.type ~= "description" and v.type ~= "header" then
-				local key = k:gsub(" ", "_")
-				print("  |cffffff78"..key.."|r - "..(desc or name or ""))
+			if v.type ~= "description" and v.type ~= "header" then
+				-- recursively show all inline groups
+				local name, desc = v.name, v.desc
+				if type(name) == "function" then
+					name = callfunction(info, v, 'name')
+				end
+				if type(desc) == "function" then
+					desc = callfunction(info, v, 'desc')
+				end
+				if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
+					print("  "..(desc or name)..":")
+					local oldhandler,oldhandler_at = getparam(info, inputpos, v, depth, "handler", handlertypes, handlermsg)
+					showhelp(info, inputpos, v, depth, true)
+					info.handler,info.handler_at = oldhandler,oldhandler_at
+				else
+					local key = k:gsub(" ", "_")
+					print("  |cffffff78"..key.."|r - "..(desc or name or ""))
+				end
 			end
 		end
 	end
@@ -315,14 +327,6 @@ local function keybindingValidateFunc(text)
 	return s
 end
 
--- constants used by getparam() calls below
-
-local handlertypes = {["table"]=true}
-local handlermsg = "expected a table"
-
-local functypes = {["function"]=true, ["string"]=true}
-local funcmsg = "expected function or member name"
-
 -- handle() - selfrecursing function that processes input->optiontable 
 -- - depth - starts at 0
 -- - retfalse - return false rather than produce error if a match is not found (used by inlined groups)
@@ -355,7 +359,7 @@ local function handle(info, inputpos, tab, depth, retfalse)
 		-- grab next arg from input
 		local _,nextpos,arg = (info.input):find(" *([^ ]+) *", inputpos)
 		if not arg then
-			showhelp(info, inputpos, tab)
+			showhelp(info, inputpos, tab, depth)
 			return
 		end
 		nextpos=nextpos+1
