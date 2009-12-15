@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 4
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 5
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -118,7 +118,7 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 	-- Make listenframes into a one-element table if it was not passed a table of frames.
 	if not listenframes then  -- default
 		listenframes = { ChatFrameEditBox }
-	elseif type(listenframes) ~= 'table' or type(listenframes[0]) == 'userdata' and type(listenframes.IsFrameType or listenframes.IsObjectType) == 'function' then  -- single frame or framename
+	elseif type(listenframes) ~= 'table' or type(listenframes[0]) == 'userdata' and type(listenframes.IsObjectType) == 'function' then  -- single frame or framename
 		listenframes = { listenframes }
 	end
 	
@@ -127,11 +127,11 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 		if type(f) == 'string' then
 			f = _G[f]
 		end
-		if type(f) ~= 'table' or type(f[0]) ~= 'userdata' or type(f.IsFrameType or f.IsObjectType) ~= 'function' then
+		if type(f) ~= 'table' or type(f[0]) ~= 'userdata' or type(f.IsObjectType) ~= 'function' then
 			error(format(ACETAB_MAJOR..": Cannot register frame %q; it does not exist", f:GetName()))
 		end
 		if f then
-			if (f.GetFrameType or f.GetObjectType)(f) ~= 'EditBox' then
+			if f:GetObjectType() ~= 'EditBox' then
 				error(format(ACETAB_MAJOR..": Cannot register frame %q; it is not an EditBox", f:GetName()))
 			else
 				hookFrame(f)
