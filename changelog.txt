@@ -1,3 +1,10 @@
+Ace3 Release - Revision r907 (December 16th, 2009)
+---------------------------------------------------
+- AceGUI-3.0: Frame: Properly save the width in the status table.
+- AceConfigCmd-3.0: Properly handle help output of inline groups with a different handler. (Ticket #101)
+- AceConfigDialog-3.0: Don't bail out and error when a dialogControl was invalid, instead show the error and fallback to the default control for that type.
+- AceConfigDialog-3.0: Fix a hickup with the OnUpdate script not getting upgraded properly in some situations.
+
 Ace3 Release - Revision r900 (December 8th, 2009)
 --------------------------------------------------
 - AceGUI-3.0: Alot of visual fixes regarding margins and general widget styles.
