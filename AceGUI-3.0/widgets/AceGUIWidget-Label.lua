@@ -15,13 +15,14 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Label"
-	local Version = 11
+	local Version = 12
 	
 	local function OnAcquire(self)
 		self:SetHeight(18)
 		self:SetWidth(200)
 		self:SetText("")
 		self:SetImage(nil)
+		self:SetImageSize(16, 16)
 		self:SetColor()
 		self:SetFontObject()
 	end
@@ -96,6 +97,8 @@ do
 			local n = select('#', ...)
 			if n == 4 or n == 8 then
 				image:SetTexCoord(...)
+			else
+				image:SetTexCoord(0, 1, 0, 1)
 			end
 		else
 			self.imageshown = nil
