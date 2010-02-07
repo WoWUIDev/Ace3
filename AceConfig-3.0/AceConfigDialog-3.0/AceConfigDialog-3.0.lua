@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 43
+local MAJOR, MINOR = "AceConfigDialog-3.0", 44
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -838,9 +838,8 @@ local function ActivateSlider(widget, event, value)
 	local min, max, step = option.min or 0, option.max or 100, option.step
 	if step then
 		value = math_floor((value - min) / step + 0.5) * step + min
-	else
-		value = math_max(math_min(value,max),min)
 	end
+	value = math_max(math_min(value,max),min)
 	ActivateControl(widget,event,value)
 end
 
