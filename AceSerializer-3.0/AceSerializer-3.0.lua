@@ -11,7 +11,7 @@
 -- @class file
 -- @name AceSerializer-3.0
 -- @release $Id$
-local MAJOR,MINOR = "AceSerializer-3.0", 2
+local MAJOR,MINOR = "AceSerializer-3.0", 3
 local AceSerializer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceSerializer then return end
@@ -34,7 +34,9 @@ local serNegInf = tostring(-1/0)
 local function SerializeStringHelper(ch)	-- Used by SerializeValue for strings
 	-- We use \126 ("~") as an escape character for all nonprints plus a few more
 	local n = strbyte(ch)
-	if n<=32 then 			-- nonprint + space
+	if n==30 then           -- v3 / ticket 115: catch a nonprint that ends up being "~^" when encoded... DOH
+		return "\126\122"
+	elseif n<=32 then 			-- nonprint + space
 		return "\126"..strchar(n+64)
 	elseif n==94 then		-- value separator 
 		return "\126\125"
@@ -126,8 +128,10 @@ end
 
 -- Deserialization functions
 local function DeserializeStringHelper(escape)
-	if escape<"~\123" then
+	if escape<"~\122" then
 		return strchar(strbyte(escape,2,2)-64)
+	elseif escape=="~\122" then	-- v3 / ticket 115: special case encode since 30+64=94 ("^") - OOPS.
+		return "\030"
 	elseif escape=="~\123" then
 		return "\127"
 	elseif escape=="~\124" then

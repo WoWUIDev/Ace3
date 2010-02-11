@@ -32,6 +32,7 @@ local SerializeStringHelper = assert(AceSer.internals.SerializeStringHelper)
 
 test(SerializeStringHelper,"\000", "~@")
 test(SerializeStringHelper,"\001", "~A")
+test(SerializeStringHelper,"\030", "~\122") -- v3 / Ticket 115: Argh. 30+64=94 ("^"). OOPS. Unique encoding for \030 now.
 test(SerializeStringHelper,"\031", "~_")
 test(SerializeStringHelper," ", "~`")
 test(SerializeStringHelper,"\094", "~\125")
@@ -167,6 +168,41 @@ assert(AceSer:Deserialize("^1^T^Sa^Sb^t^^"))
 
 
 -----------------------------------------------------------------------
+-- Ticket 115: Serializing and then de-serializing strings
+
+for i=0,255 do
+	local str = strbyte(i)
+	local ok,res = AceSer:Deserialize(AceSer:Serialize(str))
+	assert( ok and str == res , i)
+end
+
+if BURNIN>1 then
+	print("String burn-in test:")
+end
+for b=1,BURNIN do
+	for i=1,1e4 do
+		local str = strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))
+		local ok,res = AceSer:Deserialize(AceSer:Serialize(str))
+		assert( ok and str == res , str, res)
+	end
+	for i=1,1e4 do
+		local str = strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))
+		local ok,r1,r2,r3 = AceSer:Deserialize(AceSer:Serialize(true,str))
+		assert( ok and r1==true and str == r2 , str, r2)
+	end
+	for i=1,1e4 do
+		local str = strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))..strbyte(random(0,255))
+		local ok,r1,r2,r3 = AceSer:Deserialize(AceSer:Serialize(5,str,true))
+		assert( ok and r1==5 and str == r2 and r3 == true , str, res)
+	end
+	if BURNIN>1 then
+		printf("%.1f%%", b/BURNIN*100)
+	end
+end
+
+
+
+-----------------------------------------------------------------------
 -- Wild combos
 
 local ser = AceSer:Serialize(
@@ -263,6 +299,12 @@ local function testone(v)
 	assert(ok and deser==v, dump(ok, v, ser, deser))
 end
 
+local function testone_tostr(v)
+	local ser = AceSer:Serialize(v)
+	local ok,deser = AceSer:Deserialize(ser)
+	assert(ok and tostring(deser)==tostring(v), dump(ok, v, ser, deser))
+end
+
 local __myrand_n = 0
 local function myrand()
 	__myrand_n = (__myrand_n + 1.23456789) % 123	-- this prng does not repeat for at least 10G iterations - tested up to 13.048G
@@ -280,16 +322,18 @@ testone(math.exp(1))	-- 2.718281828459...
 testone(math.sqrt(math.exp(1)))  -- 1.6487212707001...
 testone(math.sqrt(0.5))   -- 0.70710678118655...
 
+-- These have to be tested via tostring() comparison of the results since e.g. NaN isn't == NaN
+testone_tostr(1/0)	 -- INF
+testone_tostr(-1/0)  -- -INF
+testone_tostr(0/0)   -- NaN
+
+
+
 if BURNIN>1 then
 	print "Floating point precision burn-in test:"
 end
-local startt = os.clock()
-for l=0,BURNIN-1 do	-- default 1 = 1 loop, but no printing
-	if l>=1 then
-		local tick = (os.clock()-startt) / l
-		printf("%.2f%% (%.1fs)", (l/BURNIN*100), (BURNIN-l)*tick)
-	end
-	for i=1,10000 do
+for b=1,BURNIN do	-- default 1 = 1 loop, but no printing
+	for i=1,1e4 do
 		local v = myrand() + myrand()*(2^-20) + myrand()*(2^-40) + myrand()*(2^-60)
 		if math.random(1,2)==1 then
 			v = v * -1
@@ -300,6 +344,9 @@ for l=0,BURNIN-1 do	-- default 1 = 1 loop, but no printing
 		-- print(str,e,v)
 		
 		testone(v)
+	end
+	if BURNIN>1 then
+		printf("%.1f%%", b/BURNIN*100)
 	end
 end
 
