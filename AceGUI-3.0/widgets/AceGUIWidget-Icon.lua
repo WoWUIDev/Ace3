@@ -11,7 +11,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Icon"
-	local Version = 11
+	local Version = 12
 	
 	local function OnAcquire(self)
 		self:SetHeight(110)
@@ -31,10 +31,10 @@ do
 		if text and text ~= "" then
 			self.label:Show()
 			self.label:SetText(text)
-			self.frame:SetHeight(self.image:GetHeight() + 25)
+			self:SetHeight(self.image:GetHeight() + 25)
 		else
 			self.label:Hide()
-			self.frame:SetHeight(self.image:GetHeight() + 10)
+			self:SetHeight(self.image:GetHeight() + 10)
 		end
 	end
 	
@@ -60,9 +60,9 @@ do
 		self.image:SetHeight(height)
 		--self.frame:SetWidth(width + 30)
 		if self.label:IsShown() then
-			self.frame:SetHeight(height + 25)
+			self:SetHeight(height + 25)
 		else
-			self.frame:SetHeight(height + 10)
+			self:SetHeight(height + 10)
 		end
 	end
 	
