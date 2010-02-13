@@ -20,7 +20,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 13
+	local Version = 14
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -106,6 +106,7 @@ do
 				self.check:Hide()
 			end
 		end
+		SetDisabled(self, self.disabled)
 	end
 	
 	local function SetTriState(self, enabled)
