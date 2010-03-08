@@ -40,7 +40,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 19
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 20
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -346,13 +346,29 @@ end
 
 -- handle PLAYER_LOGOUT
 -- strip all defaults from all databases
+-- and cleans up empty sections
 local function logoutHandler(frame, event)
 	if event == "PLAYER_LOGOUT" then
 		for db in pairs(AceDB.db_registry) do
 			db.callbacks:Fire("OnDatabaseShutdown", db)
-			for section, key in pairs(db.keys) do
-				if db.defaults and db.defaults[section] and rawget(db, section) then
-					removeDefaults(db[section], db.defaults[section])
+			db:RegisterDefaults(nil)
+			
+			-- cleanup sections that are empty without defaults
+			local sv = rawget(db, "sv")
+			for section in pairs(db.keys) do
+				if rawget(sv, section) then
+					-- global is special, all other sections have sub-entrys
+					-- also don't delete empty profiles on main dbs, only on namespaces
+					if section ~= "global" and (section ~= "profiles" or rawget(db, "parent")) then
+						for key in pairs(sv[section]) do
+							if not next(sv[section][key]) then
+								sv[section][key] = nil
+							end
+						end
+					end
+					if not next(sv[section]) then
+						sv[section] = nil
+					end
 				end
 			end
 		end

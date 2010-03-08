@@ -214,3 +214,49 @@ do
 	testdb:SetProfile("testprofile")
 	assert(#testdb:GetProfiles() == 3)
 end
+
+do
+
+local TestDB = {
+	["namespaces"] = {
+		["Space"] = {
+			["profiles"] = {
+				["Default"] = {
+				},
+			},
+		},
+	},
+	["profiles"] = {
+		["Default"] = {
+			["notEmpty"] = true,
+		},
+		["Test"] = {
+		},
+	},
+	["char"] = {
+		["TestChar - SomeRealm"] = {
+		},
+	},
+	["realm"] = {
+		["SomeRealm"] = {
+			["notEmpty"] = true,
+		},
+	},
+}
+
+local nsdef = {
+	profile = {
+		bla = true,
+	}
+}
+
+wipe(LibStub("AceDB-3.0").db_registry)
+local testdb = LibStub("AceDB-3.0"):New(TestDB, nil, true)
+local ns = testdb:RegisterNamespace("Space", nsdef)
+
+WoWAPI_FireEvent("PLAYER_LOGOUT")
+assert(not TestDB.char)
+assert(TestDB.profiles.Test)
+assert(TestDB.realm.SomeRealm.notEmpty)
+assert(not TestDB.namespaces.Space.profiles)
+end
