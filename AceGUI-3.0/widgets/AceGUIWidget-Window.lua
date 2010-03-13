@@ -20,7 +20,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Window"
-	local Version = 2
+	local Version = 3
 
 	local function frameOnClose(this)
 		this.obj:Fire("OnClose")
@@ -90,6 +90,7 @@ do
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
 		self:EnableResize(true)
+		self:Show()
 	end
 	
 	local function OnRelease(self)

@@ -20,7 +20,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Frame"
-	local Version = 9
+	local Version = 10
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -99,6 +99,7 @@ do
 		self.frame:SetParent(UIParent)
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
+		self:Show()
 	end
 	
 	local function OnRelease(self)
