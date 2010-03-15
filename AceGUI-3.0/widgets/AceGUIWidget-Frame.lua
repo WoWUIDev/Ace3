@@ -4,6 +4,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local pairs, assert, type = pairs, assert, type
 
 -- WoW APIs
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
@@ -20,7 +21,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Frame"
-	local Version = 10
+	local Version = 11
 
 	local FrameBackdrop = {
 		bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -41,6 +42,7 @@ do
 	end
 	
 	local function closeOnClick(this)
+		PlaySound("gsTitleOptionExit")
 		this.obj:Hide()
 	end
 	

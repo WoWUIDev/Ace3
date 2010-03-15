@@ -2,6 +2,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 -- WoW APIs
 local _G = _G
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 --------------------------
@@ -9,7 +10,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Button"
-	local Version = 12
+	local Version = 13
 	
 	local function OnAcquire(self)
 		-- restore default values
@@ -24,6 +25,7 @@ do
 	end
 	
 	local function Button_OnClick(this, ...)
+		PlaySound("igMainMenuOption")
 		this.obj:Fire("OnClick", ...)
 		AceGUI:ClearFocus()
 	end

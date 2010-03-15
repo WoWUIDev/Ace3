@@ -4,6 +4,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local select = select
 
 -- WoW APIs
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
@@ -20,7 +21,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 14
+	local Version = 15
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -58,6 +59,13 @@ do
 		local self = this.obj
 		if not self.disabled then
 			self:ToggleChecked()
+			
+			if self.checked then
+				PlaySound("igMainMenuOptionCheckBoxOn")
+			else -- for both nil and false (tristate)
+				PlaySound("igMainMenuOptionCheckBoxOff")
+			end
+			
 			self:Fire("OnValueChanged",self.checked)
 			self.text:SetPoint("LEFT",self.check,"RIGHT",0,0)
 		end

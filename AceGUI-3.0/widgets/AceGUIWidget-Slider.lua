@@ -5,6 +5,7 @@ local min, max, floor = math.min, math.max, math.floor
 local tonumber = tonumber
 
 -- WoW APIs
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
@@ -16,7 +17,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 9
+	local Version = 10
 	
 	local function OnAcquire(self)
 		self:SetWidth(200)
@@ -160,6 +161,7 @@ do
 		end
 		
 		if value then
+			PlaySound("igMainMenuOptionCheckBoxOn")
 			self:Fire("OnMouseUp",value)
 		end
 	end

@@ -4,6 +4,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local tostring = tostring
 
 -- WoW APIs
+local PlaySound = PlaySound
 local GetCursorInfo, ClearCursor, GetSpellName = GetCursorInfo, ClearCursor, GetSpellName
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
@@ -13,7 +14,7 @@ local _G = _G
 -- GLOBALS: AceGUIEditBoxInsertLink, ChatFontNormal, OKAY
 
 local Type = "EditBox"
-local Version = 13
+local Version = 14
 
 if not AceGUIEditBoxInsertLink then
 	-- upgradeable hook
@@ -85,6 +86,7 @@ do
 		local value = this:GetText()
 		local cancel = self:Fire("OnEnterPressed",value)
 		if not cancel then
+			PlaySound("igMainMenuOptionCheckBoxOn")		
 			HideButton(self)
 		end
 	end

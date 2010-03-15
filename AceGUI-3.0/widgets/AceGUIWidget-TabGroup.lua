@@ -4,6 +4,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local pairs, ipairs, assert, type = pairs, ipairs, assert, type
 
 -- WoW APIs
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
 
@@ -41,7 +42,7 @@ local _G = _G
 
 do
 	local Type = "TabGroup"
-	local Version = 24
+	local Version = 25
 
 	local PaneBackdrop  = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -91,6 +92,7 @@ do
 	
 	local function Tab_OnClick(self)
 		if not (self.selected or self.disabled) then
+			PlaySound("igCharacterInfoTab")
 			self.obj:SelectTab(self.value)
 		end
 	end
