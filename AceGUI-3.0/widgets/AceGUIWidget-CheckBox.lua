@@ -21,7 +21,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "CheckBox"
-	local Version = 15
+	local Version = 16
 	
 	local function OnAcquire(self)
 		self:SetValue(false)
@@ -231,7 +231,7 @@ do
 	end
 	
 	local function OnWidthSet(self, width)
-		if self.desc and self.desc:GetText() ~= "" then
+		if self.desc and self.desc:GetText() ~= "" and self.desc:GetText() ~= nil then
 			self.desc:SetWidth(width - 30)
 			self:SetHeight(28 + self.desc:GetHeight())
 		end
