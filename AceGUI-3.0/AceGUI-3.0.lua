@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 30
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 31
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -211,7 +211,7 @@ function AceGUI:Release(widget)
 	if widget.OnRelease then
 		widget:OnRelease()
 	else
-		error(("Widget type %s doesn't supply an OnRelease Function"):format(type))
+		error(("Widget type %s doesn't supply an OnRelease Function"):format(widget.type))
 	end
 	for k in pairs(widget.userdata) do
 		widget.userdata[k] = nil
@@ -609,6 +609,19 @@ function AceGUI:GetNextWidgetNum(type)
 	end
 	self.counts[type] = self.counts[type] + 1
 	return self.counts[type]
+end
+
+--- Return the number of created widgets for this type.
+-- In contrast to GetNextWidgetNum, the number is not incremented.
+-- @param type The widget type
+function AceGUI:GetWidgetCount(type)
+	return self.counts[type] or 0
+end
+
+--- Return the version of the currently registered widget type.
+-- @param type The widget type
+function AceGUI:GetWidgetVersion(type)
+	return WidgetVersions[type]
 end
 
 --[[ Widget Template
