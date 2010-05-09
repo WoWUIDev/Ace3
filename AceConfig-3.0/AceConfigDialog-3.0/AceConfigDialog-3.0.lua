@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 46
+local MAJOR, MINOR = "AceConfigDialog-3.0", 47
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -835,11 +835,13 @@ end
 
 local function ActivateSlider(widget, event, value)
 	local option = widget:GetUserData('option')
-	local min, max, step = option.min or 0, option.max or 100, option.step
-	if step then
-		value = math_floor((value - min) / step + 0.5) * step + min
+	local min, max, step = option.min or (not option.softMin and 0 or nil), option.max or (not option.softMax and 100 or nil), option.step
+	if min and max then
+		if step then
+			value = math_floor((value - min) / step + 0.5) * step + min
+		end
+		value = math_max(math_min(value,max),min)
 	end
-	value = math_max(math_min(value,max),min)
 	ActivateControl(widget,event,value)
 end
 
@@ -1154,7 +1156,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 				elseif v.type == "range" then
 					control = gui:Create("Slider")
 					control:SetLabel(name)
-					control:SetSliderValues(v.min or 0,v.max or 100, v.bigStep or v.step or 0)
+					control:SetSliderValues(v.softMin or v.min or 0, v.softMax or v.max or 100, v.bigStep or v.step or 0)
 					control:SetIsPercent(v.isPercent)
 					local value = GetOptionsMemberValue("get",v, options, path, appName)
 					if type(value) ~= "number" then
