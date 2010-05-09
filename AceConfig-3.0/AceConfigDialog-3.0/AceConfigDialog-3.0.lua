@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 45
+local MAJOR, MINOR = "AceConfigDialog-3.0", 46
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1117,12 +1117,8 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						control = gui:Create(v.multiline and "MultiLineEditBox" or "EditBox")
 					end
 					
-					if v.multiline then
-						local lines = 4
-						if type(v.multiline) == "number" then
-							lines = v.multiline
-						end
-						control:SetHeight(60 + (14*lines))
+					if v.multiline and control.SetNumLines then
+						control:SetNumLines(tonumber(v.multiline) or 4)
 					end
 					control:SetLabel(name)
 					control:SetCallback("OnEnterPressed",ActivateControl)
@@ -1488,17 +1484,13 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 	local grouptype, parenttype = options.childGroups, "none"
 
 
-	--temp path table to pass to callbacks as we traverse the tree
-	local temppath = new()
 	for i = 1, #path do
 		local v = path[i]
-		temppath[i] = v
 		group = GetSubOption(group, v)
 		inline = inline or pickfirstset(v.dialogInline,v.guiInline,v.inline, false)
 		parenttype = grouptype
 		grouptype = group.childGroups
 	end
-	del(temppath)
 
 	if not parenttype then
 		parenttype = "tree"
