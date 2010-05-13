@@ -67,19 +67,6 @@ local function Constructor()
 	frame:SetScript("OnEnter", Button_OnEnter)
 	frame:SetScript("OnLeave", Button_OnLeave)
 
-	-- properly re-align the textures
-	local left = _G[name .. "Left"]
-	left:SetPoint("TOP", frame)
-	left:SetPoint("BOTTOM", frame)
-
-	local right = _G[name .. "Right"]
-	right:SetPoint("TOP", frame)
-	right:SetPoint("BOTTOM", frame)
-
-	local middle = _G[name .. "Middle"]
-	middle:SetPoint("TOP", frame)
-	middle:SetPoint("BOTTOM", frame)
-
 	local text = frame:GetFontString()
 	text:ClearAllPoints()
 	text:SetPoint("TOPLEFT", 15, -1)
