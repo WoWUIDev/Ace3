@@ -74,10 +74,7 @@ local methods = {
 		self.label:SetFont(GameFontHighlightSmall:GetFont())
 	end,
 
-	["OnRelease"] = function(self)
-		self.frame:ClearAllPoints()
-		self.frame:Hide()
-	end,
+	-- ["OnRelease"] = nil,
 
 	["SetText"] = function(self, text)
 		self.label:SetText(text or "")
