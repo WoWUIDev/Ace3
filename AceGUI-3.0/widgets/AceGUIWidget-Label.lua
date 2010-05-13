@@ -37,19 +37,19 @@ local function UpdateImageAnchor(self)
 			image:SetPoint("TOP")
 			label:SetPoint("TOP", image, "BOTTOM")
 			label:SetPoint("LEFT")
-			label:SetPoint("RIGHT")
+			label:SetWidth(width)
 			height = image:GetHeight() + label:GetHeight()
 		else
 			-- image on the left
 			image:SetPoint("TOPLEFT")
 			label:SetPoint("TOPLEFT", image, "TOPRIGHT", 4, 0)
-			label:SetPoint("TOPRIGHT")
+			label:SetWidth(width - imagewidth - 4)
 			height = max(image:GetHeight(), label:GetHeight())
 		end
 	else
 		-- no image shown
 		label:SetPoint("TOPLEFT")
-		label:SetPoint("TOPRIGHT")
+		label:SetWidth(width)
 		height = label:GetHeight()
 	end
 	
