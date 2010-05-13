@@ -2,7 +2,7 @@
 Label Widget
 Displays text and optionally an icon.
 -------------------------------------------------------------------------------]]
-local Type, Version = "Label", 20
+local Type, Version = "Label", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -21,6 +21,7 @@ Support functions
 -------------------------------------------------------------------------------]]
 
 local function UpdateImageAnchor(self)
+	if self.resizing then return end
 	local frame = self.frame
 	local width = frame.width or frame:GetWidth() or 0
 	local image = self.image
@@ -64,14 +65,20 @@ Methods
 -------------------------------------------------------------------------------]]
 local methods = {
 	["OnAcquire"] = function(self)
-		self:SetHeight(18)
+		-- set the flag to stop constant size updates
+		self.resizing = true
+		-- height is set dynamically by the text and image size
 		self:SetWidth(200)
 		self:SetText("")
 		self:SetImage(nil)
 		self:SetImageSize(16, 16)
 		self:SetColor()
-		self.label:SetFontObject(nil)
-		self.label:SetFont(GameFontHighlightSmall:GetFont())
+		self:SetFontObject()
+
+		-- reset the flag
+		self.resizing = nil
+		-- run the update explicitly
+		UpdateImageAnchor(self)
 	end,
 
 	-- ["OnRelease"] = nil,
@@ -89,7 +96,6 @@ local methods = {
 	end,
 
 	["OnWidthSet"] = function(self, width)
-		if self.resizing then return end
 		UpdateImageAnchor(self)
 	end,
 
@@ -116,7 +122,7 @@ local methods = {
 	end,
 
 	["SetFontObject"] = function(self, font)
-		self.label:SetFontObject(font or GameFontHighlightSmall)
+		self:SetFont((font or GameFontHighlightSmall):GetFont())
 	end,
 
 	["SetImageSize"] = function(self, width, height)
