@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 31
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 32
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -294,17 +294,6 @@ end
 -- Widget Base Template --
 --------------------------
 do
-	local function fixlevels(parent,...)
-		local i = 1
-		local child = select(i, ...)
-		while child do
-			child:SetFrameLevel(parent:GetFrameLevel()+1)
-			fixlevels(child, child:GetChildren())
-			i = i + 1
-			child = select(i, ...)
-		end
-	end
-	
 	local WidgetBase = AceGUI.WidgetBase 
 	
 	WidgetBase.SetParent = function(self, parent)
@@ -312,7 +301,6 @@ do
 		frame:SetParent(nil)
 		frame:SetParent(parent.content)
 		self.parent = parent
-		--fixlevels(parent.frame,parent.frame:GetChildren())
 	end
 	
 	WidgetBase.SetCallback = function(self, name, func)
@@ -445,7 +433,7 @@ do
 		if self.LayoutPaused then
 			return
 		end
-		safecall(self.LayoutFunc,self.content, self.children)
+		safecall(self.LayoutFunc, self.content, self.children)
 	end
 	
 	--call this function to layout, makes sure layed out objects get a frame to get sizes etc
@@ -537,9 +525,9 @@ do
 		widget.base = WidgetContainerBase
 		widget.content.obj = widget
 		widget.frame.obj = widget
-		widget.content:SetScript("OnSizeChanged",ContentResize)
-		widget.frame:SetScript("OnSizeChanged",FrameResize)
-		setmetatable(widget,{__index=WidgetContainerBase})
+		widget.content:SetScript("OnSizeChanged", ContentResize)
+		widget.frame:SetScript("OnSizeChanged", FrameResize)
+		setmetatable(widget, {__index = WidgetContainerBase})
 		widget:SetLayout("List")
 	end
 	
@@ -550,8 +538,8 @@ do
 		widget.events = {}
 		widget.base = WidgetBase
 		widget.frame.obj = widget
-		widget.frame:SetScript("OnSizeChanged",FrameResize)
-		setmetatable(widget,{__index=WidgetBase})
+		widget.frame:SetScript("OnSizeChanged", FrameResize)
+		setmetatable(widget, {__index = WidgetBase})
 	end
 end
 
@@ -676,15 +664,13 @@ end
 	A Layout is a func that takes 2 parameters
 		content - the frame that widgets will be placed inside
 		children - a table containing the widgets to layout
-
 ]]
 
 -- Very simple Layout, Children are stacked on top of each other down the left side
 AceGUI:RegisterLayout("List",
-	 function(content, children)
-	 
-	 	local height = 0
-	 	local width = content.width or content:GetWidth() or 0
+	function(content, children)
+		local height = 0
+		local width = content.width or content:GetWidth() or 0
 		for i = 1, #children do
 			local child = children[i]
 			
@@ -692,25 +678,21 @@ AceGUI:RegisterLayout("List",
 			frame:ClearAllPoints()
 			frame:Show()
 			if i == 1 then
-				frame:SetPoint("TOPLEFT",content,"TOPLEFT",0,0)
+				frame:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 			else
-				frame:SetPoint("TOPLEFT",children[i-1].frame,"BOTTOMLEFT",0,0)
+				frame:SetPoint("TOPLEFT", children[i-1].frame, "BOTTOMLEFT", 0, 0)
 			end
 			
 			if child.width == "fill" then
 				child:SetWidth(width)
-				frame:SetPoint("RIGHT",content,"RIGHT")
-				if child.OnWidthSet then
-					child:OnWidthSet(content.width or content:GetWidth())
-				end
+				frame:SetPoint("RIGHT", content, "RIGHT")
+				
 				if child.DoLayout then
 					child:DoLayout()
 				end
 			elseif child.width == "relative" then
 				child:SetWidth(width * child.relWidth)
-				if child.OnWidthSet then
-					child:OnWidthSet(content.width or content:GetWidth())
-				end
+				
 				if child.DoLayout then
 					child:DoLayout()
 				end
@@ -718,13 +700,12 @@ AceGUI:RegisterLayout("List",
 			
 			height = height + (frame.height or frame:GetHeight() or 0)
 		end
-		safecall( content.obj.LayoutFinished, content.obj, nil, height )
-	 end
-	)
-	
+		safecall(content.obj.LayoutFinished, content.obj, nil, height)
+	end)
+
 -- A single control fills the whole content area
 AceGUI:RegisterLayout("Fill",
-	 function(content, children)
+	function(content, children)
 		if children[1] then
 			children[1]:SetWidth(content:GetWidth() or 0)
 			children[1]:SetHeight(content:GetHeight() or 0)
@@ -732,31 +713,30 @@ AceGUI:RegisterLayout("Fill",
 			children[1].frame:Show()
 			safecall( content.obj.LayoutFinished, content.obj, nil, children[1].frame:GetHeight() )
 		end
-	 end
-	)
-	
-AceGUI:RegisterLayout("Flow",
-	 function(content, children)
-	 	--used height so far
-	 	local height = 0
-	 	--width used in the current row
-	 	local usedwidth = 0
-	 	--height of the current row
-	 	local rowheight = 0
-	 	local rowoffset = 0
-	 	local lastrowoffset
+	end)
 
-	 	local width = content.width or content:GetWidth() or 0
-	 	
-	 	--control at the start of the row
-	 	local rowstart
+AceGUI:RegisterLayout("Flow",
+	function(content, children)
+		--used height so far
+		local height = 0
+		--width used in the current row
+		local usedwidth = 0
+		--height of the current row
+		local rowheight = 0
+		local rowoffset = 0
+		local lastrowoffset
+		
+		local width = content.width or content:GetWidth() or 0
+		
+		--control at the start of the row
+		local rowstart
 		local rowstartoffset
-	 	local lastrowstart
-	 	local isfullheight
-	 	
-	 	local frameoffset
-	 	local lastframeoffset
-	 	local oversize 
+		local lastrowstart
+		local isfullheight
+		
+		local frameoffset
+		local lastframeoffset
+		local oversize 
 		for i = 1, #children do
 			local child = children[i]
 			oversize = nil
@@ -779,7 +759,7 @@ AceGUI:RegisterLayout("Flow",
 			frame:ClearAllPoints()
 			if i == 1 then
 				-- anchor the first control to the top left
-				frame:SetPoint("TOPLEFT",content,"TOPLEFT",0,0)
+				frame:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 				rowheight = frameheight
 				rowoffset = frameoffset
 				rowstart = frame
@@ -798,7 +778,7 @@ AceGUI:RegisterLayout("Flow",
 						break
 					end
 					--anchor the previous row, we will now know its height and offset
-					rowstart:SetPoint("TOPLEFT",content,"TOPLEFT",0,-(height+(rowoffset-rowstartoffset)+3))
+					rowstart:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -(height + (rowoffset - rowstartoffset) + 3))
 					height = height + rowheight + 3
 					--save this as the rowstart so we can anchor it after the row is complete and we have the max height and offset of controls in it
 					rowstart = frame
@@ -816,25 +796,21 @@ AceGUI:RegisterLayout("Flow",
 					
 					--offset is always the larger of the two offsets
 					rowoffset = math_max(rowoffset, frameoffset)
+					rowheight = math_max(rowheight, rowoffset + (frameheight / 2))
 					
-					rowheight = math_max(rowheight,rowoffset+(frameheight/2))
-					--print("type:", child.type, "offset:",frameoffset-lastframeoffset)
-					frame:SetPoint("TOPLEFT",children[i-1].frame,"TOPRIGHT",0,frameoffset-lastframeoffset)
+					frame:SetPoint("TOPLEFT", children[i-1].frame, "TOPRIGHT", 0, frameoffset - lastframeoffset)
 					usedwidth = framewidth + usedwidth
 				end
 			end
 
 			if child.width == "fill" then
 				child:SetWidth(width)
-				frame:SetPoint("RIGHT",content,"RIGHT",0,0)
+				frame:SetPoint("RIGHT", content, "RIGHT", 0, 0)
 				
 				usedwidth = 0
 				rowstart = frame
 				rowstartoffset = frameoffset
 				
-				if child.OnWidthSet then
-					child:OnWidthSet(width)
-				end
 				if child.DoLayout then
 					child:DoLayout()
 				end
@@ -844,16 +820,12 @@ AceGUI:RegisterLayout("Flow",
 			elseif child.width == "relative" then
 				child:SetWidth(width * child.relWidth)
 				
-				if child.OnWidthSet then
-					child:OnWidthSet(width)
-				end
-				
 				if child.DoLayout then
 					child:DoLayout()
 				end
 			elseif oversize then
 				if width > 1 then
-					frame:SetPoint("RIGHT",content,"RIGHT",0,0)
+					frame:SetPoint("RIGHT", content, "RIGHT", 0, 0)
 				end
 			end
 			
@@ -865,12 +837,11 @@ AceGUI:RegisterLayout("Flow",
 		
 		--anchor the last row, if its full height needs a special case since  its height has just been changed by the anchor
 		if isfullheight then
-			rowstart:SetPoint("TOPLEFT",content,"TOPLEFT",0,-height)
+			rowstart:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -height)
 		elseif rowstart then
-			rowstart:SetPoint("TOPLEFT",content,"TOPLEFT",0,-(height+(rowoffset-rowstartoffset)+3))
+			rowstart:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -(height + (rowoffset - rowstartoffset) + 3))
 		end
 		
 		height = height + rowheight + 3
-		safecall( content.obj.LayoutFinished, content.obj, nil, height )		
-	 end
-	)
+		safecall(content.obj.LayoutFinished, content.obj, nil, height)
+	end)
