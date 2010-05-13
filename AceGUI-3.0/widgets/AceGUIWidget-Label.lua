@@ -1,3 +1,7 @@
+--[[-----------------------------------------------------------------------------
+Label Widget
+Displays text and optionally an icon.
+-------------------------------------------------------------------------------]]
 local Type, Version = "Label", 20
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
@@ -13,7 +17,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 -- GLOBALS: GameFontHighlightSmall
 
 --[[-----------------------------------------------------------------------------
-Scripts
+Support functions
 -------------------------------------------------------------------------------]]
 
 local function UpdateImageAnchor(self)
@@ -30,22 +34,22 @@ local function UpdateImageAnchor(self)
 		local imagewidth = image:GetWidth()
 		if (width - imagewidth) < 200 or (label:GetText() or "") == "" then
 			-- image goes on top centered when less than 200 width for the text, or if there is no text
-			image:SetPoint("TOP", frame, "TOP", 0, 0)
-			label:SetPoint("TOP", image, "BOTTOM", 0, 0)
-			label:SetPoint("LEFT", frame, "LEFT", 0, 0)
-			label:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
+			image:SetPoint("TOP")
+			label:SetPoint("TOP", image, "BOTTOM")
+			label:SetPoint("LEFT")
+			label:SetPoint("RIGHT")
 			height = image:GetHeight() + label:GetHeight()
 		else
 			-- image on the left
-			image:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+			image:SetPoint("TOPLEFT")
 			label:SetPoint("TOPLEFT", image, "TOPRIGHT", 4, 0)
-			label:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+			label:SetPoint("TOPRIGHT")
 			height = max(image:GetHeight(), label:GetHeight())
 		end
 	else
 		-- no image shown
-		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
-		label:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+		label:SetPoint("TOPLEFT")
+		label:SetPoint("TOPRIGHT")
 		height = label:GetHeight()
 	end
 	
@@ -98,7 +102,7 @@ local methods = {
 		
 		if image:GetTexture() then
 			self.imageshown = true
-			local n = select('#', ...)
+			local n = select("#", ...)
 			if n == 4 or n == 8 then
 				image:SetTexCoord(...)
 			else
@@ -124,7 +128,8 @@ local methods = {
 		UpdateImageAnchor(self)
 	end,
 }
-	--[[-----------------------------------------------------------------------------
+
+--[[-----------------------------------------------------------------------------
 Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
@@ -132,8 +137,6 @@ local function Constructor()
 	frame:Hide()
 
 	local label = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlightSmall")
-	label:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
-	label:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
 	label:SetJustifyH("LEFT")
 	label:SetJustifyV("TOP")
 
@@ -149,10 +152,8 @@ local function Constructor()
 	for method, func in pairs(methods) do
 		widget[method] = func
 	end
-	frame.obj, label.obj, image.obj = widget, widget, widget
 
-	AceGUI:RegisterAsWidget(widget)
-	return widget
+	return AceGUI:RegisterAsWidget(widget)
 end
 
 AceGUI:RegisterWidgetType(Type, Constructor, Version)

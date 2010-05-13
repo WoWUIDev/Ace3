@@ -1,48 +1,50 @@
-local AceGUI = LibStub("AceGUI-3.0")
+--[[-----------------------------------------------------------------------------
+Button Widget
+Graphical Button.
+-------------------------------------------------------------------------------]]
+local Type, Version = "Button", 20
+local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
+if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- WoW APIs
 local _G = _G
-local PlaySound = PlaySound
-local CreateFrame, UIParent = CreateFrame, UIParent
+local PlaySound, CreateFrame, UIParent = PlaySound, CreateFrame, UIParent
 
---------------------------
--- Button		        --
---------------------------
-do
-	local Type = "Button"
-	local Version = 13
-	
-	local function OnAcquire(self)
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
+local function Button_OnClick(frame, ...)
+	PlaySound("igMainMenuOption")
+	frame.obj:Fire("OnClick", ...)
+	AceGUI:ClearFocus()
+end
+
+local function Button_OnEnter(frame)
+	frame.obj:Fire("OnEnter")
+end
+
+local function Button_OnLeave(frame)
+	frame.obj:Fire("OnLeave")
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+local methods = {
+	["OnAcquire"] = function(self)
 		-- restore default values
 		self:SetHeight(24)
 		self:SetWidth(200)
-	end
-	
-	local function OnRelease(self)
-		self.frame:ClearAllPoints()
-		self.frame:Hide()
 		self:SetDisabled(false)
-	end
-	
-	local function Button_OnClick(this, ...)
-		PlaySound("igMainMenuOption")
-		this.obj:Fire("OnClick", ...)
-		AceGUI:ClearFocus()
-	end
-	
-	local function Button_OnEnter(this)
-		this.obj:Fire("OnEnter")
-	end
-	
-	local function Button_OnLeave(this)
-		this.obj:Fire("OnLeave")
-	end
-	
-	local function SetText(self, text)
+	end,
+
+	-- ["OnRelease"] = nil,
+
+	["SetText"] = function(self, text)
 		self.text:SetText(text or "")
-	end
-	
-	local function SetDisabled(self, disabled)
+	end,
+
+	["SetDisabled"] = function(self, disabled)
 		self.disabled = disabled
 		if disabled then
 			self.frame:Disable()
@@ -50,57 +52,50 @@ do
 			self.frame:Enable()
 		end
 	end
-	
-	local function Constructor()
-		local num  = AceGUI:GetNextWidgetNum(Type)
-		local name = "AceGUI30Button"..num
-		local frame = CreateFrame("Button",name,UIParent,"UIPanelButtonTemplate2")
-		local self = {}
-		self.num = num
-		self.type = Type
-		self.frame = frame
-		
-		local left = _G[name .. "Left"]
-		local right = _G[name .. "Right"]
-		local middle = _G[name .. "Middle"]
-		
-		left:SetPoint("TOP", frame, "TOP", 0, 0)
-		left:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
-		
-		right:SetPoint("TOP", frame, "TOP", 0, 0)
-		right:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
-		
-		middle:SetPoint("TOP", frame, "TOP", 0, 0)
-		middle:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
+}
 
-		local text = frame:GetFontString()
-		self.text = text
-		text:ClearAllPoints()
-		text:SetPoint("TOPLEFT",frame,"TOPLEFT", 15, -1)
-		text:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT", -15, 1)
-		text:SetJustifyV("MIDDLE")
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
+local function Constructor()
+	local name = "AceGUI30Button" .. AceGUI:GetNextWidgetNum(Type)
+	local frame = CreateFrame("Button", name, UIParent, "UIPanelButtonTemplate2")
+	frame:Hide()
 
-		frame:SetScript("OnClick",Button_OnClick)
-		frame:SetScript("OnEnter",Button_OnEnter)
-		frame:SetScript("OnLeave",Button_OnLeave)
+	frame:EnableMouse(true)
+	frame:SetScript("OnClick", Button_OnClick)
+	frame:SetScript("OnEnter", Button_OnEnter)
+	frame:SetScript("OnLeave", Button_OnLeave)
 
-		self.SetText = SetText
-		self.SetDisabled = SetDisabled
-		
-		frame:EnableMouse(true)
+	-- properly re-align the textures
+	local left = _G[name .. "Left"]
+	left:SetPoint("TOP", frame)
+	left:SetPoint("BOTTOM", frame)
 
-		frame:SetHeight(24)
-		frame:SetWidth(200)
-	
-		self.OnRelease = OnRelease
-		self.OnAcquire = OnAcquire
-		
-		self.frame = frame
-		frame.obj = self
+	local right = _G[name .. "Right"]
+	right:SetPoint("TOP", frame)
+	right:SetPoint("BOTTOM", frame)
 
-		AceGUI:RegisterAsWidget(self)
-		return self
+	local middle = _G[name .. "Middle"]
+	middle:SetPoint("TOP", frame)
+	middle:SetPoint("BOTTOM", frame)
+
+	local text = frame:GetFontString()
+	text:ClearAllPoints()
+	text:SetPoint("TOPLEFT", 15, -1)
+	text:SetPoint("BOTTOMRIGHT", -15, 1)
+	text:SetJustifyV("MIDDLE")
+
+	local widget = {
+		text  = text,
+		frame = frame,
+		type  = Type
+	}
+	for method, func in pairs(methods) do
+		widget[method] = func
 	end
-	
-	AceGUI:RegisterWidgetType(Type,Constructor,Version)
+
+	return AceGUI:RegisterAsWidget(widget)
 end
+
+AceGUI:RegisterWidgetType(Type, Constructor, Version)
