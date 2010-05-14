@@ -24,7 +24,7 @@ local tconcat, tinsert, tsort, tremove = table.concat, table.insert, table.sort,
 local strmatch, format = string.match, string.format
 local assert, loadstring, error = assert, loadstring, error
 local pairs, next, select, type, unpack = pairs, next, select, type, unpack
-local rawset, tostring = rawset, tostring
+local rawset, tostring, tonumber = rawset, tostring, tonumber
 local math_min, math_max, math_floor = math.min, math.max, math.floor
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
