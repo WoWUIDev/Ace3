@@ -37,8 +37,10 @@ function _G.AceGUIEditBoxInsertLink(text)
 end
 
 local function ShowButton(self)
-	self.button:Show()
-	self.editbox:SetTextInsets(0, 20, 3, 3)
+	if not self.disablebutton then
+		self.button:Show()
+		self.editbox:SetTextInsets(0, 20, 3, 3)
+	end
 end
 
 local function HideButton(self)
@@ -117,6 +119,7 @@ local methods = {
 		self:SetDisabled(false)
 		self:SetLabel()
 		self:SetText()
+		self:DisableButton(false)
 	end,
 
 	-- ["OnRelease"] = nil,
@@ -156,6 +159,10 @@ local methods = {
 			self:SetHeight(26)
 			self.alignoffset = 12
 		end
+	end,
+
+	["DisableButton"] = function(self, disabled)
+		self.disablebutton = disabled
 	end
 }
 
