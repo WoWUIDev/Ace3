@@ -83,6 +83,10 @@ local methods = {
 
 	-- ["OnRelease"] = nil,
 
+	["OnWidthSet"] = function(self, width)
+		UpdateImageAnchor(self)
+	end,
+
 	["SetText"] = function(self, text)
 		self.label:SetText(text or "")
 		UpdateImageAnchor(self)
@@ -93,10 +97,6 @@ local methods = {
 			r, g, b = 1, 1, 1
 		end
 		self.label:SetVertexColor(r, g, b)
-	end,
-
-	["OnWidthSet"] = function(self, width)
-		UpdateImageAnchor(self)
 	end,
 
 	["SetImage"] = function(self, path, ...)
