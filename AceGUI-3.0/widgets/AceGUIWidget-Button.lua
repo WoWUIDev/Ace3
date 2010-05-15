@@ -6,6 +6,9 @@ local Type, Version = "Button", 20
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
+-- Lua APIs
+local pairs = pairs
+
 -- WoW APIs
 local _G = _G
 local PlaySound, CreateFrame, UIParent = PlaySound, CreateFrame, UIParent
@@ -19,11 +22,11 @@ local function Button_OnClick(frame, ...)
 	AceGUI:ClearFocus()
 end
 
-local function Button_OnEnter(frame)
+local function Control_OnEnter(frame)
 	frame.obj:Fire("OnEnter")
 end
 
-local function Button_OnLeave(frame)
+local function Control_OnLeave(frame)
 	frame.obj:Fire("OnLeave")
 end
 
@@ -36,12 +39,13 @@ local methods = {
 		self:SetHeight(24)
 		self:SetWidth(200)
 		self:SetDisabled(false)
+		self:SetText()
 	end,
 
 	-- ["OnRelease"] = nil,
 
 	["SetText"] = function(self, text)
-		self.text:SetText(text or "")
+		self.text:SetText(text)
 	end,
 
 	["SetDisabled"] = function(self, disabled)
@@ -64,8 +68,8 @@ local function Constructor()
 
 	frame:EnableMouse(true)
 	frame:SetScript("OnClick", Button_OnClick)
-	frame:SetScript("OnEnter", Button_OnEnter)
-	frame:SetScript("OnLeave", Button_OnLeave)
+	frame:SetScript("OnEnter", Control_OnEnter)
+	frame:SetScript("OnLeave", Control_OnLeave)
 
 	local text = frame:GetFontString()
 	text:ClearAllPoints()

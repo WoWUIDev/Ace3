@@ -2,6 +2,18 @@ local Type, Version = "MultiLineEditBox", 20
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
+-- Lua APIs
+local pairs = pairs
+
+-- WoW APIs
+local GetCursorInfo, GetSpellName, ClearCursor = GetCursorInfo, GetSpellName, ClearCursor
+local CreateFrame, UIParent = CreateFrame, UIParent
+local _G = _G
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: ACCEPT, ChatFontNormal
+
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
@@ -92,7 +104,7 @@ local function OnTextSet(self)                                                  
 	self.obj.button:Disable()
 end
 
-function OnVerticalScroll(self, offset)                                          -- ScrollFrame
+local function OnVerticalScroll(self, offset)                                    -- ScrollFrame
 	local editBox = self.obj.editBox
 	editBox:SetHitRectInsets(0, 0, offset, editBox:GetHeight() - offset - self:GetHeight())
 end
