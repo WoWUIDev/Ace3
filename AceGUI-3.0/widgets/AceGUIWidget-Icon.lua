@@ -58,7 +58,7 @@ local methods = {
 		image:SetTexture(path)
 		
 		if image:GetTexture() then
-			local n = select('#', ...)
+			local n = select("#", ...)
 			if n == 4 or n == 8 then
 				image:SetTexCoord(...)
 			else
@@ -96,7 +96,7 @@ local methods = {
 Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
-	local frame = CreateFrame("Button",nil,UIParent)
+	local frame = CreateFrame("Button", nil, UIParent)
 	frame:Hide()
 
 	frame:EnableMouse(true)

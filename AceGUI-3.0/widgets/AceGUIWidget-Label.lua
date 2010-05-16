@@ -69,7 +69,7 @@ local methods = {
 		self.resizing = true
 		-- height is set dynamically by the text and image size
 		self:SetWidth(200)
-		self:SetText("")
+		self:SetText()
 		self:SetImage(nil)
 		self:SetImageSize(16, 16)
 		self:SetColor()
@@ -88,7 +88,7 @@ local methods = {
 	end,
 
 	["SetText"] = function(self, text)
-		self.label:SetText(text or "")
+		self.label:SetText(text)
 		UpdateImageAnchor(self)
 	end,
 
