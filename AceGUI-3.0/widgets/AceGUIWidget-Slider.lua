@@ -17,7 +17,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 --------------------------
 do
 	local Type = "Slider"
-	local Version = 10
+	local Version = 11
 	
 	local function OnAcquire(self)
 		self:SetWidth(200)
@@ -162,6 +162,7 @@ do
 		
 		if value then
 			PlaySound("igMainMenuOptionCheckBoxOn")
+			self:Fire("OnValueChanged", value)
 			self:Fire("OnMouseUp",value)
 		end
 	end
