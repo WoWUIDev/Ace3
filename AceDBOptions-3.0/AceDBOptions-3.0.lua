@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDBOptions-3.0
 -- @release $Id$
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 11
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 12
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -30,7 +30,7 @@ local L = {
 	reset_desc = "Reset the current profile back to its default values, in case your configuration is broken, or you simply want to start over.",
 	reset = "Reset Profile",
 	reset_sub = "Reset the current profile to the default",
-	choose_desc = "You can either create a new profile by entering a name in the editbox, or choose one of the already exisiting profiles.",
+	choose_desc = "You can either create a new profile by entering a name in the editbox, or choose one of the already existing profiles.",
 	new = "New",
 	new_sub = "Create a new empty profile.",
 	choose = "Existing Profiles",
