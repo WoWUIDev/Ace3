@@ -40,7 +40,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 20
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 21
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -507,11 +507,11 @@ function DBObjectLib:DeleteProfile(name, silent)
 		error("Cannot delete the active profile in an AceDBObject.", 2)
 	end
 
-	if not rawget(self.sv.profiles, name) and not silent then
+	if not rawget(self.profiles, name) and not silent then
 		error("Cannot delete profile '" .. name .. "'. It does not exist.", 2)
 	end
 
-	self.sv.profiles[name] = nil
+	self.profiles[name] = nil
 
 	-- populate to child namespaces
 	if self.children then
@@ -537,7 +537,7 @@ function DBObjectLib:CopyProfile(name, silent)
 		error("Cannot have the same source and destination profiles.", 2)
 	end
 
-	if not rawget(self.sv.profiles, name) and not silent then
+	if not rawget(self.profiles, name) and not silent then
 		error("Cannot copy profile '" .. name .. "'. It does not exist.", 2)
 	end
 
@@ -545,7 +545,7 @@ function DBObjectLib:CopyProfile(name, silent)
 	DBObjectLib.ResetProfile(self, nil, true)
 
 	local profile = self.profile
-	local source = self.sv.profiles[name]
+	local source = self.profiles[name]
 
 	copyTable(source, profile)
 

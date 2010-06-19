@@ -39,3 +39,19 @@ do
 	local ns2 = db:GetNamespace("test")
 	assert(namespace == ns2)
 end
+
+do
+	local dbtbl = {}
+	local db = LibStub("AceDB-3.0"):New(dbtbl, nil, "bar")
+	local ns = db:RegisterNamespace("ns1")
+	
+	db.profile.foo = "bar"
+	db:SetProfile("foo")
+	
+	WoWAPI_FireEvent("PLAYER_LOGOUT")
+	
+	local db = LibStub("AceDB-3.0"):New(dbtbl, nil, "foo")
+	local ns = db:RegisterNamespace("ns1")
+	
+	db:DeleteProfile("bar")
+end
