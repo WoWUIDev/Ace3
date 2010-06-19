@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Checkbox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "CheckBox", 20
+local Type, Version = "CheckBox", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -17,6 +17,21 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 -- GLOBALS: SetDesaturation, GameFontHighlight
 
 --[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
+local function AlignImage(self)
+	local img = self.image:GetTexture()
+	self.text:ClearAllPoints()
+	if not img then
+		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
+		self.text:SetPoint("RIGHT")
+	else
+		self.text:SetPoint("LEFT", self.image,"RIGHT", 1, 0)
+		self.text:SetPoint("RIGHT")
+	end
+end
+
+--[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
@@ -30,7 +45,11 @@ end
 local function CheckBox_OnMouseDown(frame)
 	local self = frame.obj
 	if not self.disabled then
-		self.text:SetPoint("LEFT", self.checkbg, "RIGHT", 1, -1)
+		if self.image:GetTexture() then
+			self.text:SetPoint("LEFT", self.image,"RIGHT", 2, -1)
+		else
+			self.text:SetPoint("LEFT", self.checkbg, "RIGHT", 1, -1)
+		end
 	end
 	AceGUI:ClearFocus()
 end
@@ -47,22 +66,7 @@ local function CheckBox_OnMouseUp(frame)
 		end
 
 		self:Fire("OnValueChanged", self.checked)
-		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
-	end
-end
-
---[[-----------------------------------------------------------------------------
-Support functions
--------------------------------------------------------------------------------]]
-local function AlignImage(self)
-	local img = self.image:GetTexture()
-	self.text:ClearAllPoints()
-	if not img then
-		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
-		self.text:SetPoint("RIGHT")
-	else
-		self.text:SetPoint("LEFT", self.image,"RIGHT", 1, 0)
-		self.text:SetPoint("RIGHT")
+		AlignImage(self)
 	end
 end
 
