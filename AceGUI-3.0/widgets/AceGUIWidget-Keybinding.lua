@@ -2,7 +2,7 @@
 Keybinding Widget
 Set Keybindings in the Config UI.
 -------------------------------------------------------------------------------]]
-local Type, Version = "Keybinding", 20
+local Type, Version = "Keybinding", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -103,7 +103,6 @@ Methods
 local methods = {
 	["OnAcquire"] = function(self)
 		self:SetWidth(200)
-		self:SetHeight(44)
 		self:SetLabel("")
 		self:SetKey("")
 		self.waitingForKey = nil
@@ -185,7 +184,7 @@ local function Constructor()
 	button:SetScript("OnMouseDown", Keybinding_OnMouseDown)
 	button:SetPoint("BOTTOMLEFT")
 	button:SetPoint("BOTTOMRIGHT")
-	button:SetPoint("TOP", 0, 20)
+	button:SetHeight(24)
 
 	local text = button:GetFontString()
 	text:SetPoint("LEFT", 7, 0)
