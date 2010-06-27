@@ -120,7 +120,10 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 	-- Make listenframes into a one-element table if it was not passed a table of frames.
 	if not listenframes then  -- default
 		if is335 then
-			listenframes = { ChatFrame1EditBox, ChatFrame2EditBox, ChatFrame3EditBox, ChatFrame4EditBox, ChatFrame5EditBox, ChatFrame6EditBox, ChatFrame7EditBox }
+			listenframes = {}
+			for i = 1, NUM_CHAT_WINDOWS do
+				listenframes[i] = _G["ChatFrame"..i.."EditBox"]
+			end
 		else
 			listenframes = { ChatFrameEditBox }
 		end
