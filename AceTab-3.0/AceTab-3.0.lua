@@ -4,10 +4,12 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 5
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 6
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
+
+local is335 = GetBuildInfo() >= "3.3.5"
 
 AceTab.registry = AceTab.registry or {}
 
@@ -36,7 +38,7 @@ end
 local function hookFrame(f)
 	if f.hookedByAceTab3 then return end
 	f.hookedByAceTab3 = true
-	if f == ChatFrameEditBox then
+	if f == (is335 and ChatEdit_GetActiveWindow() or ChatFrameEditBox) then
 		local origCTP = ChatEdit_CustomTabPressed
 		function ChatEdit_CustomTabPressed()
 			if AceTab:OnTabPressed(f) then
@@ -117,7 +119,11 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 
 	-- Make listenframes into a one-element table if it was not passed a table of frames.
 	if not listenframes then  -- default
-		listenframes = { ChatFrameEditBox }
+		if is335 then
+			listenframes = { ChatFrame1EditBox, ChatFrame2EditBox, ChatFrame3EditBox, ChatFrame4EditBox, ChatFrame5EditBox, ChatFrame6EditBox, ChatFrame7EditBox }
+		else
+			listenframes = { ChatFrameEditBox }
+		end
 	elseif type(listenframes) ~= 'table' or type(listenframes[0]) == 'userdata' and type(listenframes.IsObjectType) == 'function' then  -- single frame or framename
 		listenframes = { listenframes }
 	end
@@ -311,7 +317,7 @@ function AceTab:OnTabPressed(this)
 	if this:GetText() == '' then return true end
 
 	-- allow Blizzard to handle slash commands, themselves
-	if this == ChatFrameEditBox then
+	if this == (is335 and ChatEdit_GetActiveWindow() or ChatFrameEditBox) then
 		local command = this:GetText()
 		if strfind(command, "^/[%a%d_]+$") then
 			return true
