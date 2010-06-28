@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 6
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 7
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -40,9 +40,9 @@ local function hookFrame(f)
 	f.hookedByAceTab3 = true
 	if f == (is335 and ChatEdit_GetActiveWindow() or ChatFrameEditBox) then
 		local origCTP = ChatEdit_CustomTabPressed
-		function ChatEdit_CustomTabPressed()
-			if AceTab:OnTabPressed(f) then
-				return origCTP()
+		function ChatEdit_CustomTabPressed(frame)
+			if AceTab:OnTabPressed(frame) then
+				return origCTP(frame)
 			else
 				return true
 			end
@@ -52,9 +52,9 @@ local function hookFrame(f)
 		if type(origOTP) ~= 'function' then
 			origOTP = function() end
 		end
-		f:SetScript('OnTabPressed', function()
-			if AceTab:OnTabPressed(f) then
-				return origOTP()
+		f:SetScript('OnTabPressed', function(frame)
+			if AceTab:OnTabPressed(frame) then
+				return origOTP(frame)
 			end
 		end)
 	end
