@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 20
+local Type, Version = "Frame", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -62,6 +62,14 @@ end
 local function SizerE_OnMouseDown(frame)
 	frame:GetParent():StartSizing("RIGHT")
 	AceGUI:ClearFocus()
+end
+
+local function StatusBar_OnEnter(frame)
+	frame.obj:Fire("OnEnterStatusBar")
+end
+
+local function StatusBar_OnLeave(frame)
+	frame.obj:Fire("OnLeaveStatusBar")
 end
 
 --[[-----------------------------------------------------------------------------
@@ -179,13 +187,15 @@ local function Constructor()
 	closebutton:SetWidth(100)
 	closebutton:SetText(CLOSE)
 
-	local statusbg = CreateFrame("Frame", nil, frame)
+	local statusbg = CreateFrame("Button", nil, frame)
 	statusbg:SetPoint("BOTTOMLEFT", 15, 15)
 	statusbg:SetPoint("BOTTOMRIGHT", -132, 15)
 	statusbg:SetHeight(24)
 	statusbg:SetBackdrop(PaneBackdrop)
 	statusbg:SetBackdropColor(0.1,0.1,0.1)
 	statusbg:SetBackdropBorderColor(0.4,0.4,0.4)
+	statusbg:SetScript("OnEnter", StatusBar_OnEnter)
+	statusbg:SetScript("OnLeave", StatusBar_OnLeave)
 
 	local statustext = statusbg:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	statustext:SetPoint("TOPLEFT", 7, -2)
@@ -280,7 +290,7 @@ local function Constructor()
 	for method, func in pairs(methods) do
 		widget[method] = func
 	end
-	closebutton.obj = widget
+	closebutton.obj, statusbg.obj = widget, widget
 
 	return AceGUI:RegisterAsContainer(widget)
 end
