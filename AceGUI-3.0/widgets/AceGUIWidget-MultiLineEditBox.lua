@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 20
+local Type, Version = "MultiLineEditBox", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -123,6 +123,7 @@ local methods = {
 		self:SetWidth(200)
 		self:SetNumLines()
 		self.entered = nil
+		self:SetMaxLetters(0)
 	end,
 
 	["OnRelease"] = function(self)
@@ -173,6 +174,10 @@ local methods = {
 
 	["SetText"] = function(self, text)
 		self.editBox:SetText(text)
+	end,
+
+	["SetMaxLetters"] = function (self, num)
+		self.editbox:SetMaxLetters(num or 0)
 	end
 }
 
