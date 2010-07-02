@@ -6,6 +6,9 @@ local Type, Version = "InlineGroup", 20
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
+-- Lua APIs
+local pairs = pairs
+
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
 
@@ -72,13 +75,12 @@ local function Constructor()
 	titletext:SetJustifyH("LEFT")
 	titletext:SetHeight(18)
 
-	local border = CreateFrame("Frame",nil,frame)
-	border:SetPoint("TOPLEFT",frame,"TOPLEFT",0,-17)
-	border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-1,3)
-
+	local border = CreateFrame("Frame", nil, frame)
+	border:SetPoint("TOPLEFT", 0, -17)
+	border:SetPoint("BOTTOMRIGHT", -1, 3)
 	border:SetBackdrop(PaneBackdrop)
-	border:SetBackdropColor(0.1,0.1,0.1,0.5)
-	border:SetBackdropBorderColor(0.4,0.4,0.4)
+	border:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
+	border:SetBackdropBorderColor(0.4, 0.4, 0.4)
 
 	--Container Support
 	local content = CreateFrame("Frame", nil, border)
@@ -86,7 +88,6 @@ local function Constructor()
 	content:SetPoint("BOTTOMRIGHT", -10, 10)
 
 	local widget = {
-		label     = label,
 		frame     = frame,
 		content   = content,
 		titletext = titletext,
@@ -99,4 +100,4 @@ local function Constructor()
 	return AceGUI:RegisterAsContainer(widget)
 end
 
-AceGUI:RegisterWidgetType(Type,Constructor,Version)
+AceGUI:RegisterWidgetType(Type, Constructor, Version)
