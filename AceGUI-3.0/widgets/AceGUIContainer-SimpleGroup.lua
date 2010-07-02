@@ -46,11 +46,11 @@ local methods = {
 Constructor
 -------------------------------------------------------------------------------]]
 local function Constructor()
-	local frame = CreateFrame("Frame",nil,UIParent)
+	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")
 
 	--Container Support
-	local content = CreateFrame("Frame",nil,frame)
+	local content = CreateFrame("Frame", nil, frame)
 	content:SetPoint("TOPLEFT")
 	content:SetPoint("BOTTOMRIGHT")
 
