@@ -177,7 +177,7 @@ local methods = {
 	end,
 
 	["SetMaxLetters"] = function (self, num)
-		self.editbox:SetMaxLetters(num or 0)
+		self.editBox:SetMaxLetters(num or 0)
 	end
 }
 
