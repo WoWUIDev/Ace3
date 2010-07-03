@@ -1,4 +1,10 @@
-local AceGUI = LibStub("AceGUI-3.0")
+--[[-----------------------------------------------------------------------------
+TabGroup Container
+Container that uses tabs on top to switch between groups.
+-------------------------------------------------------------------------------]]
+local Type, Version = "TabGroup", 30
+local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
+if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
 local pairs, ipairs, assert, type = pairs, ipairs, assert, type
@@ -12,52 +18,79 @@ local _G = _G
 -- List them here for Mikk's FindGlobals script
 -- GLOBALS: PanelTemplates_TabResize, PanelTemplates_SetDisabledTabState, PanelTemplates_SelectTab, PanelTemplates_DeselectTab
 
--------------
--- Widgets --
--------------
---[[
-	Widgets must provide the following functions
-		Acquire() - Called when the object is aquired, should set everything to a default hidden state
-		Release() - Called when the object is Released, should remove any anchors and hide the Widget
-		
-	And the following members
-		frame - the frame or derivitive object that will be treated as the widget for size and anchoring purposes
-		type - the type of the object, same as the name given to :RegisterWidget()
-		
-	Widgets contain a table called userdata, this is a safe place to store data associated with the wigdet
-	It will be cleared automatically when a widget is released
-	Placing values directly into a widget object should be avoided
-	
-	If the Widget can act as a container for other Widgets the following
-		content - frame or derivitive that children will be anchored to
-		
-	The Widget can supply the following Optional Members
+-- local upvalue storage used by BuildTabs
+local widths = {}
+local rowwidths = {}
+local rowends = {}
 
-
-]]
-
---------------------------
--- Tab Group            --
---------------------------
-
-do
-	local Type = "TabGroup"
-	local Version = 25
-
-	local PaneBackdrop  = {
-		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tile = true, tileSize = 16, edgeSize = 16,
-		insets = { left = 3, right = 3, top = 5, bottom = 3 }
-	}
-	
-	local function OnAcquire(self)
-
+--[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
+local function UpdateTabLook(frame)
+	if frame.disabled then
+		PanelTemplates_SetDisabledTabState(frame)
+	elseif frame.selected then
+		PanelTemplates_SelectTab(frame)
+	else
+		PanelTemplates_DeselectTab(frame)
 	end
-	
-	local function OnRelease(self)
-		self.frame:ClearAllPoints()
-		self.frame:Hide()
+end
+
+local function Tab_SetText(frame, text)
+	frame:_SetText(text)
+	local width = frame.obj.frame.width or frame.obj.frame:GetWidth() or 0
+	PanelTemplates_TabResize(frame, 0, nil, width)
+end
+
+local function Tab_SetSelected(frame, selected)
+	frame.selected = selected
+	UpdateTabLook(frame)
+end
+
+local function Tab_SetDisabled(frame, disabled)
+	frame.disabled = disabled
+	UpdateTabLook(frame)
+end
+
+local function BuildTabsOnUpdate(frame)
+	local self = frame.obj
+	self:BuildTabs()
+	frame:SetScript("OnUpdate", nil)
+end
+
+--[[-----------------------------------------------------------------------------
+Scripts
+-------------------------------------------------------------------------------]]
+local function Tab_OnClick(frame)
+	if not (frame.selected or frame.disabled) then
+		PlaySound("igCharacterInfoTab")
+		frame.obj:SelectTab(frame.value)
+	end
+end
+
+local function Tab_OnEnter(frame)
+	local self = frame.obj
+	self:Fire("OnTabEnter", self.tabs[frame.id].value, frame)
+end
+
+local function Tab_OnLeave(frame)
+	local self = frame.obj
+	self:Fire("OnTabLeave", self.tabs[frame.id].value, frame)
+end
+
+local function Tab_OnShow(frame)
+	_G[frame:GetName().."HighlightTexture"]:SetWidth(frame:GetTextWidth() + 30)
+end
+
+--[[-----------------------------------------------------------------------------
+Methods
+-------------------------------------------------------------------------------]]
+local methods = {
+	["OnAcquire"] = function(self)
+		self:SetTitle()
+	end,
+
+	["OnRelease"] = function(self)
 		self.status = nil
 		for k in pairs(self.localstatus) do
 			self.localstatus[k] = nil
@@ -66,81 +99,33 @@ do
 		for _, tab in pairs(self.tabs) do
 			tab:Hide()
 		end
-		self:SetTitle()
-	end
-	
-	local function Tab_SetText(self, text)
-		self:_SetText(text)
-		local width = self.obj.frame.width or self.obj.frame:GetWidth() or 0
-		PanelTemplates_TabResize(self, 0, nil, width)
-	end
-	
-	local function UpdateTabLook(self)
-		if self.disabled then
-			PanelTemplates_SetDisabledTabState(self)
-		elseif self.selected then
-			PanelTemplates_SelectTab(self)
-		else
-			PanelTemplates_DeselectTab(self)
-		end
-	end
-	
-	local function Tab_SetSelected(self, selected)
-		self.selected = selected
-		UpdateTabLook(self)
-	end
-	
-	local function Tab_OnClick(self)
-		if not (self.selected or self.disabled) then
-			PlaySound("igCharacterInfoTab")
-			self.obj:SelectTab(self.value)
-		end
-	end
-	
-	local function Tab_SetDisabled(self, disabled)
-		self.disabled = disabled
-		UpdateTabLook(self)
-	end
-	
-	local function Tab_OnEnter(this)
-		local self = this.obj
-		self:Fire("OnTabEnter", self.tabs[this.id].value, this)
-	end
-	
-	local function Tab_OnLeave(this)
-		local self = this.obj
-		self:Fire("OnTabLeave", self.tabs[this.id].value, this)
-	end
-	
-	local function Tab_OnShow(this)
-		_G[this:GetName().."HighlightTexture"]:SetWidth(this:GetTextWidth() + 30)
-	end
-	
-	local function CreateTab(self, id)
-		local tabname = "AceGUITabGroup"..self.num.."Tab"..id
-		local tab = CreateFrame("Button",tabname,self.border,"OptionsFrameTabButtonTemplate")
+	end,
+
+	["CreateTab"] = function(self, id)
+		local tabname = ("AceGUITabGroup%dTab%d"):format(self.num, id)
+		local tab = CreateFrame("Button", tabname, self.border, "OptionsFrameTabButtonTemplate")
 		tab.obj = self
 		tab.id = id
-		
+
 		tab.text = _G[tabname .. "Text"]
 		tab.text:ClearAllPoints()
-		tab.text:SetPoint("LEFT", tab, "LEFT", 14, -3)
-		tab.text:SetPoint("RIGHT", tab, "RIGHT", -12, -3)
-		
-		tab:SetScript("OnClick",Tab_OnClick)
-		tab:SetScript("OnEnter",Tab_OnEnter)
-		tab:SetScript("OnLeave",Tab_OnLeave)
+		tab.text:SetPoint("LEFT", 14, -3)
+		tab.text:SetPoint("RIGHT", -12, -3)
+
+		tab:SetScript("OnClick", Tab_OnClick)
+		tab:SetScript("OnEnter", Tab_OnEnter)
+		tab:SetScript("OnLeave", Tab_OnLeave)
 		tab:SetScript("OnShow", Tab_OnShow)
-		
+
 		tab._SetText = tab.SetText
 		tab.SetText = Tab_SetText
 		tab.SetSelected = Tab_SetSelected
 		tab.SetDisabled = Tab_SetDisabled
-		
+
 		return tab
-	end
-	
-	local function SetTitle(self, text)
+	end,
+
+	["SetTitle"] = function(self, text)
 		self.titletext:SetText(text or "")
 		if text and text ~= "" then
 			self.alignoffset = 25
@@ -148,17 +133,15 @@ do
 			self.alignoffset = 18
 		end
 		self:BuildTabs()
-	end
-	
-	-- called to set an external table to store status in
-	local function SetStatusTable(self, status)
+	end,
+
+	["SetStatusTable"] = function(self, status)
 		assert(type(status) == "table")
 		self.status = status
-	end
-	
-	local function SelectTab(self, value)
-		local status = self.status or self.localstatus
+	end,
 
+	["SelectTab"] = function(self, value)
+		local status = self.status or self.localstatus
 		local found
 		for i, v in ipairs(self.tabs) do
 			if v.value == value then
@@ -172,18 +155,15 @@ do
 		if found then
 			self:Fire("OnGroupSelected",value)
 		end
-	end
-		
-	local function SetTabs(self, tabs)
+	end,
+
+	["SetTabs"] = function(self, tabs)
 		self.tablist = tabs
 		self:BuildTabs()
-	end
+	end,
 	
 
-	local widths = {}
-	local rowwidths = {}
-	local rowends = {}
-	local function BuildTabs(self)
+	["BuildTabs"] = function(self)
 		local hastitle = (self.titletext:GetText() and self.titletext:GetText() ~= "")
 		local status = self.status or self.localstatus
 		local tablist = self.tablist
@@ -193,15 +173,9 @@ do
 		
 		local width = self.frame.width or self.frame:GetWidth() or 0
 		
-		for i = #widths, 1, -1 do 
-			widths[i] = nil 
-		end
-		for i = #rowwidths, 1, -1 do
-			rowwidths[i] = nil 
-		end
-		for i = #rowends, 1, -1 do 
-			rowends[i] = nil 
-		end
+		wipe(widths)
+		wipe(rowwidths)
+		wipe(rowends)
 		
 		--Place Text into tabs and get thier initial width
 		for i, v in ipairs(tablist) do
@@ -286,15 +260,10 @@ do
 		end
 		
 		self.borderoffset = (hastitle and 17 or 10)+((numrows)*20)
-		self.border:SetPoint("TOPLEFT",self.frame,"TOPLEFT",1,-self.borderoffset)
-	end
-	
-	local function BuildTabsOnUpdate(this)
-		BuildTabs(this.obj)
-		this:SetScript("OnUpdate", nil)
-	end
-	
-	local function OnWidthSet(self, width)
+		self.border:SetPoint("TOPLEFT", 1, -self.borderoffset)
+	end,
+
+	["OnWidthSet"] = function(self, width)
 		local content = self.content
 		local contentwidth = width - 60
 		if contentwidth < 0 then
@@ -302,12 +271,11 @@ do
 		end
 		content:SetWidth(contentwidth)
 		content.width = contentwidth
-		BuildTabs(self)
+		self:BuildTabs(self)
 		self.frame:SetScript("OnUpdate", BuildTabsOnUpdate)
-	end
-	
-	
-	local function OnHeightSet(self, height)
+	end,
+
+	["OnHeightSet"] = function(self, height)
 		local content = self.content
 		local contentheight = height - (self.borderoffset + 23)
 		if contentheight < 0 then
@@ -315,75 +283,66 @@ do
 		end
 		content:SetHeight(contentheight)
 		content.height = contentheight
-	end
+	end,
 	
-	local function LayoutFinished(self, width, height)
+	["LayoutFinished"] = function(self, width, height)
 		if self.noAutoHeight then return end
 		self:SetHeight((height or 0) + (self.borderoffset + 23))
 	end
+}
 
-	local function Constructor()
-		local frame = CreateFrame("Frame",nil,UIParent)
-		local self = {}
-		self.type = Type
-		
-		self.num = AceGUI:GetNextWidgetNum(Type)
+--[[-----------------------------------------------------------------------------
+Constructor
+-------------------------------------------------------------------------------]]
+local PaneBackdrop  = {
+	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true, tileSize = 16, edgeSize = 16,
+	insets = { left = 3, right = 3, top = 5, bottom = 3 }
+}
 
-		self.localstatus = {}
-		
-		self.OnRelease = OnRelease
-		self.OnAcquire = OnAcquire
-		self.SetTitle = SetTitle
-		self.CreateTab = CreateTab
-		self.SelectTab = SelectTab
-		self.BuildTabs = BuildTabs
-		self.SetStatusTable = SetStatusTable
-		self.SetTabs = SetTabs
-		self.LayoutFinished = LayoutFinished
-		self.frame = frame
-		
-		self.OnWidthSet = OnWidthSet
-		self.OnHeightSet = OnHeightSet
+local function Constructor()
+	local num = AceGUI:GetNextWidgetNum(Type)
+	local frame = CreateFrame("Frame",nil,UIParent)
+	frame:SetHeight(100)
+	frame:SetWidth(100)
+	frame:SetFrameStrata("FULLSCREEN_DIALOG")
 
-		frame.obj = self
-		
-		frame:SetHeight(100)
-		frame:SetWidth(100)
-		frame:SetFrameStrata("FULLSCREEN_DIALOG")
-		
-		self.alignoffset = 18
-		
-		local titletext = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
-		titletext:SetPoint("TOPLEFT",frame,"TOPLEFT",14,0)
-		titletext:SetPoint("TOPRIGHT",frame,"TOPRIGHT",-14,0)
-		titletext:SetJustifyH("LEFT")
-		titletext:SetHeight(18)
-		titletext:SetText("")
-		
-		self.titletext = titletext
-		
-		local border = CreateFrame("Frame",nil,frame)
-		self.border = border
-		self.borderoffset = 27
-		border:SetPoint("TOPLEFT",frame,"TOPLEFT",1,-27)
-		border:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-1,3)
-		
-		border:SetBackdrop(PaneBackdrop)
-		border:SetBackdropColor(0.1,0.1,0.1,0.5)
-		border:SetBackdropBorderColor(0.4,0.4,0.4)
-		
-		self.tabs = {}
-		
-		--Container Support
-		local content = CreateFrame("Frame",nil,border)
-		self.content = content
-		content.obj = self
-		content:SetPoint("TOPLEFT",border,"TOPLEFT",10,-7)
-		content:SetPoint("BOTTOMRIGHT",border,"BOTTOMRIGHT",-10,7)
-		
-		AceGUI:RegisterAsContainer(self)
-		return self
+	local titletext = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+	titletext:SetPoint("TOPLEFT", 14, 0)
+	titletext:SetPoint("TOPRIGHT", -14, 0)
+	titletext:SetJustifyH("LEFT")
+	titletext:SetHeight(18)
+	titletext:SetText("")
+
+	local border = CreateFrame("Frame", nil, frame)
+	border:SetPoint("TOPLEFT", 1, -27)
+	border:SetPoint("BOTTOMRIGHT", -1, 3)
+	border:SetBackdrop(PaneBackdrop)
+	border:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
+	border:SetBackdropBorderColor(0.4, 0.4, 0.4)
+
+	local content = CreateFrame("Frame", nil, border)
+	content:SetPoint("TOPLEFT", 10, -7)
+	content:SetPoint("BOTTOMRIGHT", -10, 7)
+
+	local widget = {
+		num          = num,
+		frame        = frame,
+		localstatus  = {},
+		alignoffset  = 18,
+		titletext    = titletext,
+		border       = border,
+		borderoffset = 27,
+		tabs         = {},
+		content      = content,
+		type         = Type
+	}
+	for method, func in pairs(methods) do
+		widget[method] = func
 	end
 	
-	AceGUI:RegisterWidgetType(Type,Constructor,Version)
+	return AceGUI:RegisterAsContainer(widget)
 end
+
+AceGUI:RegisterWidgetType(Type, Constructor, Version)
