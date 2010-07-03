@@ -8,7 +8,7 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local tonumber = tonumber
+local tonumber, pairs = tonumber, pairs
 
 -- WoW APIs
 local PlaySound = PlaySound
