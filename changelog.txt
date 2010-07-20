@@ -1,3 +1,24 @@
+Ace3 Release - Revision r960 (July 20th, 2010)
+----------------------------------------------
+- AceGUI-3.0: Label: Reset Image Size and TexCoords on Acquire (Ticket #110)
+- AceGUI-3.0: CheckBox: Re-apply the disabled state after setting a value, so the visuals are correct in either case. (Ticket #107)
+- AceGUI-3.0: Icon: Fix the vertical size. It'll now properly scale with the image size, and not be fixed to about 110px. (Ticket #104)
+- AceGUI-3.0: External Containers (Frame, Window) should always start in a visible state. (Ticket #121)
+- AceGUI-3.0: Added Blizzard sounds to widgets (Ticket #120)
+- AceGUI-3.0: CheckBox: check for self.desc:GetText() being nil as well as "" to prevent setting the wrong height on the checkbox causing bouncing checkboxes.
+- AceGUI-3.0: Rewrite of the MultiLineEditBox (Ticket #68)
+- AceGUI-3.0: CheckBox: Fix alignment of the text in OnMouseDown when an image is set. (Ticket #142)
+- AceGUI-3.0: Add SetMaxLetters APIs to EB and MLEB (Ticket #135)
+- AceGUI-3.0: Frame: Add events for OnEnter/OnLeave of the statusbar (Ticket #139)
+- AceGUI-3.0: Major cleanups and refactoring in nearly all widgets and containers.
+- AceConfigDialog-3.0: Always obey the min/max values on range-type widgets (Ticket #114)
+- AceConfigDialog-3.0: Pass iconCoords set on groups in the options table to the tree widget (Ticket #111)
+- AceConfigDialog-3.0: Implement "softMin" and "softMax", allowing for a UI-specific minimum/maximum for range controls, while allowing manual input of values in the old min/max range. (Ticket #123)
+- AceConfigDialog-3.0: Don't close frames in CloseAll that are being opened after the CloseAll event was dispatched. (Ticket #132).
+- AceSerializer-3.0: Fix encoding & decoding of \030. (Ticket #115)
+- AceDB-3.0: Remove empty sections on logout, keeping the SV clean of more useless informations.
+- AceDBOptions-3.0.lua: Fix a string typo (Ticket #141)
+
 Ace3 Release - Revision r907 (December 16th, 2009)
 ---------------------------------------------------
 - AceGUI-3.0: Frame: Properly save the width in the status table.
