@@ -19,8 +19,8 @@ if not AceConfig then return end
 
 local cfgreg = LibStub("AceConfigRegistry-3.0")
 local cfgcmd = LibStub("AceConfigCmd-3.0")
-local cfgdlg = LibStub("AceConfigDialog-3.0")
---TODO: local cfgdrp = LibStub("AceConfigDropdown-3.0")
+--TODO: local cfgdlg = LibStub("AceConfigDialog-3.0", true)
+--TODO: local cfgdrp = LibStub("AceConfigDropdown-3.0", true)
 
 -- Lua APIs
 local pcall, error, type, pairs = pcall, error, type, pairs
