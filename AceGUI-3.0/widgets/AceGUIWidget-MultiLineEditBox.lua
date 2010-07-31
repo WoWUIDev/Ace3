@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 22
+local Type, Version = "MultiLineEditBox", 23
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -13,6 +13,27 @@ local _G = _G
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
 -- GLOBALS: ACCEPT, ChatFontNormal
+
+--[[-----------------------------------------------------------------------------
+Support functions
+-------------------------------------------------------------------------------]]
+local function Layout(self)
+	self:SetHeight(self.numlines * 14 + (self.disablebutton and 19 or 41) + self.labelHeight)
+
+	if self.labelHeight == 0 then
+		self.scrollBar:SetPoint("TOP", self.frame, "TOP", 0, -23)
+	else
+		self.scrollBar:SetPoint("TOP", self.label, "BOTTOM", 0, -19)
+	end
+
+	if self.disablebutton then
+		self.scrollBar:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, 21)
+		self.scrollBG:SetPoint("BOTTOMLEFT", 0, 4)
+	else
+		self.scrollBar:SetPoint("BOTTOM", self.button, "TOP", 0, 18)
+		self.scrollBG:SetPoint("BOTTOMLEFT", self.button, "TOPLEFT")
+	end
+end
 
 --[[-----------------------------------------------------------------------------
 Scripts
@@ -113,23 +134,17 @@ end
 Methods
 -------------------------------------------------------------------------------]]
 local methods = {
-	["GetText"] = function(self)
-		return self.editBox:GetText()
-	end,
-
 	["OnAcquire"] = function(self)
 		self.editBox:SetText("")
 		self:SetDisabled(false)
 		self:SetWidth(200)
+		self:DisableButton(false)
 		self:SetNumLines()
 		self.entered = nil
 		self:SetMaxLetters(0)
 	end,
 
-	["OnRelease"] = function(self)
-		self.frame:ClearAllPoints()
-		self.frame:Hide()
-	end,
+	-- ["OnRelease"] = nil,
 
 	["SetDisabled"] = function(self, disabled)
 		local editBox = self.editBox
@@ -153,31 +168,43 @@ local methods = {
 			self.label:SetText(text)
 			if self.labelHeight ~= 10 then
 				self.labelHeight = 10
-				self.scrollBar:SetPoint("TOP", self.label, "BOTTOM", 0, -19)
-				self:SetHeight(self.frame.height + 10)
 				self.label:Show()
 			end
 		elseif self.labelHeight ~= 0 then
 			self.labelHeight = 0
 			self.label:Hide()
-			self.scrollBar:SetPoint("TOP", self.frame, "TOP", 0, -23)
-			self:SetHeight(self.frame.height - 10)
 		end
+		Layout(self)
 	end,
 
 	["SetNumLines"] = function(self, value)
 		if not value or value < 4 then
 			value = 4
 		end
-		self:SetHeight(value * 14 + 41 + self.labelHeight)
+		self.numlines = value
+		Layout(self)
 	end,
 
 	["SetText"] = function(self, text)
 		self.editBox:SetText(text)
 	end,
 
+	["GetText"] = function(self)
+		return self.editBox:GetText()
+	end,
+
 	["SetMaxLetters"] = function (self, num)
 		self.editBox:SetMaxLetters(num or 0)
+	end,
+
+	["DisableButton"] = function(self, disabled)
+		self.disablebutton = disabled
+		if disabled then
+			self.button:Hide()
+		else
+			self.button:Show()
+		end
+		Layout(self)
 	end
 }
 
@@ -204,7 +231,7 @@ local function Constructor()
 	label:SetHeight(10)
 
 	local button = CreateFrame("Button", ("%s%dButton"):format(Type, widgetNum), frame, "UIPanelButtonTemplate2")
-	button:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 4)
+	button:SetPoint("BOTTOMLEFT", 0, 4)
 	button:SetHeight(22)
 	button:SetWidth(label:GetStringWidth() + 24)
 	button:SetText(ACCEPT)
@@ -267,7 +294,9 @@ local function Constructor()
 		frame       = frame,
 		label       = label,
 		labelHeight = 10,
+		numlines    = 4,
 		scrollBar   = scrollBar,
+		scrollBG    = scrollBG,
 		scrollFrame = scrollFrame,
 		type        = Type
 	}
@@ -276,8 +305,7 @@ local function Constructor()
 	end
 	button.obj, editBox.obj, scrollFrame.obj = widget, widget, widget
 
-	AceGUI:RegisterAsWidget(widget)
-	return widget
+	return AceGUI:RegisterAsWidget(widget)
 end
 
 AceGUI:RegisterWidgetType(Type, Constructor, Version)
