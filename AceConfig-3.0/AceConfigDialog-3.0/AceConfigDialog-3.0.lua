@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 49
+local MAJOR, MINOR = "AceConfigDialog-3.0", 50
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -322,8 +322,8 @@ local function compareOptions(a,b)
 	end
 	local OrderA, OrderB = tempOrders[a] or 100, tempOrders[b] or 100
 	if OrderA == OrderB then
-		local NameA = (type(tempNames[a] == "string") and tempNames[a]) or ""
-		local NameB = (type(tempNames[b] == "string") and tempNames[b]) or ""
+		local NameA = (type(tempNames[a]) == "string") and tempNames[a] or ""
+		local NameB = (type(tempNames[b]) == "string") and tempNames[b] or ""
 		return NameA:upper() < NameB:upper()
 	end
 	if OrderA < 0 then
