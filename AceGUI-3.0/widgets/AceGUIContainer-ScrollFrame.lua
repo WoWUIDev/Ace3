@@ -2,13 +2,13 @@
 ScrollFrame Container
 Plain container that scrolls its content and doesn't grow in height.
 -------------------------------------------------------------------------------]]
-local Type, Version = "ScrollFrame", 20
+local Type, Version = "ScrollFrame", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
 local pairs, assert, type = pairs, assert, type
-local min, max, floor = math.min, math.max, math.floor
+local min, max, floor, abs = math.min, math.max, math.floor, math.abs
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -77,10 +77,7 @@ local methods = {
 		local status = self.status or self.localstatus
 		local height, viewheight = self.scrollframe:GetHeight(), self.content:GetHeight()
 		
-		if height > viewheight then
-			self.scrollbar:Hide()
-		else
-			self.scrollbar:Show()
+		if self.scrollBarShown then
 			local diff = height - viewheight
 			local delta = 1
 			if value < 0 then
@@ -97,7 +94,9 @@ local methods = {
 		local height, viewheight = self.scrollframe:GetHeight(), self.content:GetHeight()
 		local offset = status.offset or 0
 		local curvalue = self.scrollbar:GetValue()
-		if viewheight < height then
+		-- Give us a margin of error of 2 pixels to stop some conditions that i would blame on floating point inaccuracys
+		-- No-one is going to miss 2 pixels at the bottom of the frame, anyhow!
+		if viewheight < height + 2 then
 			if self.scrollBarShown then
 				self.scrollBarShown = nil
 				self.scrollbar:Hide()
