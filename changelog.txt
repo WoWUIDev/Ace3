@@ -1,3 +1,9 @@
+Ace3 Release - Revision r971 (October 12th, 2010)
+-------------------------------------------------
+- Small fixes and adjustments for the 4.0 Content Patch.
+- AceGUI-3.0: ScrollFrame: Allow for a small margin of error when determining if the scroll bar should be shown.
+- AceGUI-3.0: Added new widget APIs: GetText for EditBox and DisableButton for MultiLineEditBox
+
 Ace3 Release - Revision r960 (July 20th, 2010)
 ----------------------------------------------
 - AceGUI-3.0: Label: Reset Image Size and TexCoords on Acquire (Ticket #110)
