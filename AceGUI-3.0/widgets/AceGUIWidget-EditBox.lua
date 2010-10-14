@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 EditBox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "EditBox", 22
+local Type, Version = "EditBox", 23
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -10,7 +10,7 @@ local tostring, pairs = tostring, pairs
 
 -- WoW APIs
 local PlaySound = PlaySound
-local GetCursorInfo, ClearCursor, GetSpellName = GetCursorInfo, ClearCursor, GetSpellName
+local GetCursorInfo, ClearCursor, GetSpellInfo = GetCursorInfo, ClearCursor, GetSpellInfo
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
 
@@ -81,10 +81,7 @@ local function EditBox_OnReceiveDrag(frame)
 		self:Fire("OnEnterPressed", info)
 		ClearCursor()
 	elseif type == "spell" then
-		local name, rank = GetSpellName(id, info)
-		if rank and rank:match("%d") then
-			name = name.."("..rank..")"
-		end
+		local name = GetSpellInfo(id, info)
 		self:SetText(name)
 		self:Fire("OnEnterPressed", name)
 		ClearCursor()

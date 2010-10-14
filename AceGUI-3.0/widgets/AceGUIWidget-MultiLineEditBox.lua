@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 23
+local Type, Version = "MultiLineEditBox", 24
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -6,7 +6,7 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 local pairs = pairs
 
 -- WoW APIs
-local GetCursorInfo, GetSpellName, ClearCursor = GetCursorInfo, GetSpellName, ClearCursor
+local GetCursorInfo, GetSpellInfo, ClearCursor = GetCursorInfo, GetSpellInfo, ClearCursor
 local CreateFrame, UIParent = CreateFrame, UIParent
 local _G = _G
 
@@ -88,10 +88,7 @@ end
 local function OnReceiveDrag(self)                                               -- EditBox / ScrollFrame
 	local type, id, info = GetCursorInfo()
 	if type == "spell" then
-		info, id = GetSpellName(id, info)
-		if id and id:match("%d") then
-			info = info .. "(" .. id .. ")"
-		end
+		info = GetSpellInfo(id, info)
 	elseif type ~= "item" then
 		return
 	end
