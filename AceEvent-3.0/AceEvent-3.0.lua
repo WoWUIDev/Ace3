@@ -55,7 +55,7 @@ local mixins = {
 }
 
 --- Register for a Blizzard Event.
--- The callback will always be called with the event as the first argument, and if supplied, the `arg` as second argument.
+-- The callback will be called with the optional `arg` as the first argument (if supplied), and the event name as the second (or first, if no arg was supplied)
 -- Any arguments to the event will be passed on after that.
 -- @name AceEvent:RegisterEvent
 -- @class function
@@ -71,7 +71,7 @@ local mixins = {
 -- @param event The event to unregister
 
 --- Register for a custom AceEvent-internal message.
--- The callback will always be called with the event as the first argument, and if supplied, the `arg` as second argument.
+-- The callback will be called with the optional `arg` as the first argument (if supplied), and the event name as the second (or first, if no arg was supplied)
 -- Any arguments to the event will be passed on after that.
 -- @name AceEvent:RegisterMessage
 -- @class function
