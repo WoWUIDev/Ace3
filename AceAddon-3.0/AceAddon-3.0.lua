@@ -30,7 +30,7 @@
 -- @name AceAddon-3.0.lua
 -- @release $Id$
 
-local MAJOR, MINOR = "AceAddon-3.0", 5
+local MAJOR, MINOR = "AceAddon-3.0", 6
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -159,6 +159,7 @@ function AceAddon:NewAddon(objectorname, ...)
 	
 	-- add to queue of addons to be initialized upon ADDON_LOADED
 	tinsert(self.initializequeue, object)
+	print("new addon", name)
 	return object
 end
 
@@ -312,7 +313,7 @@ end
 -- MyModule:Enable()
 function Enable(self)
 	self:SetEnabledState(true)
-	return AceAddon:EnableAddon(self)
+	return AceAddon:EnableAddon(self, true)
 end
 
 --- Disables the Addon, if possible, return true or false depending on success.
@@ -529,7 +530,8 @@ end
 -- **Note:** Do not call this function manually, unless you're absolutely sure that you know what you are doing.
 -- Use :Enable on the addon itself instead.
 -- @param addon addon object to enable
-function AceAddon:EnableAddon(addon)
+-- @param doModules flag if module should be enabled. (During initial load, modules are enabled properly through the event handlers, and not here)
+function AceAddon:EnableAddon(addon, doModules)
 	if type(addon) == "string" then addon = AceAddon:GetAddon(addon) end
 	if self.statuses[addon.name] or not addon.enabledState then return false end
 	
@@ -545,10 +547,12 @@ function AceAddon:EnableAddon(addon)
 			local lib = LibStub:GetLibrary(embeds[i], true)
 			if lib then safecall(lib.OnEmbedEnable, lib, addon) end
 		end
-	
+		
 		-- enable possible modules.
-		for name, module in pairs(addon.modules) do
-			self:EnableAddon(module)
+		if doModules then
+			for name, module in pairs(addon.modules) do
+				self:DisableAddon(module)
+			end
 		end
 	end
 	return self.statuses[addon.name] -- return true if we're disabled
@@ -626,6 +630,7 @@ local function onEvent(this, event, arg1)
 		if IsLoggedIn() then
 			while(#AceAddon.enablequeue > 0) do
 				local addon = tremove(AceAddon.enablequeue, 1)
+				print("enabling", addon.name)
 				AceAddon:EnableAddon(addon)
 			end
 		end
