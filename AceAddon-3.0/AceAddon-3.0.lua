@@ -631,7 +631,7 @@ local function onEvent(this, event, arg1)
 			while(#AceAddon.enablequeue > 0) do
 				local addon = tremove(AceAddon.enablequeue, 1)
 				print("enabling", addon.name)
-				AceAddon:EnableAddon(addon)
+				AceAddon:EnableAddon(addon, true)
 			end
 		end
 	end
