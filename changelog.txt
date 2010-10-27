@@ -1,3 +1,11 @@
+Ace3 Release - Revision r981 (October 27th, 2010)
+-------------------------------------------------
+- AceAddon-3.0: Fixed a library upgrading issue
+- AceAddon-3.0: Modules are now enabled in loading order
+- AceGUI-3.0: Keybinding: The widget will no longer steal keybindings even when inactive (Ticket #169)
+- AceGUI-3.0: EditBox: Fixed spell drag'n'drop
+
+
 Ace3 Release - Revision r971 (October 12th, 2010)
 -------------------------------------------------
 - Small fixes and adjustments for the 4.0 Content Patch.
