@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 50
+local MAJOR, MINOR = "AceConfigDialog-3.0", 51
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -423,6 +423,9 @@ local function CleanUserData(widget, event)
 		widget:SetGroupList(nil)
 		if user.grouplist then
 			del(user.grouplist)
+		end
+		if user.orderlist then
+			del(user.orderlist)
 		end
 	end
 end
@@ -952,10 +955,9 @@ local function BuildSelect(group, options, path, appName)
 		end
 	end
 
-	del(keySort)
 	del(opts)
 
-	return groups
+	return groups, keySort
 end
 
 local function BuildSubGroups(group, tree, options, path, appName)
@@ -1589,16 +1591,12 @@ function AceConfigDialog:FeedGroup(appName,options,container,rootframe,path, isR
 				status.groups = {}
 			end
 			select:SetStatusTable(status.groups)
-			local grouplist = BuildSelect(group, options, path, appName)
-			select:SetGroupList(grouplist)
+			local grouplist, orderlist = BuildSelect(group, options, path, appName)
+			select:SetGroupList(grouplist, orderlist)
 			select:SetUserData("grouplist", grouplist)
-			local firstgroup
-			for k, v in pairs(grouplist) do
-				if not firstgroup or k < firstgroup then
-					firstgroup = k
-				end
-			end
-			
+			select:SetUserData("orderlist", orderlist)
+
+			local firstgroup = orderlist[1]
 			if firstgroup then
 				select:SetGroup((GroupExists(appName, options, path,status.groups.selected) and status.groups.selected) or firstgroup)
 			end
