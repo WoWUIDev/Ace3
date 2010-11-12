@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 21
+local Type, Version = "Frame", 22
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -112,6 +112,7 @@ local methods = {
 
 	["SetTitle"] = function(self, title)
 		self.titletext:SetText(title)
+		self.titlebg:SetWidth((self.titletext:GetWidth() or 0) + 10)
 	end,
 
 	["SetStatusText"] = function(self, text)
@@ -283,6 +284,7 @@ local function Constructor()
 		localstatus = {},
 		titletext   = titletext,
 		statustext  = statustext,
+		titlebg     = titlebg,
 		content     = content,
 		frame       = frame,
 		type        = Type
