@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 24
+local Type, Version = "MultiLineEditBox", 25
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -127,6 +127,15 @@ local function OnVerticalScroll(self, offset)                                   
 	editBox:SetHitRectInsets(0, 0, offset, editBox:GetHeight() - offset - self:GetHeight())
 end
 
+local function OnShowFocus(frame)
+	frame.obj.editBox:SetFocus()
+	frame:SetScript("OnShow", nil)
+end
+
+local function OnFocusGained(frame)
+	AceGUI:SetFocus(frame.obj)
+end
+
 --[[-----------------------------------------------------------------------------
 Methods
 -------------------------------------------------------------------------------]]
@@ -141,7 +150,9 @@ local methods = {
 		self:SetMaxLetters(0)
 	end,
 
-	-- ["OnRelease"] = nil,
+	["OnRelease"] = function(self)
+		self:ClearFocus()
+	end,
 
 	["SetDisabled"] = function(self, disabled)
 		local editBox = self.editBox
@@ -202,6 +213,18 @@ local methods = {
 			self.button:Show()
 		end
 		Layout(self)
+	end,
+	
+	["ClearFocus"] = function(self)
+		self.editBox:ClearFocus()
+		self.frame:SetScript("OnShow", nil)
+	end,
+
+	["SetFocus"] = function(self)
+		self.editBox:SetFocus()
+		if not self.frame:IsShown() then
+			self.frame:SetScript("OnShow", OnShowFocus)
+		end
 	end
 }
 
@@ -282,6 +305,8 @@ local function Constructor()
 	editBox:SetScript("OnReceiveDrag", OnReceiveDrag)
 	editBox:SetScript("OnTextChanged", OnTextChanged)
 	editBox:SetScript("OnTextSet", OnTextSet)
+	editBox:SetScript("OnEditFocusGained", OnFocusGained)
+	
 
 	scrollFrame:SetScrollChild(editBox)
 

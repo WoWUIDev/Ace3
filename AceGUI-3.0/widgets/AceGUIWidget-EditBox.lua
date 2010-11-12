@@ -60,8 +60,8 @@ local function Control_OnLeave(frame)
 end
 
 local function Frame_OnShowFocus(frame)
-	self.obj.editbox:SetFocus()
-	self:SetScript("OnShow", nil)
+	frame.obj.editbox:SetFocus()
+	frame:SetScript("OnShow", nil)
 end
 
 local function EditBox_OnEscapePressed(frame)
@@ -130,7 +130,7 @@ local methods = {
 	end,
 
 	["OnRelease"] = function(self)
-		self.frame:SetScript("OnShow", nil)
+		self:ClearFocus()
 	end,
 
 	["SetDisabled"] = function(self, disabled)
@@ -195,7 +195,7 @@ local methods = {
 		if not self.frame:IsShown() then
 			self.frame:SetScript("OnShow", Frame_OnShowFocus)
 		end
-	end,
+	end
 }
 
 --[[-----------------------------------------------------------------------------
