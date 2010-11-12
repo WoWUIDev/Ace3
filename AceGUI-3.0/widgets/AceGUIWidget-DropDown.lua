@@ -3,7 +3,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local select, pairs, ipairs = select, pairs, ipairs
+local select, pairs, ipairs, type = select, pairs, ipairs, type
 local tsort = table.sort
 
 -- WoW APIs
