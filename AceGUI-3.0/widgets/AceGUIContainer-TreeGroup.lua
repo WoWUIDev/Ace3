@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 30
+local Type, Version = "TreeGroup", 31
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -350,7 +350,7 @@ local methods = {
 		if not status.treewidth then
 			status.treewidth = DEFAULT_TREE_WIDTH
 		end
-		if not status.treesizable then
+		if status.treesizable == nil then
 			status.treesizable = DEFAULT_TREE_SIZABLE
 		end
 		self:SetTreeWidth(status.treewidth,status.treesizable)
