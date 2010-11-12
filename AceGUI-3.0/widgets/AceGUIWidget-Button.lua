@@ -2,7 +2,7 @@
 Button Widget
 Graphical Button.
 -------------------------------------------------------------------------------]]
-local Type, Version = "Button", 20
+local Type, Version = "Button", 21
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -17,9 +17,9 @@ local PlaySound, CreateFrame, UIParent = PlaySound, CreateFrame, UIParent
 Scripts
 -------------------------------------------------------------------------------]]
 local function Button_OnClick(frame, ...)
+	AceGUI:ClearFocus()
 	PlaySound("igMainMenuOption")
 	frame.obj:Fire("OnClick", ...)
-	AceGUI:ClearFocus()
 end
 
 local function Control_OnEnter(frame)
