@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 51
+local MAJOR, MINOR = "AceConfigDialog-3.0", 52
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -125,9 +125,7 @@ do
 	end
 	function del(t)
 		--delcount = delcount + 1
-		for k in pairs(t) do
-			t[k] = nil
-		end
+		wipe(t)
 		pool[t] = true
 	end
 --	function cached()
@@ -936,6 +934,7 @@ end
 ]]
 local function BuildSelect(group, options, path, appName)
 	local groups = new()
+	local order = new()
 	local keySort = new()
 	local opts = new()
 
@@ -950,14 +949,16 @@ local function BuildSelect(group, options, path, appName)
 			local hidden = CheckOptionHidden(v, options, path, appName)
 			if not inline and not hidden then
 				groups[k] = GetOptionsMemberValue("name", v, options, path, appName)
+				tinsert(order, k)
 			end
 			path[#path] = nil
 		end
 	end
 
 	del(opts)
+	del(keySort)
 
-	return groups, keySort
+	return groups, order
 end
 
 local function BuildSubGroups(group, tree, options, path, appName)
