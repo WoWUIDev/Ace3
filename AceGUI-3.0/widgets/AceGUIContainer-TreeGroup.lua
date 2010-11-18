@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 31
+local Type, Version = "TreeGroup", 32
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -413,6 +413,7 @@ local methods = {
 		local numlines = #lines
 
 		local maxlines = (floor(((self.treeframe:GetHeight()or 0) - 20 ) / 18))
+		if maxlines <= 0 then return end
 
 		local first, last
 
@@ -429,6 +430,8 @@ local methods = {
 			--check if we are scrolled down too far
 			if numlines - status.scrollvalue < maxlines then
 				status.scrollvalue = numlines - maxlines
+			end
+			if self.scrollbar:GetValue() ~= status.scrollvalue then
 				self.scrollbar:SetValue(status.scrollvalue)
 			end
 			self.noupdate = nil
@@ -446,13 +449,13 @@ local methods = {
 				button:SetParent(treeframe)
 				button:SetFrameLevel(treeframe:GetFrameLevel()+1)
 				button:ClearAllPoints()
-				if i == 1 then
+				if buttonnum == 1 then
 					if self.showscroll then
-						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",-22,-10)
-						button:SetPoint("TOPLEFT", self.treeframe, "TOPLEFT", 0, -10)
+						button:SetPoint("TOPRIGHT", -22, -10)
+						button:SetPoint("TOPLEFT", 0, -10)
 					else
-						button:SetPoint("TOPRIGHT", self.treeframe,"TOPRIGHT",0,-10)
-						button:SetPoint("TOPLEFT", self.treeframe, "TOPLEFT", 0, -10)
+						button:SetPoint("TOPRIGHT", 0, -10)
+						button:SetPoint("TOPLEFT", 0, -10)
 					end
 				else
 					button:SetPoint("TOPRIGHT", buttons[buttonnum-1], "BOTTOMRIGHT",0,0)
