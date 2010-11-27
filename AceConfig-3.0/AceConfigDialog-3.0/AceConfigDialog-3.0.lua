@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 52
+local MAJOR, MINOR = "AceConfigDialog-3.0", 53
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1175,20 +1175,55 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 
 				elseif v.type == "select" then
 					local values = GetOptionsMemberValue("values", v, options, path, appName)
-					local controlType = v.dialogControl or v.control or "Dropdown"
-					control = gui:Create(controlType)
-					if not control then
-						geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
-						control = gui:Create("Dropdown")
+					if v.style == "radio" then
+						local disabled = CheckOptionDisabled(v, options, path, appName)
+						local width = GetOptionsMemberValue("width",v,options,path,appName)
+						control = gui:Create("InlineGroup")
+						control:SetLayout("Flow")
+						control:SetTitle(name)
+						control.width = "fill"
+
+						control:PauseLayout()
+						local optionValue = GetOptionsMemberValue("get",v, options, path, appName, value)
+						for value, text in pairs(values) do
+							local radio = gui:Create("CheckBox")
+							radio:SetLabel(text)
+							radio:SetUserData("value", value)
+							radio:SetUserData("text", text)
+							radio:SetDisabled(disabled)
+							radio:SetType("radio")
+							radio:SetValue(optionValue == value)
+							radio:SetCallback("OnValueChanged", ActivateMultiControl)
+							InjectInfo(radio, options, v, path, rootframe, appName)
+							control:AddChild(radio)
+							if width == "double" then
+								radio:SetWidth(width_multiplier * 2)
+							elseif width == "half" then
+								radio:SetWidth(width_multiplier / 2)
+							elseif width == "full" then
+								radio.width = "fill"
+							else
+								radio:SetWidth(width_multiplier)
+							end
+						end
+						control:ResumeLayout()
+						control:DoLayout()
+					else
+						local controlType = v.dialogControl or v.control or "Dropdown"
+						control = gui:Create(controlType)
+						if not control then
+							geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
+							control = gui:Create("Dropdown")
+						end
+						control:SetLabel(name)
+						control:SetList(values)
+						local value = GetOptionsMemberValue("get",v, options, path, appName)
+						if not values[value] then
+							value = nil
+						end
+						control:SetValue(value)
+						control:SetCallback("OnValueChanged", ActivateControl)
 					end
-					control:SetLabel(name)
-					control:SetList(values)
-					local value = GetOptionsMemberValue("get",v, options, path, appName)
-					if not values[value] then
-						value = nil
-					end
-					control:SetValue(value)
-					control:SetCallback("OnValueChanged",ActivateControl)
 
 				elseif v.type == "multiselect" then
 					local values = GetOptionsMemberValue("values", v, options, path, appName)
