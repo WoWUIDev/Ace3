@@ -215,6 +215,12 @@ function ItemBase.Create(type)
 	return self
 end
 
+-- Register a dummy LibStub library to retrieve the ItemBase, so other addons can use it.
+local IBLib = LibStub:NewLibrary("AceGUI-3.0-DropDown-ItemBase", ItemBase.version)
+if IBLib then
+	IBLib.GetItemBase = function() return ItemBase end
+end
+
 --[[
 	Template for items:
 	
