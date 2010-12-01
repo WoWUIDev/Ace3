@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 53
+local MAJOR, MINOR = "AceConfigDialog-3.0", 54
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1215,8 +1215,13 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
 							control = gui:Create("Dropdown")
 						end
+						local itemType = v.itemControl
+						if itemType and not gui:GetWidgetVersion(itemType) then
+							geterrorhandler()(("Invalid Custom Item Type - %s"):format(tostring(itemType)))
+							itemType = nil
+						end
 						control:SetLabel(name)
-						control:SetList(values)
+						control:SetList(values, nil, itemType)
 						local value = GetOptionsMemberValue("get",v, options, path, appName)
 						if not values[value] then
 							value = nil

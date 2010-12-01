@@ -9,7 +9,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 12
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 13
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
@@ -151,6 +151,7 @@ local typedkeys={
 		control=optstring,
 		dialogControl=optstring,
 		dropdownControl=optstring,
+		itemControl=optstring,
 	},
 	multiselect={
 		values=ismethodtable,
