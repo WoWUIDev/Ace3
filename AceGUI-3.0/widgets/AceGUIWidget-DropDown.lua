@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 23
+	local widgetVersion = 24
 	
 	--[[ Static data ]]--
 	
@@ -560,8 +560,12 @@ do
 		end
 	end
 	
-	local function AddListItem(self, value, text)
-		local item = AceGUI:Create("Dropdown-Item-Toggle")
+	local function AddListItem(self, value, text, itemType)
+		if not itemType then itemType = "Dropdown-Item-Toggle" end
+		local exists = AceGUI:GetWidgetVersion(itemType)
+		if not exists then error(("The given item type, %q, does not exist within AceGUI-3.0"):format(tostring(itemType)), 2) end
+
+		local item = AceGUI:Create(itemType)
 		item:SetText(text)
 		item.userdata.obj = self
 		item.userdata.value = value
@@ -580,7 +584,7 @@ do
 	
 	-- exported
 	local sortlist = {}
-	local function SetList(self, list,order)
+	local function SetList(self, list, order, itemType)
 		self.list = list
 		self.pullout:Clear()
 		self.hasClose = nil
@@ -593,12 +597,12 @@ do
 			tsort(sortlist)
 			
 			for i, key in ipairs(sortlist) do
-				AddListItem(self, key, list[key])
+				AddListItem(self, key, list[key], itemType)
 				sortlist[i] = nil
 			end
 		else
 			for i, key in ipairs(order) do
-				AddListItem(self, key, list[key])
+				AddListItem(self, key, list[key], itemType)
 			end
 		end
 		if self.multiselect then
@@ -608,10 +612,10 @@ do
 	end
 	
 	-- exported
-	local function AddItem(self, value, text)
+	local function AddItem(self, value, text, itemType)
 		if self.list then
 			self.list[value] = text
-			AddListItem(self, value, text)
+			AddListItem(self, value, text, itemType)
 		end
 	end
 	
