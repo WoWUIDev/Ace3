@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 32
+local Type, Version = "TreeGroup", 33
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -566,6 +566,11 @@ local methods = {
 		if status.fullwidth then
 			self:OnWidthSet(status.fullwidth)
 		end
+	end,
+
+	["GetTreeWidth"] = function(self)
+		local status = self.status or self.localstatus
+		return status.treewidth or DEFAULT_TREE_WIDTH
 	end,
 
 	["LayoutFinished"] = function(self, width, height)
