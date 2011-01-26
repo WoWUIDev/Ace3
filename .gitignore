@@ -13,6 +13,7 @@ AceGUI-3.0/*.toc
 AceGUI-3.0/widgets/*.toc
 AceHook-3.0/*.toc
 AceLocale-3.0/*.toc
+AceLocale-3.0/luac.out
 AceSerializer-3.0/*.toc
 AceTimer-3.0/*.toc
 CallbackHandler-1.0/*.toc
