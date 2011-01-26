@@ -98,7 +98,7 @@ function AceLocale:NewLocale(application, locale, isDefault, silent)
 	local app = AceLocale.apps[application]
 	
 	if silent and app then
-		error("Usage: NewLocale(application, locale[, isDefault[, silent]]): 'silent' must be specified for the first locale registered", 2)
+		geterrorhandler()("Usage: NewLocale(application, locale[, isDefault[, silent]]): 'silent' must be specified for the first locale registered", 2)
 	end
 	
 	if not app then

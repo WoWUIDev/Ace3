@@ -55,6 +55,22 @@ local test3=AceLocale:GetLocale("test3")
 assert(test3["thisdoesntexist"]=="thisdoesntexist")
 assert(test3["This Exists"]=="This Exists")
 
+
+------------------------------------------------
+-- Test the silent flag warning when using it on nonfirst
+
+local oldgeterrorhandler = geterrorhandler
+local errors=0
+_G.geterrorhandler = function() return function() errors=errors+1 end end
+
+AceLocale:NewLocale("test3", "deDE")
+AceLocale:NewLocale("test3", "enUS", true, true)
+AceLocale:NewLocale("test3", "frFR")
+
+assert(errors==1)
+_G.geterrorhandler=oldgeterrorhandler
+
+
 ------------------------------------------------
 -- Test silent="raw" working 
 
