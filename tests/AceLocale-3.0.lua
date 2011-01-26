@@ -13,7 +13,7 @@ loc["a"] = "aa"
 loc["b"] = "bb"
 loc["c"] = "cc"
 
-local locale_3 = AceLocale:NewLocale("test", "frFR")
+local loc = AceLocale:NewLocale("test", "frFR")
 assert(loc == nil)
 
 
@@ -34,12 +34,14 @@ _G.geterrorhandler=oldgeterrorhandler
 ------------------------------------------------
 -- Test the silent flag working 
 
-AceLocale:NewLocale("test2", "enUS", true, true) -- silent flag set on first locale to be registered
+local loc = AceLocale:NewLocale("test2", "enUS", true, true) -- silent flag set on first locale to be registered
+loc["This Exists"]=true
 AceLocale:NewLocale("test2", "deDE")
 AceLocale:NewLocale("test2", "frFR")
 
 local test2=AceLocale:GetLocale("test2")
 assert(test2["thisdoesntexist"]=="thisdoesntexist")
+assert(test2["This Exists"]=="This Exists")
 
 
 ------------------------------------------------
@@ -49,10 +51,21 @@ AceLocale:NewLocale("test3", "deDE", false, true)	-- silent flag set on first lo
 AceLocale:NewLocale("test3", "enUS", true)
 AceLocale:NewLocale("test3", "frFR")
 
-local test3=AceLocale:GetLocale("test2")
+local test3=AceLocale:GetLocale("test3")
 assert(test3["thisdoesntexist"]=="thisdoesntexist")
+assert(test3["This Exists"]=="This Exists")
 
+------------------------------------------------
+-- Test silent="raw" working 
 
+local loc = AceLocale:NewLocale("test4", "enUS", true, "raw")
+loc["This Exists"]=true
+AceLocale:NewLocale("test4", "deDE")
+AceLocale:NewLocale("test4", "frFR")
+
+local test4=AceLocale:GetLocale("test4")
+assert(test4["thisdoesntexist"]==nil)
+assert(test4["This Exists"]=="This Exists")
 
 ------------------------------------------------
 print "OK"
