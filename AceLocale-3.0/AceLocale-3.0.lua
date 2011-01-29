@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceLocale-3.0
 -- @release $Id$
-local MAJOR,MINOR = "AceLocale-3.0", 4
+local MAJOR,MINOR = "AceLocale-3.0", 5
 
 local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -98,7 +98,7 @@ function AceLocale:NewLocale(application, locale, isDefault, silent)
 	local app = AceLocale.apps[application]
 	
 	if silent and app then
-		geterrorhandler()("Usage: NewLocale(application, locale[, isDefault[, silent]]): 'silent' must be specified for the first locale registered", 2)
+		geterrorhandler()("Usage: NewLocale(application, locale[, isDefault[, silent]]): 'silent' must be specified for the first locale registered")
 	end
 	
 	if not app then
