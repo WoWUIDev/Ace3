@@ -1,3 +1,17 @@
+Ace3 Release - Revision r1009 (February 9th, 2011)
+--------------------------------------------------
+- AceLocale-3.0: Fix erronous assumption that the default locale is always the first to be registered for the :NewLocale() "silent" flag. The flag must now be set on the FIRST locale to be registered.
+- AceLocale-3.0: The :NewLocale() "silent" flag may now be set to the string "raw", meaning nils are returned for unknown translations.
+- AceGUI-3.0: Fix the disabled state of Icon widgets
+- AceGUI-3.0: The header of the Frame widget now dynamically changes size to fit the text (Ticket #171)
+- AceGUI-3.0: Its now possible to define a custom order the elements in a dropdown widget
+- AceGUI-3.0: Improved widget focus behaviour across the board (Ticket #192, #193)
+- AceGUI-3.0: Fixed a bug that made it impossible to block the tree widget from being user resizable (Ticket #163)
+- AceGUI-3.0: Fixed a bug that caused TreeGroups to become unresponsive under certain conditions (Ticket #189, #202)
+- AceGUI-3.0: Enhanced the DropDown widget to allow it to be reused more easily.
+- AceConfigDialog-3.0: Select Groups now have the proper order in the dropdown (Ticket #184)
+- AceConfigDialog-3.0: Implemented "radio" style select boxes (Ticket #149)
+
 Ace3 Release - Revision r981 (October 27th, 2010)
 -------------------------------------------------
 - AceAddon-3.0: Fixed a library upgrading issue
