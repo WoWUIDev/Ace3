@@ -1,6 +1,8 @@
 * text=auto !eol
 /.docmeta -text
 /.pkgmeta -text
+AceLocale-3.1/AceLocale-3.1.lua -text
+AceLocale-3.1/AceLocale-3.1.xml -text
 /LICENSE.txt svneol=native#text/plain
 tests/AceAddon-3.0.lua svneol=native#text/plain
 tests/AceDB-3.0.lua svneol=native#text/plain
