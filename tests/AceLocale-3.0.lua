@@ -83,5 +83,30 @@ local test4=AceLocale:GetLocale("test4")
 assert(test4["thisdoesntexist"]==nil)
 assert(test4["This Exists"]=="This Exists")
 
+
+------------------------------------------------
+-- Test that we can re-get an already-created locale so we can write more to it
+
+local loc = AceLocale:NewLocale("test5", "enUS")
+loc["orig1"]=true
+loc["orig2"]="orig2"
+loc["orig3"]=true
+loc["orig4"]="orig4"
+
+local loc = AceLocale:NewLocale("unrelatedLocale", "enUS")  -- touch something else in between to make extra sure
+
+local loc = AceLocale:NewLocale("test5", "enUS")
+loc["orig3"]="NEWorig3"
+loc["orig4"]="NEWorig4"
+loc["orig5"]="thisneverexisted"
+
+local test5=AceLocale:GetLocale("test5")
+assert(test5["orig1"]=="orig1")
+assert(test5["orig2"]=="orig2")
+assert(test5["orig3"]=="NEWorig3")
+assert(test5["orig4"]=="NEWorig4")
+assert(test5["orig5"]=="thisneverexisted")
+
+
 ------------------------------------------------
 print "OK"
