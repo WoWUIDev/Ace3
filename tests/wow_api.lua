@@ -194,12 +194,34 @@ function SendChatMessage(text, chattype, language, destination)
 	WoWAPI_FireEvent("CHAT_MSG_"..strupper(chattype), text, "Sender", language or "Common")
 end
 
+local registeredPrefixes = {}
+function RegisterAddonMessagePrefix(prefix)
+	assert(#prefix<=16)	-- tested, 16 works /mikk, 20110327
+	registeredPrefixes[prefix] = true
+end
+
 function SendAddonMessage(prefix, message, distribution, target)
-	assert(#prefix + #message < 255,
-	       string.format("SendAddonMessage: message too long (%d bytes)",
-			     #prefix + #message))
-	-- CHAT_MSG_ADDON(prefix, message, distribution, sender)
-	WoWAPI_FireEvent("CHAT_MSG_ADDON", prefix, message, distribution, "Sender")
+	if RegisterAddonMessagePrefix then --4.1+
+		assert(#message <= 255,
+		       string.format("SendAddonMessage: message too long (%d bytes > 255)",
+				     #message))
+		-- CHAT_MSG_ADDON(prefix, message, distribution, sender)
+		WoWAPI_FireEvent("CHAT_MSG_ADDON", prefix, message, distribution, "Sender")
+	else -- allow RegisterAddonMessagePrefix to be nilled out to emulate pre-4.1
+		assert(#prefix + #message < 255,
+		       string.format("SendAddonMessage: message too long (%d bytes)",
+				     #prefix + #message))
+		-- CHAT_MSG_ADDON(prefix, message, distribution, sender)
+		WoWAPI_FireEvent("CHAT_MSG_ADDON", prefix, message, distribution, "Sender")
+	end
+end
+
+if not wipe then
+	function wipe(tbl)
+		for k in pairs(tbl) do
+			tbl[k]=nil
+		end
+	end
 end
 
 function hooksecurefunc(func_name, post_hook_func)
@@ -259,6 +281,8 @@ function dump(...)
 		local v = select(i, ...)
 		if type(v)=="string" then
 			tinsert(t, string.format("%q", v))
+		elseif type(v)=="table" then
+			tinsert(t, tostring(v).." #"..#v)
 		else
 			tinsert(t, tostring(v))
 		end

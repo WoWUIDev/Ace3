@@ -21,7 +21,7 @@
 -- Can run as a standalone addon also, but, really, just embed it! :-)
 --
 
-local CTL_VERSION = 21
+local CTL_VERSION = 22
 
 local _G = _G
 
@@ -446,10 +446,17 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 		error('ChatThrottleLib:SendAddonMessage(): callbackFn: expected function, got '..type(callbackFn), 2)
 	end
 
-	local nSize = prefix:len() + 1 + text:len();
+	local nSize = text:len();
 
-	if nSize>255 then
-		error("ChatThrottleLib:SendAddonMessage(): prefix + message length cannot exceed 254 bytes", 2)
+	if RegisterAddonMessagePrefix then
+		if nSize>255 then
+			error("ChatThrottleLib:SendAddonMessage(): message length cannot exceed 255 bytes", 2)
+		end
+	else
+		nSize = nSize + prefix:len() + 1
+		if nSize>255 then
+			error("ChatThrottleLib:SendAddonMessage(): prefix + message length cannot exceed 254 bytes", 2)
+		end
 	end
 
 	nSize = nSize + self.MSG_OVERHEAD;

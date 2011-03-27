@@ -43,7 +43,7 @@ addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL",
 		nMulti=nMulti+1
 		--	print(sent)
 		if nMulti>=1 and nMulti<=3 then
-			assert(sent==(255-1-(#"multi")-1)*nMulti)	-- 256 - \0 - \t - #prefix - [\001-\003]
+			assert(sent==(255-1)*nMulti)	-- 256 - \0 - \t - #prefix - [\001-\003]
 		elseif nMulti==4 then
 			assert(sent==800)
 		end
@@ -94,7 +94,7 @@ addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL",
 		nMulti=nMulti+1
 		--	print(sent)
 		if nMulti>=1 and nMulti<=3 then
-			assert(sent==(255-1-(#"multi")-1)*nMulti)	-- 256 - \0 - \t - #prefix - [\001-\003]
+			assert(sent==(255-1)*nMulti)	-- 256 - \0 - \t - #prefix - [\001-\003]
 		elseif nMulti==4 then
 			assert(sent==800)
 		end
