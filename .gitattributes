@@ -3,6 +3,7 @@
 /.pkgmeta -text
 /LICENSE.txt svneol=native#text/plain
 tests/AceAddon-3.0.lua svneol=native#text/plain
+tests/AceComm-3.0-pre-4.1.lua -text
 tests/AceDB-3.0.lua svneol=native#text/plain
 tests/AceEvent-3.0.lua svneol=native#text/plain
 tests/LibStub.lua svneol=native#text/plain
