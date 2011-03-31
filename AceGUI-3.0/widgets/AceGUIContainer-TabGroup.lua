@@ -2,7 +2,7 @@
 TabGroup Container
 Container that uses tabs on top to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TabGroup", 33
+local Type, Version = "TabGroup", 34
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -47,7 +47,7 @@ local function Tab_SetText(frame, text)
 	frame:_SetText(text)
 	local width = frame.obj.frame.width or frame.obj.frame:GetWidth() or 0
 	if wow_406 then
-		PanelTemplates_TabResize(frame, 0, nil, nil, width, frame.text:GetStringWidth())
+		PanelTemplates_TabResize(frame, 0, nil, nil, width, frame:GetFontString():GetStringWidth())
 	else
 		PanelTemplates_TabResize(frame, 0, nil, width)
 	end
@@ -268,7 +268,7 @@ local methods = {
 			
 			for i = starttab, endtab do
 				if wow_406 then
-					PanelTemplates_TabResize(tabs[i], padding + 4, nil, nil, width, tabs[i].text:GetStringWidth())
+					PanelTemplates_TabResize(tabs[i], padding + 4, nil, nil, width, tabs[i]:GetFontString():GetStringWidth())
 				else
 					PanelTemplates_TabResize(tabs[i], padding + 4, nil, width)
 				end
