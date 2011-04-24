@@ -61,6 +61,7 @@ end
 
 local function OnEditFocusLost(self)                                             -- EditBox
 	self:HighlightText(0, 0)
+	self.obj:Fire("OnEditFocusLost")
 end
 
 local function OnEnter(self)                                                     -- EditBox / ScrollFrame
@@ -132,8 +133,9 @@ local function OnShowFocus(frame)
 	frame:SetScript("OnShow", nil)
 end
 
-local function OnFocusGained(frame)
+local function OnEditFocusGained(frame)
 	AceGUI:SetFocus(frame.obj)
+	frame.obj:Fire("OnEditFocusGained")
 end
 
 --[[-----------------------------------------------------------------------------
@@ -225,7 +227,17 @@ local methods = {
 		if not self.frame:IsShown() then
 			self.frame:SetScript("OnShow", OnShowFocus)
 		end
-	end
+	end,
+	
+	["GetCursorPosition"] = function(self)
+		return self.editBox:GetCursorPosition()
+	end,
+	
+	["SetCursorPosition"] = function(self, ...)
+		return self.editBox:SetCursorPosition(...)
+	end,
+	
+	
 }
 
 --[[-----------------------------------------------------------------------------
@@ -305,7 +317,7 @@ local function Constructor()
 	editBox:SetScript("OnReceiveDrag", OnReceiveDrag)
 	editBox:SetScript("OnTextChanged", OnTextChanged)
 	editBox:SetScript("OnTextSet", OnTextSet)
-	editBox:SetScript("OnEditFocusGained", OnFocusGained)
+	editBox:SetScript("OnEditFocusGained", OnEditFocusGained)
 	
 
 	scrollFrame:SetScrollChild(editBox)
