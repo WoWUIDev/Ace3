@@ -1,4 +1,4 @@
-## Interface: 40000
+## Interface: 40100
 
 ## Title: Lib: Ace3
 ## Notes: AddOn development framework
