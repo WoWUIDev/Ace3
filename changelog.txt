@@ -1,3 +1,8 @@
+Ace3 Release - Revision r1025 (April 27th, 2011)
+------------------------------------------------
+- AceComm-3.0: Updated for 4.1 changes - now handles RegisterAddonMessagePrefix internally for you.
+- AceGUI-3.0: TabGroup: Fixed width of tabs in 4.1(Ticket #243)
+
 Ace3 Release - Revision r1009 (February 9th, 2011)
 --------------------------------------------------
 - AceLocale-3.0: Fix erronous assumption that the default locale is always the first to be registered for the :NewLocale() "silent" flag. The flag must now be set on the FIRST locale to be registered.
