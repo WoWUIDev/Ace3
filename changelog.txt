@@ -1,3 +1,8 @@
+Ace3 Release - Revision r1032 (June 29th, 2011)
+-----------------------------------------------
+- AceTab-3.0: Improvements to Match handling (Ticket #255 and #256)
+- AceGUI-3.0: DropDown layout fix with hidden labels (Ticket #234)
+
 Ace3 Release - Revision r1025 (April 27th, 2011)
 ------------------------------------------------
 - AceComm-3.0: Updated for 4.1 changes - now handles RegisterAddonMessagePrefix internally for you.
