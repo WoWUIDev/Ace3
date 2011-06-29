@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 8
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 9
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -102,18 +102,25 @@ function AceTab:RegisterTabCompletion(descriptor, prematches, wordlist, usagefun
 	if postfunc and type(postfunc) ~= 'function' then error("Usage: RegisterTabCompletion(descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite): 'postfunc' - function expected.", 3) end
 	if pmoverwrite and type(pmoverwrite) ~= 'boolean' and type(pmoverwrite) ~= 'number' then error("Usage: RegisterTabCompletion(descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite): 'pmoverwrite' - boolean or number expected.", 3) end
 
-	local pmtable = type(prematches) == 'table' and prematches or {}
-	-- Mark this group as a fallback group if no value was passed.
-	if not prematches then
-		pmtable[1] = ""
-		fallbacks[descriptor] = true
-	-- Make prematches into a one-element table if it was passed as a string.
-	elseif type(prematches) == 'string' then
-		pmtable[1] = prematches
-		if prematches == "" then
+	local pmtable
+
+	if type(prematches) == 'table' then
+		pmtable = prematches
+		notfallbacks[descriptor] = true
+	else
+		pmtable = {}
+		-- Mark this group as a fallback group if no value was passed.
+		if not prematches then
+			pmtable[1] = ""
 			fallbacks[descriptor] = true
-		else
-			notfallbacks[descriptor] = true
+		-- Make prematches into a one-element table if it was passed as a string.
+		elseif type(prematches) == 'string' then
+			pmtable[1] = prematches
+			if prematches == "" then
+				fallbacks[descriptor] = true
+			else
+				notfallbacks[descriptor] = true
+			end
 		end
 	end
 
@@ -299,7 +306,7 @@ local function fillMatches(this, desc, fallback)
 						-- Finally, increment our match count and set firstMatch, if appropriate.
 						for _, m in ipairs(cands) do
 							if strfind(strlower(m), strlower(text_pmendToCursor), 1, 1) == 1 then  -- we have a matching completion!
-								hasNonFallback = not fallback
+								hasNonFallback = hasNonFallback or (not fallback)
 								matches[m] = entry.postfunc and entry.postfunc(m, prematchEnd + 1, text_all) or m
 								numMatches = numMatches + 1
 								if numMatches == 1 then
