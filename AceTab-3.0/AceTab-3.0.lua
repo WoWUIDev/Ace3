@@ -435,16 +435,18 @@ function AceTab:OnTabPressed(this)
 				end
 			end
 
-			-- Replace the original string with the greatest common substring of all valid completions.
-			this.at3curMatch = 1
-			this.at3origWord = strsub(text_precursor, this.at3matchStart, this.at3matchStart + pmolengths[desc] - 1) .. allGCBS or ""
-			this.at3origMatch = allGCBS or ""
-			this.at3lastWord = this.at3origWord
-			this.at3lastMatch = this.at3origMatch
+			if next(matches) then
+				-- Replace the original string with the greatest common substring of all valid completions.
+				this.at3curMatch = 1
+				this.at3origWord = strsub(text_precursor, this.at3matchStart, this.at3matchStart + pmolengths[desc] - 1) .. allGCBS or ""
+				this.at3origMatch = allGCBS or ""
+				this.at3lastWord = this.at3origWord
+				this.at3lastMatch = this.at3origMatch
 
-			this:HighlightText(this.at3matchStart-1, cursor)
-			this:Insert(this.at3origWord)
-			this.at3_last_precursor = getTextBeforeCursor(this) or ''
+				this:HighlightText(this.at3matchStart-1, cursor)
+				this:Insert(this.at3origWord)
+				this.at3_last_precursor = getTextBeforeCursor(this) or ''
+			end
 		end
 	end
 end
