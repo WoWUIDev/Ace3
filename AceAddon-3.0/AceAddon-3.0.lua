@@ -30,7 +30,7 @@
 -- @name AceAddon-3.0.lua
 -- @release $Id$
 
-local MAJOR, MINOR = "AceAddon-3.0", 10
+local MAJOR, MINOR = "AceAddon-3.0", 11
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceAddon then return end -- No Upgrade needed.
@@ -619,7 +619,8 @@ function AceAddon:IterateModulesOfAddon(addon) return pairs(addon.modules) end
 
 -- Event Handling
 local function onEvent(this, event, arg1)
-	if event == "ADDON_LOADED" or event == "PLAYER_LOGIN" then
+	-- 2011-08-17 nevcairiel - ignore the load event of Blizzard_DebugTools, so a potential startup error isn't swallowed up
+	if (event == "ADDON_LOADED"  and arg1 ~= "Blizzard_DebugTools") or event == "PLAYER_LOGIN" then
 		-- if a addon loads another addon, recursion could happen here, so we need to validate the table on every iteration
 		while(#AceAddon.initializequeue > 0) do
 			local addon = tremove(AceAddon.initializequeue, 1)
