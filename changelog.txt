@@ -1,3 +1,9 @@
+Ace3 Release - Revision r1041 (November 29th, 2011)
+---------------------------------------------------
+- AceDB-3.0: Added locale and factionrealmregion profile keys
+- AceSerializer-3.0: Removed support for NaN, as WoW 4.3 does no longer allow it.
+- AceGUI-3.0: Frame: Add :EnableResize (Ticket #214)
+
 Ace3 Release - Revision r1032 (June 29th, 2011)
 -----------------------------------------------
 - AceTab-3.0: Improvements to Match handling (Ticket #255 and #256)
