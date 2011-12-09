@@ -9,7 +9,7 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 13
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 14
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
@@ -162,7 +162,7 @@ local typedkeys={
 		dropdownControl=optstring,
 	},
 	color={
-		hasAlpha=optbool,
+		hasAlpha=optmethodbool,
 	},
 	keybinding={
 		-- TODO

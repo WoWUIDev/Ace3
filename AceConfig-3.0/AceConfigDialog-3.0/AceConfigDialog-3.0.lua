@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 54
+local MAJOR, MINOR = "AceConfigDialog-3.0", 55
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1315,7 +1315,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 				elseif v.type == "color" then
 					control = gui:Create("ColorPicker")
 					control:SetLabel(name)
-					control:SetHasAlpha(v.hasAlpha)
+					control:SetHasAlpha(GetOptionsMemberValue("hasAlpha",v, options, path, appName))
 					control:SetColor(GetOptionsMemberValue("get",v, options, path, appName))
 					control:SetCallback("OnValueChanged",ActivateControl)
 					control:SetCallback("OnValueConfirmed",ActivateControl)
