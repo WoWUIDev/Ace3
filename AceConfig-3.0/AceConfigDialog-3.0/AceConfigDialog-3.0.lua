@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 56
+local MAJOR, MINOR = "AceConfigDialog-3.0", 57
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -21,10 +21,10 @@ local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
 -- Lua APIs
-local tconcat, tinsert, tsort, tremove = table.concat, table.insert, table.sort, table.remove
+local tconcat, tinsert, tsort, tremove, tsort = table.concat, table.insert, table.sort, table.remove, table.sort
 local strmatch, format = string.match, string.format
 local assert, loadstring, error = assert, loadstring, error
-local pairs, next, select, type, unpack, wipe = pairs, next, select, type, unpack, wipe
+local pairs, next, select, type, unpack, wipe, ipairs = pairs, next, select, type, unpack, wipe, ipairs
 local rawset, tostring, tonumber = rawset, tostring, tonumber
 local math_min, math_max, math_floor = math.min, math.max, math.floor
 
@@ -1185,8 +1185,14 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						control.width = "fill"
 
 						control:PauseLayout()
-						local optionValue = GetOptionsMemberValue("get",v, options, path, appName, value)
+						local optionValue = GetOptionsMemberValue("get",v, options, path, appName)
+						local t = {}
 						for value, text in pairs(values) do
+							t[#t+1]=value
+						end
+						tsort(t)
+						for k, value in ipairs(t) do
+							local text = values[value]
 							local radio = gui:Create("CheckBox")
 							radio:SetLabel(text)
 							radio:SetUserData("value", value)
