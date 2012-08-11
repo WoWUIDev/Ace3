@@ -185,6 +185,10 @@ function GetFramerate()
 	return 60
 end
 
+function GetCVar(var)
+	return "test"
+end
+
 time = os.clock
 
 strmatch = string.match

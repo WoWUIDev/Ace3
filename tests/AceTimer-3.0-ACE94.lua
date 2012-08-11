@@ -133,7 +133,7 @@ for _ in pairs(AceTimer.selfs) do
 	WoWAPI_FireEvent("PLAYER_REGEN_ENABLED")
 end
 assert(numwarnmsgs==1, dump(numwarnmsgs))
-assert(strmatch(warnmsg, "MyTestObj.*has 100[1-9] live timers"), dump(warnmsg, msg))	-- it won't be 1000 since __ops etc gets counted. it'll be a little more.
+assert(strmatch(warnmsg, "MyTestObj.*has 100[0-9] live timers"), dump(warnmsg, msg))	-- it won't be 1000 since __ops etc gets counted. it'll be a little more.
 
 -- Now it shouldn't clean&warn again since there are no operations on the table
 numwarnmsgs=0

@@ -63,9 +63,9 @@ local oldgeterrorhandler = geterrorhandler
 local errors=0
 _G.geterrorhandler = function() return function() errors=errors+1 end end
 
-AceLocale:NewLocale("test3", "deDE")
-AceLocale:NewLocale("test3", "enUS", true, true)
-AceLocale:NewLocale("test3", "frFR")
+AceLocale:NewLocale("test3a", "deDE")
+AceLocale:NewLocale("test3a", "enUS", true, true)
+AceLocale:NewLocale("test3a", "frFR")
 
 assert(errors==1)
 _G.geterrorhandler=oldgeterrorhandler
