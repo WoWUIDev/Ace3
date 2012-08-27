@@ -1,3 +1,13 @@
+Ace3 Release - Revision r1061 (August 27th, 2012)
+-------------------------------------------------
+- AceConfigDialog-3.0: Try to avoid potential taints in static popup dialogs
+- AceConfigDialog-3.0: Sort multiselects with "radio" style
+- AceGUI-3.0: Support for WoW 5.0
+- AceGUI-3.0: MultiLineEditBox: Support shift-click'ing items/spells/etc. into the editbox
+- AceGUI-3.0: Label: Fix text alignment (Ticket #301)
+- AceGUI-3.0: Checkbox: Description text on a disable checkbox should look disabled (Ticket #304)
+- AceGUI-3.0: Keybinding: Ensure the Keybinding popup is on the top level (Ticket #305)
+
 Ace3 Release - Revision r1041 (November 29th, 2011)
 ---------------------------------------------------
 - AceDB-3.0: Added locale and factionrealmregion profile keys
