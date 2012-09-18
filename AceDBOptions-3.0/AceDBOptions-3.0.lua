@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceDBOptions-3.0
 -- @release $Id$
-local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 12
+local ACEDBO_MAJOR, ACEDBO_MINOR = "AceDBOptions-3.0", 13
 local AceDBOptions, oldminor = LibStub:NewLibrary(ACEDBO_MAJOR, ACEDBO_MINOR)
 
 if not AceDBOptions then return end -- No upgrade needed
@@ -187,6 +187,26 @@ elseif LOCALE == "ruRU" then
 	L["profiles"] = "Профили"
 	L["profiles_sub"] = "Управление профилями"
 	--L["current"] = "Current Profile:"
+elseif LOCALE == "itIT" then
+	L["default"] = "Standard"
+	L["intro"] = "Puoi cambiare il profilo attivo, in modo da usare impostazioni diverse per ogni personaggio."
+	L["reset_desc"] = "Riporta il tuo profilo attivo alle sue impostazioni di default, nel caso in cui la tua configurazione si sia corrotta, o semplicemente tu voglia re-inizializzarla."
+	L["reset"] = "Reimposta Profilo"
+	L["reset_sub"] = "Reimposta il profilo ai suoi valori di default."
+	L["choose_desc"] = "Puoi creare un nuovo profilo digitando il nome della casella di testo, oppure scegliendone uno tra i profili gia' esistenti."
+	L["new"] = "Nuovo"
+	L["new_sub"] = "Crea un nuovo profilo vuoto."
+	L["choose"] = "Profili esistenti"
+	L["choose_sub"] = "Seleziona uno dei profili disponibili."
+	L["copy_desc"] = "Copia le impostazioni da un profilo esistente, nel profilo attivo in questo momento."
+	L["copy"] = "Copia Da"
+	L["delete_desc"] = "Cancella i profili non utilizzati dal database per risparmiare spazio e mantenere puliti i file di configurazione SavedVariables."
+	L["delete"] = "Cancella un profilo"
+	L["delete_sub"] = "Cancella un profilo dal Database."
+	L["delete_confirm"] = "Sei sicuro di voler cancellare il profilo selezionato?"
+	L["profiles"] = "Profili"
+	L["profiles_sub"] = "Gestisci Profili"
+	L["current"] = "Profilo Attivo:"
 end
 
 local defaultProfiles
