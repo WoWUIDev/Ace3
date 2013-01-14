@@ -17,7 +17,7 @@
 -- @name AceTimer-3.0
 -- @release $Id$
 
-local MAJOR, MINOR = "AceTimer-3.0", 11 -- Bump minor on changes
+local MAJOR, MINOR = "AceTimer-3.0", 12 -- Bump minor on changes
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -36,6 +36,9 @@ local activeTimers = AceTimer.activeTimers
 local aceTimerHashCompatTable = AceTimer.hashCompatTable
 
 local function OnFinished(self)
+	-- check if the timer is still live, because its possible a timer gets stoped just shortly before its meant to fire, and the OnFinished is still called in this case
+	-- note: args gets niled out when the timer is canceld, if this is ever changed, this check needs to be updated
+	if not self.args then return end
 	if type(self.func) == "string" then
 		self.object[self.func](self.object, unpack(self.args))
 	else
