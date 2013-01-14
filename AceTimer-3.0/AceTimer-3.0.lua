@@ -17,7 +17,7 @@
 -- @name AceTimer-3.0
 -- @release $Id$
 
-local MAJOR, MINOR = "AceTimer-3.0", 10 -- Bump minor on changes
+local MAJOR, MINOR = "AceTimer-3.0", 11 -- Bump minor on changes
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -176,7 +176,7 @@ end
 function AceTimer:CancelAllTimers()
 	for k,v in pairs(activeTimers) do
 		if v.object == self then
-			self:CancelTimer(k)
+			AceTimer.CancelTimer(self, k)
 		end
 	end
 end
