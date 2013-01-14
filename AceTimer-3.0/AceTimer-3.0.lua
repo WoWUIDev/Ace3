@@ -1,6 +1,6 @@
 --- **AceTimer-3.0** provides a central facility for registering timers.
 -- AceTimer supports one-shot timers and repeating timers. All timers are stored in an efficient
--- data structure that allows easy dispatching and fast rescheduling. Timers can be registered 
+-- data structure that allows easy dispatching and fast rescheduling. Timers can be registered
 -- or canceled at any time, even from within a running timer, without conflict or large overhead.\\
 -- AceTimer is currently limited to firing timers at a frequency of 0.01s. This constant may change
 -- in the future, but for now it seemed like a good compromise in efficiency and accuracy.
@@ -8,7 +8,7 @@
 -- All `:Schedule` functions will return a handle to the current timer, which you will need to store if you
 -- need to cancel the timer you just registered.
 --
--- **AceTimer-3.0** can be embeded into your addon, either explicitly by calling AceTimer:Embed(MyAddon) or by 
+-- **AceTimer-3.0** can be embeded into your addon, either explicitly by calling AceTimer:Embed(MyAddon) or by
 -- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
 -- and can be accessed directly, without having to explicitly call AceTimer itself.\\
 -- It is recommended to embed AceTimer, otherwise you'll have to specify a custom `self` on all calls you
@@ -96,7 +96,7 @@ end
 -- @param ... An optional, unlimited amount of arguments to pass to the callback function.
 -- @usage
 -- MyAddOn = LibStub("AceAddon-3.0"):NewAddon("MyAddOn", "AceTimer-3.0")
--- 
+--
 -- function MyAddOn:OnEnable()
 --   self:ScheduleTimer("TimerFeedback", 5)
 -- end
@@ -125,7 +125,7 @@ end
 -- @param ... An optional, unlimited amount of arguments to pass to the callback function.
 -- @usage
 -- MyAddOn = LibStub("AceAddon-3.0"):NewAddon("MyAddOn", "AceTimer-3.0")
--- 
+--
 -- function MyAddOn:OnEnable()
 --   self.timerCount = 0
 --   self.testTimer = self:ScheduleRepeatingTimer("TimerFeedback", 5)
@@ -243,7 +243,7 @@ end
 AceTimer.embeds = AceTimer.embeds or {}
 
 local mixins = {
-	"ScheduleTimer", "ScheduleRepeatingTimer", 
+	"ScheduleTimer", "ScheduleRepeatingTimer",
 	"CancelTimer", "CancelAllTimers",
 	"TimeLeft"
 }
