@@ -17,7 +17,7 @@
 -- @name AceTimer-3.0
 -- @release $Id$
 
-local MAJOR, MINOR = "AceTimer-3.0", 13 -- Bump minor on changes
+local MAJOR, MINOR = "AceTimer-3.0", 14 -- Bump minor on changes
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -27,7 +27,7 @@ AceTimer.inactiveTimers = AceTimer.inactiveTimers or {}                    -- ti
 AceTimer.activeTimers = AceTimer.activeTimers or {}                        -- active timer list
 
 -- Lua APIs
-local type, unpack, next, error, pairs, debugprofilestop = type, unpack, next, error, pairs, debugprofilestop
+local type, unpack, next, error, pairs, tostring = type, unpack, next, error, pairs, tostring
 
 -- Upvalue our private data
 local inactiveTimers = AceTimer.inactiveTimers
@@ -79,7 +79,7 @@ local function new(self, loop, func, delay, ...)
 	end
 	timer:SetDuration(delay)
 
-	local id = debugprofilestop()
+	local id = tostring(timer.args)
 	timer.id = id
 	activeTimers[id] = timer
 
