@@ -17,13 +17,12 @@
 -- @name AceTimer-3.0
 -- @release $Id$
 
-local MAJOR, MINOR = "AceTimer-3.0", 12 -- Bump minor on changes
+local MAJOR, MINOR = "AceTimer-3.0", 13 -- Bump minor on changes
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
 
 AceTimer.frame = AceTimer.frame or CreateFrame("Frame", "AceTimer30Frame")
-AceTimer.hashCompatTable = AceTimer.hashCompatTable or {}                  -- compat table for pre-animation timers
 AceTimer.inactiveTimers = AceTimer.inactiveTimers or {}                    -- timer recycling storage
 AceTimer.activeTimers = AceTimer.activeTimers or {}                        -- active timer list
 
@@ -33,7 +32,6 @@ local type, unpack, next, error, pairs, debugprofilestop = type, unpack, next, e
 -- Upvalue our private data
 local inactiveTimers = AceTimer.inactiveTimers
 local activeTimers = AceTimer.activeTimers
-local aceTimerHashCompatTable = AceTimer.hashCompatTable
 
 local function OnFinished(self)
 	-- check if the timer is still live, because its possible a timer gets stoped just shortly before its meant to fire, and the OnFinished is still called in this case
@@ -158,11 +156,6 @@ end
 -- and the timer has not fired yet or was canceled before.
 -- @param id The id of the timer, as returned by `:ScheduleTimer` or `:ScheduleRepeatingTimer`
 function AceTimer:CancelTimer(id)
-	if type(id) == "string" then -- AceTimer3 v6 or previous
-		id = aceTimerHashCompatTable[id]
-		if not id then return false end
-	end
-
 	local timer = activeTimers[id]
 	if not timer then return false end
 
@@ -189,11 +182,6 @@ end
 -- @param id The id of the timer, as returned by `:ScheduleTimer` or `:ScheduleRepeatingTimer`
 -- @return The time left on the timer.
 function AceTimer:TimeLeft(id)
-	if type(id) == "string" then -- AceTimer3 v6 or previous
-		id = aceTimerHashCompatTable[id]
-		if not id then return 0 end
-	end
-
 	local timer = activeTimers[id]
 	if not timer then return 0 end
 	return timer:GetDuration() - timer:GetElapsed()
@@ -213,19 +201,33 @@ if oldminor and oldminor < 10 then
 	for object,timers in pairs(AceTimer.selfs) do
 		for handle,timer in pairs(timers) do
 			if type(timer) == "table" and timer.callback then
+				local id
 				if timer.delay then
-					local id = AceTimer.ScheduleRepeatingTimer(timer.object, timer.callback, timer.delay, timer.arg)
-					aceTimerHashCompatTable[handle] = id
+					id = AceTimer.ScheduleRepeatingTimer(timer.object, timer.callback, timer.delay, timer.arg)
 				else
-					local id = AceTimer.ScheduleTimer(timer.object, timer.callback, timer.when - GetTime(), timer.arg)
-					aceTimerHashCompatTable[handle] = id
+					id = AceTimer.ScheduleTimer(timer.object, timer.callback, timer.when - GetTime(), timer.arg)
 				end
+				-- change id to the old handle
+				local t = activeTimers[id]
+				activeTimers[id] = nil
+				activeTimers[handle] = t
+				t.id = handle
 			end
 		end
 	end
 	AceTimer.selfs = nil
 	AceTimer.hash = nil
 	AceTimer.debug = nil
+elseif oldminor and oldminor < 13 then
+	for handle, id in pairs(AceTimer.hashCompatTable) do
+		local t = activeTimers[id]
+		if t then
+			activeTimers[id] = nil
+			activeTimers[handle] = t
+			t.id = handle
+		end
+	end
+	AceTimer.hashCompatTable = nil
 end
 
 -- upgrade existing timers to the latest OnFinished
