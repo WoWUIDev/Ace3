@@ -3,7 +3,7 @@
 -- data structure that allows easy dispatching and fast rescheduling. Timers can be registered
 -- or canceled at any time, even from within a running timer, without conflict or large overhead.\\
 -- AceTimer is currently limited to firing timers at a frequency of 0.01s. This constant may change
--- in the future, but for now it seemed like a good compromise in efficiency and accuracy.
+-- in the future, but for now it's required as animations with lower frequencies are buggy.
 --
 -- All `:Schedule` functions will return a handle to the current timer, which you will need to store if you
 -- need to cancel the timer you just registered.
@@ -60,8 +60,8 @@ local function new(self, loop, func, delay, ...)
 		timer:SetScript("OnFinished", OnFinished)
 	end
 
-	-- too low delays cause the animations to not work anymore.
-	-- a maximum resolution of 0.01 seems reasonable.
+	-- Very low delays cause the animations to fail randomly.
+	-- A limited resolution of 0.01 seems reasonable.
 	if delay < 0.01 then
 		delay = 0.01
 	end
