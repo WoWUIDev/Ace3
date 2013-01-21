@@ -17,14 +17,14 @@
 -- @name AceTimer-3.0
 -- @release $Id$
 
-local MAJOR, MINOR = "AceTimer-3.0", 14 -- Bump minor on changes
+local MAJOR, MINOR = "AceTimer-3.0", 15 -- Bump minor on changes
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
 
-AceTimer.frame = AceTimer.frame or CreateFrame("Frame", "AceTimer30Frame")
-AceTimer.inactiveTimers = AceTimer.inactiveTimers or {}                    -- timer recycling storage
-AceTimer.activeTimers = AceTimer.activeTimers or {}                        -- active timer list
+AceTimer.frame = AceTimer.frame or CreateFrame("Frame", "AceTimer30Frame") -- Animation parent
+AceTimer.inactiveTimers = AceTimer.inactiveTimers or {}                    -- Timer recycling storage
+AceTimer.activeTimers = AceTimer.activeTimers or {}                        -- Active timer list
 
 -- Lua APIs
 local type, unpack, next, error, pairs, tostring = type, unpack, next, error, pairs, tostring
@@ -34,16 +34,16 @@ local inactiveTimers = AceTimer.inactiveTimers
 local activeTimers = AceTimer.activeTimers
 
 local function OnFinished(self)
-	-- check if the timer is still live, because its possible a timer gets stoped just shortly before its meant to fire, and the OnFinished is still called in this case
-	-- note: args gets niled out when the timer is canceld, if this is ever changed, this check needs to be updated
-	if not self.args then return end
+	local id = self.id
 	if type(self.func) == "string" then
 		self.object[self.func](self.object, unpack(self.args))
 	else
 		self.func(unpack(self.args))
 	end
 
-	if not self.looping then
+	-- If the id is different it means that the timer was already cancelled
+	-- and has been used to create a new timer during the OnFinished callback.
+	if not self.looping and id == self.id then
 		activeTimers[self.id] = nil
 		self.args = nil
 		inactiveTimers[self] = true
@@ -56,7 +56,7 @@ local function new(self, loop, func, delay, ...)
 		inactiveTimers[timer] = nil
 	else
 		local anim = AceTimer.frame:CreateAnimationGroup()
-		timer = anim:CreateAnimation("Animation")
+		timer = anim:CreateAnimation()
 		timer:SetScript("OnFinished", OnFinished)
 	end
 
