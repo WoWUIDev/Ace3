@@ -1,3 +1,11 @@
+Ace3 Release - Revision r1078 (February 10th, 2013)
+---------------------------------------------------
+- AceTimer-3.0: Re-write based on AnimationTimers
+- AceHook-3.0: Improved checks/error messages when trying to hook a script on a "nil" frame
+- AceDBOptions-3.0: Added Italian locale
+- AceGUI-3.0: BlizOptionsGroup: Fixed the "default" button callback
+- AceGUI-3.0: Colorpicker: The colorpicker is now clamped to the screen
+
 Ace3 Release - Revision r1061 (August 27th, 2012)
 -------------------------------------------------
 - AceConfigDialog-3.0: Try to avoid potential taints in static popup dialogs
