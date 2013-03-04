@@ -1,3 +1,8 @@
+Ace3 Release - Revision r1083 (March 4th, 2013)
+-----------------------------------------------
+- AceTimer-3.0: Fixed an issue that caused the parameter list passed to the callback to be cut off at nil values
+- AceGUI-3.0: InlineGroup: The title attribute is properly reset for recycled objects
+
 Ace3 Release - Revision r1078 (February 10th, 2013)
 ---------------------------------------------------
 - AceTimer-3.0: Re-write based on AnimationTimers
