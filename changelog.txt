@@ -1,3 +1,7 @@
+Ace3 Release - Revision r1086 (May 21st, 2013)
+----------------------------------------------
+- AceAddon-3.0: Improved behavior when loading modules during game startup, ensures proper loading order
+
 Ace3 Release - Revision r1083 (March 4th, 2013)
 -----------------------------------------------
 - AceTimer-3.0: Fixed an issue that caused the parameter list passed to the callback to be cut off at nil values
