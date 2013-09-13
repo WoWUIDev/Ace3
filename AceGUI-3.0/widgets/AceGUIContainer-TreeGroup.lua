@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 35
+local Type, Version = "TreeGroup", 36
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -466,7 +466,6 @@ local methods = {
 		end
 
 		local buttonnum = 1
-		print(first,last,numlines)
 		for i = first, last do
 			local line = lines[i]
 			local button = buttons[buttonnum]
