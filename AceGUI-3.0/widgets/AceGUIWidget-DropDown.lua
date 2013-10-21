@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 26
+	local widgetVersion = 27
 	
 	--[[ Static data ]]--
 	
@@ -517,9 +517,9 @@ do
 		if text and text ~= "" then
 			self.label:SetText(text)
 			self.label:Show()
-			self.dropdown:SetPoint("TOPLEFT",self.frame,"TOPLEFT",-15,-18)
-			self:SetHeight(44)
-			self.alignoffset = 30
+			self.dropdown:SetPoint("TOPLEFT",self.frame,"TOPLEFT",-15,-14)
+			self:SetHeight(40)
+			self.alignoffset = 26
 		else
 			self.label:SetText("")
 			self.label:Hide()
@@ -669,7 +669,7 @@ do
 		self.SetItemValue = SetItemValue
 		self.SetItemDisabled = SetItemDisabled
 		
-		self.alignoffset = 30
+		self.alignoffset = 26
 		
 		frame:SetScript("OnHide",Dropdown_OnHide)
 
