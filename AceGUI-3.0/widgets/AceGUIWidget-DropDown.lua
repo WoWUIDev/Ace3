@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 27
+	local widgetVersion = 28
 	
 	--[[ Static data ]]--
 	
@@ -388,7 +388,7 @@ do
 			AceGUI:ClearFocus()
 		else
 			self.open = true
-			self.pullout:SetWidth(self.frame:GetWidth())
+			self.pullout:SetWidth(self.pulloutWidth or self.frame:GetWidth())
 			self.pullout:Open("TOPLEFT", self.frame, "BOTTOMLEFT", 0, self.label:IsShown() and -2 or 0)
 			AceGUI:SetFocus(self)
 		end
@@ -463,6 +463,7 @@ do
 		self:SetHeight(44)
 		self:SetWidth(200)
 		self:SetLabel()
+		self:SetPulloutWidth(nil)
 	end
 	
 	-- exported, AceGUI callback
@@ -637,6 +638,10 @@ do
 		return self.multiselect
 	end
 	
+	local function SetPulloutWidth(self, width)
+		self.pulloutWidth = width
+	end
+	
 	--[[ Constructor ]]--
 	
 	local function Constructor()
@@ -668,6 +673,7 @@ do
 		self.GetMultiselect = GetMultiselect
 		self.SetItemValue = SetItemValue
 		self.SetItemDisabled = SetItemDisabled
+		self.SetPulloutWidth = SetPulloutWidth
 		
 		self.alignoffset = 26
 		
