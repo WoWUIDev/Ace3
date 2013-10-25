@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 28
+	local widgetVersion = 29
 	
 	--[[ Static data ]]--
 	
@@ -405,6 +405,7 @@ do
 		end
 		
 		self.open = true
+		self:Fire("OnOpened")
 	end
 
 	local function OnPulloutClose(this)
