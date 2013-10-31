@@ -1,3 +1,9 @@
+Ace3 Release - Revision r1104 (October 31st, 2013)
+--------------------------------------------------
+AceGUI-3.0: Flow Layout: Added a safeguard to prevent an infinite loop in the layout engine
+AceGUI-3.0: DropDown: Adjust its style slightly to closer resemble the Blizzard DropDown Widget
+AceGUI-3.0: DropDown: API enhancements to specify the width of the pullout and be notified when its opened
+
 Ace3 Release - Revision r1098 (September 13th, 2013)
 ----------------------------------------------------
 AceDB-3.0: Switch characters to the default profile if their active profile is deleted (Ticket #324)
