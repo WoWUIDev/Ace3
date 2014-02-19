@@ -17,7 +17,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 
 ]]
 
-local MAJOR, MINOR = "AceComm-3.0", 7
+local MAJOR, MINOR = "AceComm-3.0", 8
 
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -32,6 +32,9 @@ local strsub, strfind = string.sub, string.find
 local match = string.match
 local tinsert, tconcat = table.insert, table.concat
 local error, assert = error, assert
+
+-- WoW APIs
+local Ambiguate = Ambiguate
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
@@ -318,9 +321,9 @@ else -- 4.1+: only one prefix for all
 	AceComm.callbacks.OnUsed = nil
 	AceComm.callbacks.OnUnused = nil
 	
-	function OnEvent(this, event, ...)
+	function OnEvent(self, event, prefix, message, distribution, sender)
 		if event == "CHAT_MSG_ADDON" then
-			local prefix,message,distribution,sender = ...
+			sender = Ambiguate(sender, "none")
 			local control, rest = match(message, "^([\001-\009])(.*)")
 			if control then
 				if control==MSG_MULTI_FIRST then
