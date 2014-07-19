@@ -260,8 +260,10 @@ local _, classKey = UnitClass("player")
 local _, raceKey = UnitRace("player")
 local factionKey = UnitFactionGroup("player")
 local factionrealmKey = factionKey .. " - " .. realmKey
-local factionrealmregionKey = factionrealmKey .. " - " .. string.sub(GetCVar("realmList"), 1, 2):upper()
 local localeKey = GetLocale():lower()
+
+local regionKey = GetCVar("portal") == "public-test" and "PTR" or GetCVar("portal")
+local factionrealmregionKey = factionrealmKey .. " - " .. regionKey
 
 -- Actual database initialization function
 local function initdb(sv, defaults, defaultProfile, olddb, parent)
