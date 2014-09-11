@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 58
+local MAJOR, MINOR = "AceConfigDialog-3.0", 59
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1815,6 +1815,14 @@ function AceConfigDialog:Open(appName, container, ...)
 	end
 	for n = 1, select("#",...) do
 		tinsert(path, (select(n, ...)))
+	end
+	
+	local option = options
+	if type(container) == "table" and container.type == "BlizOptionsGroup" and #path > 0 then
+		for i = 1, #path do
+			option = options.args[path[i]]
+		end
+		name = format("%s - %s", name, GetOptionsMemberValue("name", option, options, path, appName))
 	end
 	
 	--if a container is given feed into that
