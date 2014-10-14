@@ -303,7 +303,7 @@ local function initdb(sv, defaults, defaultProfile, olddb, parent)
 		["factionrealm"] = factionrealmKey,
 		["factionrealmregion"] = factionrealmregionKey,
 		["profile"] = profileKey,
-        ["locale"] = localeKey,
+		["locale"] = localeKey,
 		["global"] = true,
 		["profiles"] = true,
 	}
