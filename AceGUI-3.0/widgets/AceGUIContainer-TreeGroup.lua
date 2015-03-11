@@ -335,7 +335,7 @@ local methods = {
 		button.toggle.button = button
 		button.toggle:SetScript("OnClick",Expand_OnClick)
 
-		button.text:SetWordWrap(false)
+		button.text:SetHeight(14) -- Prevents text wrapping
 
 		return button
 	end,
