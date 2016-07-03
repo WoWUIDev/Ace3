@@ -4,7 +4,7 @@
 -- @release $Id$
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 60
+local MAJOR, MINOR = "AceConfigDialog-3.0", 61
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1092,7 +1092,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local imageCoords = GetOptionsMemberValue("imageCoords",v, options, path, appName)
 					local image, width, height = GetOptionsMemberValue("image",v, options, path, appName)
 					
-					if type(image) == "string" then
+					if type(image) == "string" or type(image) == "number" then
 						control = gui:Create("Icon")
 						if not width then
 							width = GetOptionsMemberValue("imageWidth",v, options, path, appName)
@@ -1154,7 +1154,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local image = GetOptionsMemberValue("image", v, options, path, appName)
 					local imageCoords = GetOptionsMemberValue("imageCoords", v, options, path, appName)
 					
-					if type(image) == "string" then
+					if type(image) == "string" or type(image) == "number" then
 						if type(imageCoords) == "table" then
 							control:SetImage(image, unpack(imageCoords))
 						else
@@ -1354,7 +1354,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					local imageCoords = GetOptionsMemberValue("imageCoords",v, options, path, appName)
 					local image, width, height = GetOptionsMemberValue("image",v, options, path, appName)
 					
-					if type(image) == "string" then
+					if type(image) == "string" or type(image) == "number" then
 						if not width then
 							width = GetOptionsMemberValue("imageWidth",v, options, path, appName)
 						end
