@@ -107,6 +107,7 @@ local function Keybinding_OnMouseDown(frame, button)
 end
 
 local function Keybinding_OnMouseWheel(frame, direction)
+	local button
 	if direction >= 0 then
 		button = "MOUSEWHEELUP"
 	else
