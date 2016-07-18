@@ -1,3 +1,12 @@
+Ace3 Release - Revision r1151 (July 18th, 2016)
+-----------------------------------------------
+- AceConfig-3.0: Allow specifying images using the numeric fileID (Ticket #389)
+- AceGUI-3.0: Use SetColorTexture in WoW 7.0
+- AceGUI-3.0: Expose the HighlightText API for EditBox and MultiLineEditBox Widgets (Ticket #378)
+- AceGUI-3.0: Keybinding: Support MouseWheel Up/Down bindings (Ticket #372)
+- AceGUI-3.0: TreeGroup: Refresh the tree in an OnUpdate once after Acquire, not only after creation (Fixes missing tree in WoW 7.0)
+- AceSerializer-3.0: Create consistent tokens for infinity, independent of the clients platform
+
 Ace3 Release - Revision r1134 (June 23rd, 2015)
 -----------------------------------------------
 - AceGUI-3.0: TreeGroup: Prevent Word Wrap in tree elements
