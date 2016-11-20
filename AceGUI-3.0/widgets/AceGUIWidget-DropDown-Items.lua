@@ -2,8 +2,6 @@
 
 local AceGUI = LibStub("AceGUI-3.0")
 
-local IsLegion = select(4, GetBuildInfo()) >= 70000
-
 -- Lua APIs
 local select, assert = select, assert
 
@@ -457,11 +455,7 @@ do
 		
 		local line = self.frame:CreateTexture(nil, "OVERLAY")
 		line:SetHeight(1)
-		if IsLegion then
-			line:SetColorTexture(.5, .5, .5)
-		else
-			line:SetTexture(.5, .5, .5)
-		end
+		line:SetColorTexture(.5, .5, .5)
 		line:SetPoint("LEFT", self.frame, "LEFT", 10, 0)
 		line:SetPoint("RIGHT", self.frame, "RIGHT", -10, 0)
 		
