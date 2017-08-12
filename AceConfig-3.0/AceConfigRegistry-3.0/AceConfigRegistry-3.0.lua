@@ -9,14 +9,14 @@
 -- @class file
 -- @name AceConfigRegistry-3.0
 -- @release $Id$
+local CallbackHandler = LibStub("CallbackHandler-1.0")
+
 local MAJOR, MINOR = "AceConfigRegistry-3.0", 16
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
 
 AceConfigRegistry.tables = AceConfigRegistry.tables or {}
-
-local CallbackHandler = LibStub:GetLibrary("CallbackHandler-1.0")
 
 if not AceConfigRegistry.callbacks then
 	AceConfigRegistry.callbacks = CallbackHandler:New(AceConfigRegistry)
