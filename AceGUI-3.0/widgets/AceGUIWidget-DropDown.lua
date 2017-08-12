@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 30
+	local widgetVersion = 31
 	
 	--[[ Static data ]]--
 	
