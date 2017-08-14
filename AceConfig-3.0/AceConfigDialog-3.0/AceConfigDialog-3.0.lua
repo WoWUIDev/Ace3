@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 62
+local MAJOR, MINOR = "AceConfigDialog-3.0", 63
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -696,30 +696,24 @@ local function ActivateControl(widget, event, ...)
 	end
 	
 	local rootframe = user.rootframe
-	if type(validated) == "string" then
-		--validate function returned a message to display
+	if not validated or type(validated) == "string" then
+		if not validated then
+			if usage then
+				validated = name..": "..usage
+			else
+				if pattern then
+					validated = name..": Expected "..pattern
+				else
+					validated = name..": Invalid Value"
+				end
+			end
+		end
+
+		-- show validate message
 		if rootframe.SetStatusText then
 			rootframe:SetStatusText(validated)
 		else
 			-- TODO: do something else.
-		end
-		PlaySound(PlaySoundKitID and "igPlayerInviteDecline" or 882) -- SOUNDKIT.IG_PLAYER_INVITE_DECLINE || XXX _DECLINE is actually missing from the table
-		del(info)
-		return true
-	elseif not validated then
-		--validate returned false	
-		if rootframe.SetStatusText then
-			if usage then
-				rootframe:SetStatusText(name..": "..usage)
-			else
-				if pattern then
-					rootframe:SetStatusText(name..": Expected "..pattern)
-				else
-					rootframe:SetStatusText(name..": Invalid Value")
-				end
-			end
-		else
-			-- TODO: do something else
 		end
 		PlaySound(PlaySoundKitID and "igPlayerInviteDecline" or 882) -- SOUNDKIT.IG_PLAYER_INVITE_DECLINE || XXX _DECLINE is actually missing from the table
 		del(info)
