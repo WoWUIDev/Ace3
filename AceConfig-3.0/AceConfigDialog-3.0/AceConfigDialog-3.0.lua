@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 64
+local MAJOR, MINOR = "AceConfigDialog-3.0", 65
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1034,6 +1034,7 @@ local function BuildGroups(group, options, path, appName, recurse)
 				entry.value = k
 				entry.text = GetOptionsMemberValue("name", v, options, path, appName)
 				entry.icon = GetOptionsMemberValue("icon", v, options, path, appName)
+				entry.iconCoords = GetOptionsMemberValue("iconCoords", v, options, path, appName)
 				entry.disabled = CheckOptionDisabled(v, options, path, appName)
 				tinsert(tree,entry)
 				if recurse and (v.childGroups or "tree") == "tree" then
