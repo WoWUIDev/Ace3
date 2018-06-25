@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 35
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 36
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -814,7 +814,10 @@ AceGUI:RegisterLayout("Flow",
 
 -- Get alignment method and value. Possible alignment methods are a callback, a number, "start", "middle", "end", "fill" or "TOPLEFT", "BOTTOMRIGHT" etc.
 local GetCellAlign = function (dir, tableObj, colObj, cellObj, cell, child)
-	local fn = cellObj["align" .. dir] or cellObj.align or colObj["align" .. dir] or colObj.align or tableObj["align" .. dir] or tableObj.align or "CENTERLEFT"
+	local fn = cellObj and (cellObj["align" .. dir] or cellObj.align)
+			or colObj and (colObj["align" .. dir] or colObj.align)
+			or tableObj["align" .. dir] or tableObj.align
+			or "CENTERLEFT"
 	local child, cell, val = child or 0, cell or 0, nil
 
 	if type(fn) == "string" then
@@ -863,31 +866,36 @@ AceGUI:RegisterLayout("Table",
 		local obj = content.obj
 		obj:PauseLayout()
 
-		local tableObj = obj:GetUserData("table") or {}
+		local tableObj = obj:GetUserData("table")
 		local cols = tableObj.columns
 		local spaceH = tableObj.spaceH or tableObj.space or 0
 		local spaceV = tableObj.spaceV or tableObj.space or 0
 		local totalH = (content:GetWidth() or content.width or 0) - spaceH * (#cols - 1)
-		local t, laneH, laneV, rowspans = {}, {}, {}, {}
-
+		
+		-- We need to reuse these because layout events can come in very frequently
+		local layoutCache = obj:GetUserData("layoutCache")
+		if not layoutCache then
+			layoutCache = {{}, {}, {}, {}, {}, {}}
+			obj:SetUserData("layoutCache", layoutCache)
+		end
+		local t, laneH, laneV, rowspans, rowStart, colStart = unpack(layoutCache)
+		
 		-- Create the grid
-		local n, slotFound = 1
+		local n, slotFound = 0
 		for i,child in ipairs(children) do
 			if child:IsShown() then
 				repeat
+					n = n + 1
 					local col = (n - 1) % #cols + 1
 					local row = ceil(n / #cols)
 					local rowspan = rowspans[col]
-					local cell = rowspan and rowspan.cell or child
-					local cellObj = cell:GetUserData("cell") or {}
+					local cell = rowspan and rowspan.child or child
+					local cellObj = cell:GetUserData("cell")
 					slotFound = not rowspan
 
-					-- First col
-					if col == 1 then t[row] = {} end
-
 					-- Rowspan
-					if not rowspan and cellObj.rowspan then
-						rowspan = {cell = cell, from = row, to = row + cellObj.rowspan - 1}
+					if not rowspan and cellObj and cellObj.rowspan then
+						rowspan = {child = child, from = row, to = row + cellObj.rowspan - 1}
 						rowspans[col] = rowspan
 					end
 					if rowspan and i == #children then
@@ -895,25 +903,24 @@ AceGUI:RegisterLayout("Table",
 					end
 
 					-- Colspan
-					local colspan = max(0, min((cellObj.colspan or 1) - 1, #cols - col))
+					local colspan = max(0, min((cellObj and cellObj.colspan or 1) - 1, #cols - col))
+					n = n + colspan
 
 					-- Place the cell
 					if not rowspan or rowspan.to == row then
-						t[row][col + colspan] = {
-							child = cell,
-							rowStart = rowspan and rowspan.from or row,
-							colStart = col,
-						}
+						t[n] = cell
+						rowStart[cell] = rowspan and rowspan.from or row
+						colStart[cell] = col
 
 						if rowspan then
 							rowspans[col] = nil
 						end
 					end
-
-					n = n + colspan + 1
 				until slotFound
 			end
 		end
+
+		local rows = ceil(n / #cols)
 
 		-- Determine fixed size cols and collect weights
 		local extantH, totalWeight = totalH, 0
@@ -931,14 +938,14 @@ AceGUI:RegisterLayout("Table",
 			else
 				if not colObj.width or colObj.width <= 0 then
 					-- Content width
-					for row=1,#t do
-						local cell = t[row][col]
-						if cell then
-							local f = cell.child.frame
+					for row=1,rows do
+						local child = t[(row - 1) * #cols + col]
+						if child then
+							local f = child.frame
 							f:ClearAllPoints()
 							local childH = f:GetWidth() or 0
-
-							laneH[col] = max(laneH[col], childH - GetCellDimension("H", laneH, cell.colStart, col - 1, spaceH))
+		
+							laneH[col] = max(laneH[col], childH - GetCellDimension("H", laneH, colStart[child], col - 1, spaceH))
 						end
 					end
 
@@ -960,19 +967,18 @@ AceGUI:RegisterLayout("Table",
 		end
 
 		-- Arrange children
-		for row,cells in ipairs(t) do
+		for row=1,rows do
 			local rowV = 0
 
 			-- Horizontal placement and sizing
 			for col=1,#cols do
-				local cell = t[row][col]
-				if cell then
-					local child = cell.child
-					local colObj = cols[cell.colStart]
-					local cellObj = child:GetUserData("cell") or {}
-					local offsetH = GetCellDimension("H", laneH, 1, cell.colStart - 1, spaceH) + (cell.colStart == 1 and 0 or spaceH)
-					local cellH = GetCellDimension("H", laneH, cell.colStart, col, spaceH)
-
+				local child = t[(row - 1) * #cols + col]
+				if child then
+					local colObj = cols[colStart[child]]
+					local cellObj = child:GetUserData("cell")
+					local offsetH = GetCellDimension("H", laneH, 1, colStart[child] - 1, spaceH) + (colStart[child] == 1 and 0 or spaceH)
+					local cellH = GetCellDimension("H", laneH, colStart[child], col, spaceH)
+					
 					local f = child.frame
 					f:ClearAllPoints()
 					local childH = f:GetWidth() or 0
@@ -982,38 +988,43 @@ AceGUI:RegisterLayout("Table",
 					if child:IsFullWidth() or alignFn == "fill" or childH > cellH then
 						f:SetPoint("RIGHT", content, "LEFT", offsetH + align + cellH, 0)
 					end
-
+					
 					if child.DoLayout then
 						child:DoLayout()
 					end
 
-					rowV = max(rowV, (f:GetHeight() or 0) - GetCellDimension("V", laneV, cell.rowStart, row - 1, spaceV))
+					rowV = max(rowV, (f:GetHeight() or 0) - GetCellDimension("V", laneV, rowStart[child], row - 1, spaceV))
 				end
 			end
 
 			laneV[row] = rowV
 
 			-- Vertical placement and sizing
-			for col,cell in pairs(cells) do
-				local child = cell.child
-				local colObj = cols[cell.colStart]
-				local cellObj = child:GetUserData("cell") or {}
-				local offsetV = GetCellDimension("V", laneV, 1, cell.rowStart - 1, spaceV) + (cell.rowStart == 1 and 0 or spaceV)
-				local cellV = GetCellDimension("V", laneV, cell.rowStart, row, spaceV)
+			for col=1,#cols do
+				local child = t[(row - 1) * #cols + col]
+				if child then
+					local colObj = cols[colStart[child]]
+					local cellObj = child:GetUserData("cell")
+					local offsetV = GetCellDimension("V", laneV, 1, rowStart[child] - 1, spaceV) + (rowStart[child] == 1 and 0 or spaceV)
+					local cellV = GetCellDimension("V", laneV, rowStart[child], row, spaceV)
+						
+					local f = child.frame
+					local childV = f:GetHeight() or 0
 
-				local f = child.frame
-				local childV = f:GetHeight() or 0
-
-				local alignFn, align = GetCellAlign("V", tableObj, colObj, cellObj, cellV, childV)
-				if child:IsFullHeight() or alignFn == "fill" then
-					f:SetHeight(cellV)
+					local alignFn, align = GetCellAlign("V", tableObj, colObj, cellObj, cellV, childV)
+					if child:IsFullHeight() or alignFn == "fill" then
+						f:SetHeight(cellV)
+					end
+					f:SetPoint("TOP", content, 0, -(offsetV + align))
 				end
-				f:SetPoint("TOP", content, 0, -(offsetV + align))
 			end
 		end
 
 		-- Calculate total height
 		local totalV = GetCellDimension("V", laneV, 1, #laneV, spaceV)
+		
+		-- Cleanup
+		for _,v in pairs(layoutCache) do wipe(v) end
 
 		safecall(obj.LayoutFinished, obj, nil, totalV)
 		obj:ResumeLayout()
