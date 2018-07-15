@@ -202,6 +202,7 @@ local methods = {
 				local desc = self.frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 				desc:ClearAllPoints()
 				desc:SetPoint("TOPLEFT", self.checkbg, "TOPRIGHT", 5, -21)
+				desc:SetWidth(self.frame.width - 30)
 				desc:SetPoint("RIGHT", self.frame, "RIGHT", -30, 0)
 				desc:SetJustifyH("LEFT")
 				desc:SetJustifyV("TOP")
