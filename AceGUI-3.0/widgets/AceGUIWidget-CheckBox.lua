@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Checkbox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "CheckBox", 24
+local Type, Version = "CheckBox", 25
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -26,7 +26,7 @@ local function AlignImage(self)
 		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
 		self.text:SetPoint("RIGHT")
 	else
-		self.text:SetPoint("LEFT", self.checkbg, "RIGHT", self.image:GetWidth() + 2, 0)
+		self.text:SetPoint("LEFT", self.image, "RIGHT", 1, 0)
 		self.text:SetPoint("RIGHT")
 	end
 end

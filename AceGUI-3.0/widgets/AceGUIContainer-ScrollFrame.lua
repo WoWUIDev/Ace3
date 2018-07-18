@@ -2,7 +2,7 @@
 ScrollFrame Container
 Plain container that scrolls its content and doesn't grow in height.
 -------------------------------------------------------------------------------]]
-local Type, Version = "ScrollFrame", 24
+local Type, Version = "ScrollFrame", 25
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -128,6 +128,11 @@ local methods = {
 
 	["LayoutFinished"] = function(self, width, height)
 		self.content:SetHeight(height or 0 + 20)
+
+		-- update the scrollframe
+		self:FixScroll()
+
+		-- schedule another update when everything has "settled"
 		self.scrollframe:SetScript("OnUpdate", FixScrollOnUpdate)
 	end,
 
