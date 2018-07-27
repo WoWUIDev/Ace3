@@ -55,16 +55,12 @@ local function UpdateImageAnchor(self)
 		-- no image shown
 		label:SetPoint("TOPLEFT")
 		label:SetWidth(width)
-
-		-- get the string height, of a space character if we need to
-		local text = label:GetText()
-		if not text or text == "" then
-			label:SetText(" ")
-			height = label:GetStringHeight()
-			label:SetText(text)
-		else
-			height = label:GetStringHeight()
-		end
+		height = label:GetStringHeight()
+	end
+	
+	-- avoid zero-height labels, since they can used as spacers
+	if not height or height == 0 then
+		height = 1
 	end
 	
 	self.resizing = true
