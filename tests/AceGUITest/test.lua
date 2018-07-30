@@ -382,7 +382,7 @@ do
 			local name, texture = GetMacroInfo(strsub(self.value,7))
 			return texture
 		end
-		return "Interface\\Icons\\INV_Misc_QuestionMark"
+		return 134400 -- Interface\\Icons\\INV_Misc_QuestionMark
 	end
 	
 	local function GetValueFromParams(objType, Info1, Info2)
@@ -533,7 +533,7 @@ end
 groups.description = {
 	type = 'description',
 	name = 'This is a test Description Icon + Width and height from a function, no coords',
-	image = function() return "Interface\\Icons\\Temp.blp", 100, 100 end,
+	image = function() return 136235, 100, 100 end, -- Interface\\Icons\\Temp
 	--imageCoords = { 0, 0.5, 0, 0.5 },
 	order = 1,
 }
@@ -541,7 +541,7 @@ groups.description = {
 groups.description2 = {
 	type = 'description',
 	name = 'This is a test Description Image + width and height directly set',
-	image = "Interface\\Icons\\Temp.blp",
+	image = 136235, -- Interface\\Icons\\Temp
 	imageCoords = { 0, 0.5, 0, 0.5 },
 	imageWidth = 100,
 	imageHeight = 100,
@@ -551,7 +551,7 @@ groups.description2 = {
 groups.description3 = {
 	type = 'description',
 	name = '',
-	image = function() return "Interface\\Icons\\Temp.blp", 100, 100 end,
+	image = function() return 136235, 100, 100 end, -- Interface\\Icons\\Temp
 	--imageCoords = { 0, 0.5, 0, 0.5 },
 	order = 3,
 }
