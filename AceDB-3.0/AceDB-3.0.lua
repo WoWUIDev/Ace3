@@ -42,13 +42,13 @@
 -- @name AceDB-3.0.lua
 -- @release $Id$
 local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 26
-local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
+local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
 
 -- Lua APIs
 local type, pairs, next, error = type, pairs, next, error
-local setmetatable, getmetatable, rawset, rawget = setmetatable, getmetatable, rawset, rawget
+local setmetatable, rawset, rawget = setmetatable, rawset, rawget
 
 -- WoW APIs
 local _G = _G
@@ -618,8 +618,6 @@ function DBObjectLib:ResetDB(defaultProfile)
 	for k,v in pairs(sv) do
 		sv[k] = nil
 	end
-
-	local parent = self.parent
 
 	initdb(sv, self.defaults, defaultProfile, self)
 
