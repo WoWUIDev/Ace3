@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 66
+local MAJOR, MINOR = "AceConfigDialog-3.0", 67
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1504,10 +1504,6 @@ local function GroupSelected(widget, event, uniquevalue)
 	end
 
 	BuildPath(feedpath, ("\001"):split(uniquevalue))
-	local group = options
-	for i = 1, #feedpath do
-		group = GetSubOption(group, feedpath[i])
-	end
 	widget:ReleaseChildren()
 	AceConfigDialog:FeedGroup(user.appName,options,widget,rootframe,feedpath)
 
