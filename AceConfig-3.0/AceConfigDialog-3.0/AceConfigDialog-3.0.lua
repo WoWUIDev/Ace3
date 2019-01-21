@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 67
+local MAJOR, MINOR = "AceConfigDialog-3.0", 68
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1035,6 +1035,19 @@ local function InjectInfo(control, options, option, path, rootframe, appName)
 	control:SetCallback("OnEnter", OptionOnMouseOver)
 end
 
+local function CreateControl(userControlType, fallbackControlType)
+	local control
+	if userControlType then
+		control = gui:Create(userControlType)
+		if not control then
+			geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(userControlType)))
+		end
+	end
+	if not control then
+		control = gui:Create(fallbackControlType)
+	end
+	return control
+end
 
 --[[
 	options - root of the options table being fed
@@ -1111,12 +1124,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control:SetCallback("OnClick",ActivateControl)
 
 				elseif v.type == "input" then
-					local controlType = v.dialogControl or v.control or (v.multiline and "MultiLineEditBox") or "EditBox"
-					control = gui:Create(controlType)
-					if not control then
-						geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
-						control = gui:Create(v.multiline and "MultiLineEditBox" or "EditBox")
-					end
+					control = CreateControl(v.dialogControl or v.control, v.multiline and "MultiLineEditBox" or "EditBox")
 					
 					if v.multiline and control.SetNumLines then
 						control:SetNumLines(tonumber(v.multiline) or 4)
@@ -1209,12 +1217,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 						control:ResumeLayout()
 						control:DoLayout()
 					else
-						local controlType = v.dialogControl or v.control or "Dropdown"
-						control = gui:Create(controlType)
-						if not control then
-							geterrorhandler()(("Invalid Custom Control Type - %s"):format(tostring(controlType)))
-							control = gui:Create("Dropdown")
-						end
+						control = CreateControl(v.dialogControl or v.control, "Dropdown")
 						local itemType = v.itemControl
 						if itemType and not gui:GetWidgetVersion(itemType) then
 							geterrorhandler()(("Invalid Custom Item Type - %s"):format(tostring(itemType)))
