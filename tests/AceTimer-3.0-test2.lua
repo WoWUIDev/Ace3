@@ -69,7 +69,7 @@ WoWAPI_FireUpdate(2)	-- Border case: at this exact bucket, we should be able to 
 assert(cnt==2, cnt)		-- This should have worked nicely
 
 errors=0
-function geterrorhandler() 
+function geterrorhandler()
 	return function(msg)
 		errors=errors+1
 		assert(strmatch(msg, "a string value"))
@@ -91,7 +91,7 @@ AceTimer.CancelTimer(obj, handle)	-- Should work
 
 
 errors=0
-function geterrorhandler() 
+function geterrorhandler()
 	return function(msg)
 		errors=errors+1
 		assert(strmatch(msg, "already cancelled"))
@@ -106,7 +106,7 @@ WoWAPI_FireUpdate(6)	-- Let the timer disappear from the buckets
 
 
 errors=0
-function geterrorhandler() 
+function geterrorhandler()
 	return function(msg)
 		errors=errors+1
 		assert(strmatch(msg, "no such timer"))
@@ -117,7 +117,7 @@ AceTimer.CancelTimer(obj, handle)	-- Should error -- doesnt exist at all
 assert(errors==1)
 
 
-function geterrorhandler() 
+function geterrorhandler()
 	return function(msg)
 		error("This shouldn't have errored!  -- "..msg)
 	end

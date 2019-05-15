@@ -162,7 +162,7 @@ assert(numwarnmsgs==1)
 
 
 -----------------------------------------------------------------------
--- Test a fencepost case: only one addon. That one addon should be 
+-- Test a fencepost case: only one addon. That one addon should be
 -- checked for every PLAYER_REGEN_ENABLED.
 
 LibStub.libs[MAJOR] = nil

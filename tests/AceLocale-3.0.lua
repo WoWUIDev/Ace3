@@ -32,7 +32,7 @@ assert(errors==1)
 _G.geterrorhandler=oldgeterrorhandler
 
 ------------------------------------------------
--- Test the silent flag working 
+-- Test the silent flag working
 
 local loc = AceLocale:NewLocale("test2", "enUS", true, true) -- silent flag set on first locale to be registered
 loc["This Exists"]=true
@@ -72,7 +72,7 @@ _G.geterrorhandler=oldgeterrorhandler
 
 
 ------------------------------------------------
--- Test silent="raw" working 
+-- Test silent="raw" working
 
 local loc = AceLocale:NewLocale("test4", "enUS", true, "raw")
 loc["This Exists"]=true

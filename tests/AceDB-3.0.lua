@@ -57,7 +57,7 @@ do
 	}
 
 	local db = LibStub("AceDB-3.0"):New({}, defaults)
-	
+
 	assert(rawget(db, "char") == nil)
 	assert(rawget(db, "realm") == nil)
 	assert(rawget(db, "class") == nil)
@@ -82,7 +82,7 @@ end
 -- Test OnProfileChanged
 do
 	local testdb = LibStub("AceDB-3.0"):New({})
-	
+
 	local triggers = {}
 
 	local function OnProfileChanged(message, db, ...)
@@ -101,7 +101,7 @@ end
 -- Test GetProfiles() fix for ACE-35
 do
 	local db = LibStub("AceDB-3.0"):New({})
-	
+
 	local profiles = {
 		"Healers",
 		"Tanks",
@@ -134,10 +134,10 @@ do
 	}
 
 	local db = LibStub("AceDB-3.0"):New({}, defaults)
-	
+
 	assert(type(db.profile.sub.monkey.sub2) == "table")
 	assert(type(db.profile.sub.apple.sub3) == "table")
-	
+
 	db.profile.sub.random.sub2.alpha = "alpha"
 end
 
@@ -150,7 +150,7 @@ do
 	}
 
 	local db = LibStub("AceDB-3.0"):New({}, defaults)
-	
+
 	table.insert(db.profile.monkey, "alpha")
 	table.insert(db.profile.random, "beta")
 
@@ -203,7 +203,7 @@ do
 	assert(testdb.profile.test == 2) --true
 	testdb:CopyProfile(firstprofile)
 	assert(testdb.profile.test == 3) --false, the value is 2
-	assert(testdb.profile.test2 == 4) --true 
+	assert(testdb.profile.test2 == 4) --true
 	assert(testdb.profile.test3.a == 1)
 end
 

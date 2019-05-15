@@ -57,7 +57,7 @@ end
 -- 3 repeating timers:
 timer1 = obj:ScheduleRepeatingTimer("Timer1", 1, "t1")
 timer2 = obj:ScheduleRepeatingTimer(Timer2, 2, "t2")
-timer3 = obj:ScheduleRepeatingTimer("Timer3", 3, "t3")	
+timer3 = obj:ScheduleRepeatingTimer("Timer3", 3, "t3")
 
 -- 2 single shot timers:
 timer4 = obj:ScheduleTimer("Timer4", 1, "t4s")
@@ -73,7 +73,7 @@ end
 
 
 -----------------------------------------------------------------------
--- Now do some basic tests of timers running at the right time and 
+-- Now do some basic tests of timers running at the right time and
 -- the right amount of times
 
 
@@ -155,7 +155,7 @@ assert(obj:CancelTimer(timer1))	-- right self - cancel timer1
 WoWAPI_FireUpdate(10.01)
 assert(t1s==0 and t2s==1)	-- timer 2 should still work
 
-obj.Timer3 = function() 
+obj.Timer3 = function()
 	t3s=t3s+1
 	t3cancelled=true
 	assert(obj:CancelTimer(timer3))

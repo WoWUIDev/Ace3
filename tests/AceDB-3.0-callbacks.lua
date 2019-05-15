@@ -7,7 +7,7 @@ dofile("serialize.lua")
 -- Test OnProfileChanged
 do
 	local testdb = LibStub("AceDB-3.0"):New({})
-	
+
 	local triggers = {}
 
 	local function OnCallback(message, db, ...)

@@ -7,53 +7,53 @@ end
 
 local function ZOMGConfig(widget, event)
 	AceGUI:Release(widget.userdata.parent)
-	
+
 	local f = AceGUI:Create("Frame")
-	
+
 	f:SetCallback("OnClose",function(widget, event) print("Closing") AceGUI:Release(widget) end )
 	f:SetTitle("ZOMG Config!")
 	f:SetStatusText("Status Bar")
 	f:SetLayout("Fill")
-	
+
 	local maingroup = AceGUI:Create("DropdownGroup")
 	maingroup:SetLayout("Fill")
 	maingroup:SetGroupList({Addons = "Addons !!", Zomg = "Zomg Addons"})
 	maingroup:SetGroup("Addons")
 	maingroup:SetTitle("")
-	
+
 	f:AddChild(maingroup)
-	
+
 	local tree = { "A", "B", "C", "D", B = { "B1", "B2", B1 = { "B11", "B12" } }, C = { "C1", "C2", C1 = { "C11", "C12" } } }
-	local text = { A = "Option 1", B = "Option 2", C = "Option 3", D = "Option 4", J = "Option 10", K = "Option 11", L = "Option 12", 
+	local text = { A = "Option 1", B = "Option 2", C = "Option 3", D = "Option 4", J = "Option 10", K = "Option 11", L = "Option 12",
 					B1 = "Option 2-1", B2 = "Option 2-2", B11 = "Option 2-1-1", B12 = "Option 2-1-2",
 					C1 = "Option 3-1", C2 = "Option 3-2", C11 = "Option 3-1-1", C12 = "Option 3-1-2" }
 	local t = AceGUI:Create("TreeGroup")
 	t:SetLayout("Fill")
 	t:SetTree(tree, text)
 	maingroup:AddChild(t)
-	
+
 	local tab = AceGUI:Create("TabGroup")
 	tab:SetTabs({"A","B","C","D"},{A="Yay",B="We",C="Have",D="Tabs"})
 	tab:SetLayout("Fill")
 	tab:SelectTab(1)
 	t:AddChild(tab)
-	
+
 	local component = AceGUI:Create("DropdownGroup")
 	component:SetLayout("Fill")
 	component:SetGroupList({Blah = "Blah", Splat = "Splat"})
 	component:SetGroup("Blah")
 	component:SetTitle("Choose Componet")
-	
+
 	tab:AddChild(component)
-	
+
 	local more = AceGUI:Create("DropdownGroup")
 	more:SetLayout("Fill")
 	more:SetGroupList({ButWait = "But Wait!", More = "Theres More"})
 	more:SetGroup("More")
 	more:SetTitle("And More!")
-	
+
 	component:AddChild(more)
-	
+
 	local sf = AceGUI:Create("ScrollFrame")
 	sf:SetLayout("Flow")
 	more:AddChild(sf)
@@ -61,7 +61,7 @@ local function ZOMGConfig(widget, event)
 	stuff:SetText("Omg Stuff Here")
 	stuff.width = "fill"
 	sf:AddChild(stuff)
-	
+
 	for i = 1, 10 do
 		local edit = AceGUI:Create("EditBox")
 		edit:SetText("")
@@ -71,16 +71,16 @@ local function ZOMGConfig(widget, event)
 		edit:SetCallback("OnTextChanged",function(widget,event,text) print(text) end )
 		sf:AddChild(edit)
 	end
-	
+
 	f:Show()
 end
 
 local function GroupA(content)
 	content:ReleaseChildren()
-	
+
 	local sf = AceGUI:Create("ScrollFrame")
 	sf:SetLayout("Flow")
-	
+
 	local edit = AceGUI:Create("EditBox")
 	edit:SetText("Testing")
 	edit:SetWidth(200)
@@ -88,67 +88,67 @@ local function GroupA(content)
 	edit:SetCallback("OnEnterPressed",function(widget,event,text) widget:SetLabel(text) end )
 	edit:SetCallback("OnTextChanged",function(widget,event,text) print(text) end )
 	sf:AddChild(edit)
-	
+
 	local slider = AceGUI:Create("Slider")
 	slider:SetLabel("Group A Slider")
 	slider:SetSliderValues(0,1000,5)
 	slider:SetDisabled(false)
 	sf:AddChild(slider)
-	
+
 	local zomg = AceGUI:Create("Button")
 	zomg.userdata.parent = content.userdata.parent
 	zomg:SetText("Zomg!")
 	zomg:SetCallback("OnClick", ZOMGConfig)
 	sf:AddChild(zomg)
-	
+
 	local heading1 = AceGUI:Create("Heading")
 	heading1:SetText("Heading 1")
 	heading1.width = "fill"
 	sf:AddChild(heading1)
-	
+
 	for i = 1, 5 do
 		local radio = AceGUI:Create("CheckBox")
 		radio:SetLabel("Test Check "..i)
 		radio:SetCallback("OnValueChanged",function(widget,event,value) print(value and "Check "..i.." Checked" or "Check "..i.." Unchecked") end )
 		sf:AddChild(radio)
 	end
-	
+
 	local heading2 = AceGUI:Create("Heading")
 	heading2:SetText("Heading 2")
 	heading2.width = "fill"
 	sf:AddChild(heading2)
-	
+
 	for i = 1, 5 do
 		local radio = AceGUI:Create("CheckBox")
 		radio:SetLabel("Test Check "..i+5)
 		radio:SetCallback("OnValueChanged",function(widget,event,value) print(value and "Check "..i.." Checked" or "Check "..i.." Unchecked") end )
 		sf:AddChild(radio)
 	end
-	
+
 	local heading1 = AceGUI:Create("Heading")
 	heading1:SetText("Heading 1")
 	heading1.width = "fill"
 	sf:AddChild(heading1)
-	
+
     for i = 1, 5 do
 	    local radio = AceGUI:Create("CheckBox")
 	    radio:SetLabel("Test Check "..i)
 	    radio:SetCallback("OnValueChanged",function(widget,event,value) print(value and "Check "..i.." Checked" or "Check "..i.." Unchecked") end )
 	    sf:AddChild(radio)
 	end
-	
+
 	local heading2 = AceGUI:Create("Heading")
 	heading2:SetText("Heading 2")
 	heading2.width = "fill"
 	sf:AddChild(heading2)
-	
+
     for i = 1, 5 do
 	    local radio = AceGUI:Create("CheckBox")
 	    radio:SetLabel("Test Check "..i+5)
 	    radio:SetCallback("OnValueChanged",function(widget,event,value) print(value and "Check "..i.." Checked" or "Check "..i.." Unchecked") end )
 	    sf:AddChild(radio)
 	end
-    
+
 	content:AddChild(sf)
 end
 
@@ -156,17 +156,17 @@ local function GroupB(content)
 	content:ReleaseChildren()
 	local sf = AceGUI:Create("ScrollFrame")
 	sf:SetLayout("Flow")
-	
- 	local check = AceGUI:Create("CheckBox")
+
+    local check = AceGUI:Create("CheckBox")
 	check:SetLabel("Group B Checkbox")
 	check:SetCallback("OnValueChanged",function(widget,event,value) print(value and "Checked" or "Unchecked") end )
-	
+
 	local dropdown = AceGUI:Create("Dropdown")
 	dropdown:SetText("Test")
 	dropdown:SetLabel("Group B Dropdown")
 	dropdown.list = {"Test","Test2"}
 	dropdown:SetCallback("OnValueChanged",function(widget,event,value) print(value) end )
-	
+
 	sf:AddChild(check)
 	sf:AddChild(dropdown)
 	content:AddChild(sf)
@@ -174,16 +174,16 @@ end
 
 local function OtherGroup(content)
 	content:ReleaseChildren()
-	
+
 	local sf = AceGUI:Create("ScrollFrame")
 	sf:SetLayout("Flow")
-	
- 	local check = AceGUI:Create("CheckBox")
+
+    local check = AceGUI:Create("CheckBox")
 	check:SetLabel("Test Check")
 	check:SetCallback("OnValueChanged",function(widget,event,value) print(value and "CheckButton Checked" or "CheckButton Unchecked") end )
-	
+
 	sf:AddChild(check)
-	
+
 	local inline = AceGUI:Create("InlineGroup")
 	inline:SetLayout("Flow")
 	inline:SetTitle("Inline Group")
@@ -193,7 +193,7 @@ local function OtherGroup(content)
 	heading1:SetText("Heading 1")
 	heading1.width = "fill"
 	inline:AddChild(heading1)
-	
+
 	for i = 1, 10 do
 		local radio = AceGUI:Create("CheckBox")
 		radio:SetLabel("Test Radio "..i)
@@ -201,12 +201,12 @@ local function OtherGroup(content)
 		radio:SetType("radio")
 		inline:AddChild(radio)
 	end
-	
+
 	local heading2 = AceGUI:Create("Heading")
 	heading2:SetText("Heading 2")
 	heading2.width = "fill"
 	inline:AddChild(heading2)
-	
+
 	for i = 1, 10 do
 		local radio = AceGUI:Create("CheckBox")
 		radio:SetLabel("Test Radio "..i)
@@ -214,8 +214,8 @@ local function OtherGroup(content)
 		radio:SetType("radio")
 		inline:AddChild(radio)
 	end
-	
-	
+
+
 	sf:AddChild(inline)
 	content:AddChild(sf)
 end
@@ -233,9 +233,9 @@ end
 
 local function TreeWindow(content)
 	content:ReleaseChildren()
-	
-	local tree = { 
-			{ 
+
+	local tree = {
+			{
 				value = "A",
 				text = "Alpha"
 			},
@@ -243,24 +243,24 @@ local function TreeWindow(content)
 				value = "B",
 				text = "Bravo",
 				children = {
-					{ 
-						value = "C", 
+					{
+						value = "C",
 						text = "Charlie",
 					},
 					{
-						value = "D",	
+						value = "D",
 						text = "Delta",
-						children = { 
-							{ 
+						children = {
+							{
 								value = "E",
 								text = "Echo",
-							} 
-						} 
+							}
+						}
 					},
 				}
 			},
-			{ 
-				value = "F", 
+			{
+				value = "F",
 				text = "Foxtrot",
 			},
 		}
@@ -270,7 +270,7 @@ local function TreeWindow(content)
 	t:SetCallback("OnGroupSelected", SelectGroup )
 	content:AddChild(t)
 	SelectGroup(t,"OnGroupSelected","A")
-	
+
 end
 
 local function TabWindow(content)
@@ -283,7 +283,7 @@ local function TabWindow(content)
 	tab:SetCallback("OnGroupSelected",SelectGroup)
 	tab:SelectTab(1)
 	content:AddChild(tab)
-	
+
 end
 
 
@@ -293,7 +293,7 @@ function TestFrame()
 	f:SetTitle("AceGUI Prototype")
 	f:SetStatusText("Root Frame Status Bar")
 	f:SetLayout("Fill")
-	
+
 	local maingroup = AceGUI:Create("DropdownGroup")
 	maingroup.userdata.parent = f
 	maingroup:SetLayout("Fill")
@@ -308,11 +308,11 @@ function TestFrame()
 			TreeWindow(widget)
 		end
 	end )
-	
+
 	TabWindow(maingroup)
 	f:AddChild(maingroup)
-	
-	
+
+
 	f:Show()
 end
 
@@ -326,12 +326,12 @@ do
 	local function Acquire(self)
 
 	end
-	
+
 	local function Release(self)
 		self.frame:ClearAllPoints()
 		self.frame:Hide()
 	end
-	
+
 
 	local function SetLabel(self, text)
 		self.label:SetText(text)
@@ -365,7 +365,7 @@ do
 		self:SetText("")
 		self:Fire("OnEnterPressed", self.value)
 	end
-	
+
 
 	local function DragLinkGetTexture(self)
 		if (self.objType == "item") then
@@ -384,7 +384,7 @@ do
 		end
 		return 134400 -- Interface\\Icons\\INV_Misc_QuestionMark
 	end
-	
+
 	local function GetValueFromParams(objType, Info1, Info2)
 		if objType == "item" then
 			--for items use the link
@@ -397,7 +397,7 @@ do
 			return "macro:"..GetMacroInfo(Info1)
 		end
 	end
-	
+
 	local function DragLinkOnReceiveDrag(this)
 		local self = this.obj
 
@@ -412,7 +412,7 @@ do
 			ClearCursor()
 		end
 	end
-	
+
 	local function SetText(self, text)
 		if not text then text = "" end
 		if text:find("item:%d+") then
@@ -431,16 +431,16 @@ do
 		self.linkIcon:SetTexture(DragLinkGetTexture(self))
 		self.text:SetText(self.value or "")
 	end
-	
+
 	local function SetDisabled(self, disabled)
-	
+
 	end
-	
+
 	local function Constructor()
 		local frame = CreateFrame("Button",nil,UIParent)
 		local self = {}
 		self.type = Type
-		
+
 
 		self.Release = Release
 		self.Acquire = Acquire
@@ -448,7 +448,7 @@ do
 		self.SetText = SetText
 		self.SetDisabled = SetDisabled
 		self.UpdateValue = UpdateValue
-		
+
 		self.frame = frame
 		frame.obj = self
 
@@ -457,11 +457,11 @@ do
 		frame:SetScript("OnClick", DragLinkOnReceiveDrag)
 		frame:SetScript("OnEnter", DragLinkOnEnter)
 		frame:SetScript("OnLeave", DragLinkOnLeave)
-	
+
 		frame:EnableMouse()
 		frame:RegisterForDrag("LeftButton")
 		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	
+
 		local linkIcon = frame:CreateTexture(nil, "OVERLAY")
 		linkIcon:SetWidth(self.iconWidth or 36)
 		linkIcon:SetHeight(self.iconHeight or 36)
@@ -470,14 +470,14 @@ do
 		linkIcon:SetTexCoord(0,1,0,1)
 		linkIcon:Show()
 		self.linkIcon = linkIcon
-		
+
 		local label = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 		label:SetPoint("TOPLEFT",linkIcon,"TOPRIGHT",3,-3)
 		label:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,0)
 		label:SetHeight(10)
 		label:SetJustifyH("LEFT")
 		self.label = label
-		
+
 		local text = frame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 		text:SetPoint("BOTTOMLEFT",linkIcon,"BOTTOMRIGHT",3,3)
 		text:SetPoint("RIGHT",frame,"RIGHT",0,0)
@@ -485,39 +485,39 @@ do
 		text:SetTextColor(1,1,1,1)
 		text:SetJustifyH("LEFT")
 		self.text = text
-	
+
 		text:SetJustifyH("LEFT")
 		text:SetTextColor(1,1,1)
-	
+
 		frame:SetHeight(36)
 		frame:SetWidth(200)
 
 		AceGUI:RegisterAsWidget(self)
 		return self
 	end
-	
+
 	AceGUI:RegisterWidgetType(Type,Constructor,Version)
-	
+
 end
 
-local name = "ConfigTest" 
-local groups = {} 
+local name = "ConfigTest"
+local groups = {}
 local testgroups = {
 	type = "group",
 	name = "Test Group Delete/Hide/Diabled",
 	childGroups = "select",
 	args = {
-	
+
 	}
 }
 
-local function Delete(info) 
-  testgroups.args[info.arg] = nil 
-end 
+local function Delete(info)
+  testgroups.args[info.arg] = nil
+end
 
-local function Disable(info) 
-  testgroups.args[info.arg].disabled = true 
-end 
+local function Disable(info)
+  testgroups.args[info.arg].disabled = true
+end
 
 local function Hide(info)
   testgroups.args[info.arg].hidden = true
@@ -577,43 +577,43 @@ groups.customDrag = {
 }
 
 
-for i = 1, 5 do 
-  testgroups.args["group"..i] = { 
-    order = i, 
-    type = "group", 
-    name = "Group"..i, 
-    args = { 
-      delete = { 
-        name = "Delete", 
-        desc = "Delete this group", 
-        type = "execute", 
-        arg = "group"..i, 
-        func = Delete, 
-      }, 
-		disable = { 
-        name = "Disable", 
-        desc = "Disable this group", 
-        type = "execute", 
-        arg = "group"..i, 
-        func = Disable, 
-      }, 
-		hide = { 
-        name = "Hide", 
-        desc = "Hide this group", 
-        type = "execute", 
-        arg = "group"..i, 
-        func = Hide, 
-      }, 
-		replace = { 
-        name = "Replace", 
-        desc = "Replace this group", 
-        type = "execute", 
-        arg = "group"..i, 
-        func = Replace, 
-      }, 
-    } 
-  } 
-end 
+for i = 1, 5 do
+  testgroups.args["group"..i] = {
+    order = i,
+    type = "group",
+    name = "Group"..i,
+    args = {
+      delete = {
+        name = "Delete",
+        desc = "Delete this group",
+        type = "execute",
+        arg = "group"..i,
+        func = Delete,
+      },
+		disable = {
+        name = "Disable",
+        desc = "Disable this group",
+        type = "execute",
+        arg = "group"..i,
+        func = Disable,
+      },
+		hide = {
+        name = "Hide",
+        desc = "Hide this group",
+        type = "execute",
+        arg = "group"..i,
+        func = Hide,
+      },
+		replace = {
+        name = "Replace",
+        desc = "Replace this group",
+        type = "execute",
+        arg = "group"..i,
+        func = Replace,
+      },
+    }
+  }
+end
 
 local m = { }
 
@@ -709,19 +709,19 @@ groups.multiline = {
 	multiline = true,
 }
 
-local options = { 
-  type = "group", 
-  name = name, 
-  childGroups = "tab", 
+local options = {
+  type = "group",
+  name = name,
+  childGroups = "tab",
   args = {
-	  	test = {
-	  	type = "group",
-	  	name = "Test Controls",
-	  	args = groups,
-	  	disabled = false
-  	}
-  } 
-} 
+    test = {
+        type = "group",
+        name = "Test Controls",
+        args = groups,
+        disabled = false
+    }
+  }
+}
 
 local types = {'input', 'toggle', 'select', 'multiselect', 'range', 'keybinding', 'execute', 'color'}
 local function GetTestOpts(disabled)
@@ -734,7 +734,7 @@ local function GetTestOpts(disabled)
 		get = function(info, value) return values[info[#info]] end,
 		args = {}
 	}
-	
+
 	if disabled then
 		group.name = "Disabled Options"
 	end
@@ -756,18 +756,18 @@ local function GetTestOpts(disabled)
 				f = "Foxtrot",
 			}
 		end
-		
+
 		if type == "range" then
 			opt.min = 0
 			opt.max = 1000
 			opt.step = 1
 			opt.bigStep = 10
 		end
-		
+
 		if type == "execute" then
 			opt.func = function(info) print("Execute") end
 		end
-		
+
 		group.args[type] = opt
 	end
 	return group
@@ -778,6 +778,6 @@ options.plugins.normal = { normal = GetTestOpts() }
 options.plugins.disabled = { disabled = GetTestOpts(true) }
 options.plugins.test = { testgroups = testgroups }
 
-LibStub("AceConfig-3.0"):RegisterOptionsTable(name, options, "ct") 
+LibStub("AceConfig-3.0"):RegisterOptionsTable(name, options, "ct")
 --LibStub("AceConfigDialog-3.0"):Open("ConfigTest" )
 

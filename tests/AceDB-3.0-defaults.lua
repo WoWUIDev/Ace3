@@ -54,14 +54,14 @@ do
 	assert(db.profile.doubleStarTest.siblingDeriv.doubleStarDefault == "overruledDefault")
 	assert(db.profile.starTest2.randomkey == "fun")
 	assert(db.profile.starTest2.sibling == "notfun")
-	
+
 	db.profile.doubleStarTest.siblingDeriv.doubleStarDefault = "doubleStarDefault"
 	db.profile.starTest2.randomkey = "notfun"
-	db.profile.starTest2.randomkey2 = "fun" 
+	db.profile.starTest2.randomkey2 = "fun"
 	db.profile.starTest2.sibling = "fun"
-	
+
 	WoWAPI_FireEvent("PLAYER_LOGOUT")
-	
+
 	assert(db.profile.singleEntry == nil)
 	assert(db.profile.tableEntry == nil)
 	assert(db.profile.starTest == nil)
@@ -73,13 +73,13 @@ do
 end
 
 do
-	local defaultTest = { 
-		profile = { 
-			units = { 
-				["**"] = { 
-					test = 2 
-				}, 
-				["player"] = { 
+	local defaultTest = {
+		profile = {
+			units = {
+				["**"] = {
+					test = 2
+				},
+				["player"] = {
 				},
 				["pet"] = {
 					test = 3
@@ -87,31 +87,31 @@ do
 				["bug"] = {
 					test = 3,
 				},
-			} 
-		} 
-	} 
-	
-	local bugdb = { 
-		["profileKeys"] = { 
-			["player - Realm Name"] = "player - Realm Name", 
-		}, 
-		["profiles"] = { 
-			["player - Realm Name"] = { 
-				["units"] = { 
-					["player"] = { 
-					}, 
+			}
+		}
+	}
+
+	local bugdb = {
+		["profileKeys"] = {
+			["player - Realm Name"] = "player - Realm Name",
+		},
+		["profiles"] = {
+			["player - Realm Name"] = {
+				["units"] = {
+					["player"] = {
+					},
 					["pet"] = {
-					}, 
-					["focus"] = { 
-					}, 
+					},
+					["focus"] = {
+					},
 					bug = "bug",
-				}, 
-			}, 
-		}, 
-	} 
-	
-	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest) 
-	 
+				},
+			},
+		},
+	}
+
+	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+
 	assert(data.profile.units["player"].test == 2)
 	assert(data.profile.units["pet"].test == 3)
 	assert(data.profile.units["focus"].test == 2)
@@ -120,36 +120,36 @@ do
 end
 
 do
-	local defaultTest = { 
-		profile = { 
-			units = { 
-				["*"] = { 
-					test = 2 
-				}, 
-				["player"] = { 
-				} 
-			} 
-		} 
-	} 
-	
-	local bugdb = { 
-		["profileKeys"] = { 
-			["player - Realm Name"] = "player - Realm Name", 
-		}, 
-		["profiles"] = { 
-			["player - Realm Name"] = { 
-				["units"] = { 
-					["player"] = { 
-					}, 
+	local defaultTest = {
+		profile = {
+			units = {
+				["*"] = {
+					test = 2
+				},
+				["player"] = {
+				}
+			}
+		}
+	}
+
+	local bugdb = {
+		["profileKeys"] = {
+			["player - Realm Name"] = "player - Realm Name",
+		},
+		["profiles"] = {
+			["player - Realm Name"] = {
+				["units"] = {
+					["player"] = {
+					},
 					["pet"] = {
-					}, 
-				}, 
-			}, 
-		}, 
-	} 
-	
-	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest) 
-	 
+					},
+				},
+			},
+		},
+	}
+
+	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
+
 	assert(data.profile.units["player"].test == nil)
 	assert(data.profile.units["pet"].test == 2)
 	assert(data.profile.units["focus"].test == 2)
@@ -162,7 +162,7 @@ do
 				["*"] = {
 					plyf = true,
 			},
-			}     
+			}
 		}
 	}
 
@@ -183,7 +183,7 @@ do
 	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
 
 	assert(data.profile.foo.hopla == 42)
-end 
+end
 
 do
 	local defaultTest = {
@@ -210,18 +210,18 @@ do
 			},
 		},
 	}
-	
+
 	local bugdb = {}
 	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
 	data.profile.stuff2.blu.stuff = 5
 	data.profile.stuff2.blu.stuff2.b.a = 4
 	data:RegisterDefaults()
-	
+
 	local data2 = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
-	
+
 	assert(data2.profile.stuff2.blu.stuff == 5)
 	assert(data2.profile.stuff2.blu.stuff2.b.a == 4)
-end 
+end
 
 do
 	local defaultTest = {
@@ -232,13 +232,13 @@ do
 			},
 		}
 	}
-	
+
 	local bugdb = {}
 	local data = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
 	data.profile.boo[true] = "not so true"
 	data.profile.boo[false] = "not so false"
 	WoWAPI_FireEvent("PLAYER_LOGOUT")
-	
+
 	local data2 = LibStub("AceDB-3.0"):New(bugdb, defaultTest)
 	assert(data2.profile.boo[true] == "not so true")
 	assert(data2.profile.boo[false] == "not so false")
@@ -249,18 +249,18 @@ do
 	-- test case for ticket 66
 	local defaults = {
 		profile = {
-			Positions = { 
-				["**"] = { 
-					point = "CENTER", relativeTo = "UIParent", relativePoint = "CENTER", xOfs = 0, yOfs = 0 
-				}, 
+			Positions = {
+				["**"] = {
+					point = "CENTER", relativeTo = "UIParent", relativePoint = "CENTER", xOfs = 0, yOfs = 0
+				},
 			},
 		},
 	}
-	
+
 	local data = LibStub("AceDB-3.0"):New(db, defaults)
-	
+
 	local v1 = data.profile.Positions.foo
-	
+
 	defaults.profile.Positions["TestFrame"] = {
 		point = "TOP",
 		relativeTo = "UIParent",
@@ -268,7 +268,7 @@ do
 		xOfs = 100,
 		yOfs = 200,
 	}
-	
+
 	data:RegisterDefaults(defaults)
 	assert(data.profile.Positions.TestFrame.xOfs == 100)
 end

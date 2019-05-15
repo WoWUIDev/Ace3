@@ -10,9 +10,9 @@ do
 
 	local frame=CreateFrame("Frame")
 	frame:RegisterEvent("CHAT_MSG_ADDON")
-	
+
 	-- Queue 2 messages in sequence. They should pop out at different times
-	
+
 	ChatThrottleLib:SendAddonMessage("NORMAL", "MyPrefix", "msg1", "SAY", nil, nil,
 		function() error("test error 1") end
 	)
@@ -25,16 +25,16 @@ do
 		assert(msg=="msg1")
 		n=n+1
 	end)
-	
+
 	local ok,msg = pcall(WoWAPI_FireUpdate,1)	-- 1 o'clock. CTL starts up in "hard clamping mode", so should only allow 80 CPS for the first few seconds
 	assert(not ok)
 	assert(strmatch(msg,"test error 1"), msg)
 	assert(n==1)
-	
+
 	local ok,msg = pcall(WoWAPI_FireUpdate,1)	-- 1 o'clock. CTL starts up in "hard clamping mode", so should only allow 80 CPS for the first few seconds
 	assert(ok)
 	assert(n==1)	-- WE SHOULD NOT SEE ANOTHER MESSAGE YET
-	
+
 	frame:SetScript("OnEvent", function(self, event, prefix, msg)
 		assert(msg=="msg2")
 		n=n+1
@@ -44,8 +44,8 @@ do
 	assert(not ok)
 	assert(strmatch(msg,"test error 2"), msg)
 	assert(n==2)
-	
-	
+
+
 	-- Now queue 2 messages up and hop 2 seconds into the future. (And pulse there twice)
 
 	ChatThrottleLib:SendAddonMessage("NORMAL", "MyPrefix", "msg3", "WHISPER", "target1", nil,
@@ -86,7 +86,7 @@ do
 	-- Errors should happen immediately on :Send now!
 
 	WoWAPI_FireUpdate(100)
-	
+
 	n=0
 	frame:SetScript("OnEvent", function(self, event, prefix, msg)
 		n=n+1
@@ -108,11 +108,11 @@ do
 		assert(n2==i, n2)
 	end
 	assert(n==50 and n2==50)
-	
+
 	WoWAPI_FireUpdate(101)	-- shouldn't cause anything untowards to happen
 
 	assert(n==50 and n2==50)
-	
+
 	frame:UnregisterEvent("CHAT_MSG_ADDON")
 end
 

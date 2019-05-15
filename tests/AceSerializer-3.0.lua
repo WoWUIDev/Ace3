@@ -58,7 +58,7 @@ local SerializeValue = assert(AceSer.internals.SerializeValue)
 local function testsv(input, expect, errlvl)
 	local res = {}
 	local nres = SerializeValue(input, res, 0)
-	
+
 	comp(input,table.concat(res), expect, 1+(errlvl or 1))
 end
 
@@ -347,7 +347,7 @@ for b=1,BURNIN do	-- default 1 = 1 loop, but no printing
 		local e = math.random(-1000, 1000)
 		v = v * 2^(e)
 		-- print(str,e,v)
-		
+
 		testone(v)
 	end
 	if BURNIN>1 then

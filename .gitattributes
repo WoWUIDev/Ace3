@@ -1,5 +1,6 @@
 * text=auto !eol
 /.docmeta -text
+/.editorconfig -text
 /.pkgmeta -text
 /LICENSE.txt svneol=native#text/plain
 tests/AceAddon-3.0.lua svneol=native#text/plain

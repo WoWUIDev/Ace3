@@ -3,7 +3,7 @@
 --
 -- Manages AddOn chat output to keep player from getting kicked off.
 --
--- ChatThrottleLib.SendChatMessage/.SendAddonMessage functions that accept 
+-- ChatThrottleLib.SendChatMessage/.SendAddonMessage functions that accept
 -- a Priority ("BULK", "NORMAL", "ALERT") as well as prefix for SendChatMessage.
 --
 -- Priorities get an equal share of available bandwidth when fully loaded.
@@ -89,7 +89,7 @@ end
 
 
 -----------------------------------------------------------------------
--- Recycling bin for pipes (kept in a linked list because that's 
+-- Recycling bin for pipes (kept in a linked list because that's
 -- how they're worked with in the rotating rings; just reusing members)
 
 ChatThrottleLib.PipeBin = { count = 0 }
@@ -119,7 +119,7 @@ function ChatThrottleLib.PipeBin:Tidy()
 	if self.count < 25 then
 		return
 	end
-	
+
 	local n
 	if self.count > 100 then
 		n = self.count-90
@@ -172,8 +172,8 @@ end
 -- Initialize queues, set up frame for OnUpdate, etc
 
 
-function ChatThrottleLib:Init()	
-	
+function ChatThrottleLib:Init()
+
 	-- Set up queues
 	if not self.Prio then
 		self.Prio = {}
@@ -181,12 +181,12 @@ function ChatThrottleLib:Init()
 		self.Prio["NORMAL"] = { ByName = {}, Ring = Ring:New(), avail = 0 }
 		self.Prio["BULK"] = { ByName = {}, Ring = Ring:New(), avail = 0 }
 	end
-	
+
 	-- v4: total send counters per priority
 	for _, Prio in pairs(self.Prio) do
 		Prio.nTotalSent = Prio.nTotalSent or 0
 	end
-	
+
 	if not self.avail then
 		self.avail = 0 -- v5
 	end
@@ -194,7 +194,7 @@ function ChatThrottleLib:Init()
 		self.nTotalSent = 0 -- v5
 	end
 
-	
+
 	-- Set up a frame to get OnUpdate events
 	if not self.Frame then
 		self.Frame = CreateFrame("Frame")
@@ -206,7 +206,7 @@ function ChatThrottleLib:Init()
 	self.OnUpdateDelay = 0
 	self.LastAvailUpdate = GetTime()
 	self.HardThrottlingBeginTime = GetTime()	-- v11: Throttle hard for a few seconds after startup
-	
+
 	-- Hook SendChatMessage and SendAddonMessage so we can measure unpiped traffic and avoid overloads (v7)
 	if not self.ORIG_SendChatMessage then
 		--SendChatMessage
@@ -262,10 +262,10 @@ function ChatThrottleLib:UpdateAvail()
 		self.avail = math_min(BURST, self.avail + newavail)
 		self.bChoking = false
 	end
-	
+
 	self.avail = math_max(self.avail, 0-(MAX_CPS*2))	-- Can go negative when someone is eating bandwidth past the lib. but we refuse to stay silent for more than 2 seconds; if they can do it, we can.
 	self.LastAvailUpdate = now
-	
+
 	return self.avail
 end
 
@@ -305,15 +305,15 @@ end
 
 function ChatThrottleLib.OnUpdate()
 	local self = ChatThrottleLib
-	
+
 	self.OnUpdateDelay = self.OnUpdateDelay + arg1
 	if self.OnUpdateDelay < 0.08 then
 		return
 	end
 	self.OnUpdateDelay = 0
-	
+
 	self:UpdateAvail()
-	
+
 	if self.avail < 0  then
 		return -- argh. some bastard is spewing stuff past the lib. just bail early to save cpu.
 	end
@@ -321,11 +321,11 @@ function ChatThrottleLib.OnUpdate()
 	-- See how many of or priorities have queued messages
 	local n = 0
 	for prioname,Prio in pairs(self.Prio) do
-		if Prio.Ring.pos or Prio.avail < 0 then 
-			n = n + 1 
+		if Prio.Ring.pos or Prio.avail < 0 then
+			n = n + 1
 		end
 	end
-	
+
 	-- Anything queued still?
 	if n<1 then
 		-- Nope. Move spillover bandwidth to global availability gauge and clear self.bQueueing
@@ -337,11 +337,11 @@ function ChatThrottleLib.OnUpdate()
 		self.Frame:Hide()
 		return
 	end
-	
+
 	-- There's stuff queued. Hand out available bandwidth to priorities as needed and despool their queues
 	local avail = self.avail/n
 	self.avail = 0
-	
+
 	for prioname, Prio in pairs(self.Prio) do
 		if Prio.Ring.pos or Prio.avail < 0 then
 			Prio.avail = Prio.avail + avail
@@ -351,7 +351,7 @@ function ChatThrottleLib.OnUpdate()
 		end
 	end
 
-	-- Expire recycled tables if needed	
+	-- Expire recycled tables if needed
 	self.MsgBin:Tidy()
 	self.PipeBin:Tidy()
 end
@@ -373,9 +373,9 @@ function ChatThrottleLib:Enqueue(prioname, pipename, msg)
 		Prio.ByName[pipename] = pipe
 		Prio.Ring:Add(pipe)
 	end
-	
+
 	pipe[#pipe + 1] = msg
-	
+
 	self.bQueueing = true
 end
 
@@ -385,11 +385,11 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 	if not self or not prio or not text or not self.Prio[prio] then
 		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix" or nil, "text"[, "chattype"[, "language"[, "destination"]]]', 2)
 	end
-	
+
 	prefix = prefix or tostring(this)		-- each frame gets its own queue if prefix is not given
-	
+
 	local nSize = text:len() + MSG_OVERHEAD
-	
+
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
 		self.avail = self.avail - nSize
@@ -397,7 +397,7 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
 		return
 	end
-	
+
 	-- Message needs to be queued
 	local msg = self.MsgBin:Get()
 	msg.f = self.ORIG_SendChatMessage
@@ -416,9 +416,9 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype)
 	if not self or not prio or not prefix or not text or not chattype or not self.Prio[prio] then
 		error('Usage: ChatThrottleLib:SendAddonMessage("{BULK||NORMAL||ALERT}", "prefix", "text", "chattype")', 0)
 	end
-	
+
 	local nSize = prefix:len() + 1 + text:len() + MSG_OVERHEAD
-	
+
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
 		self.avail = self.avail - nSize
@@ -426,7 +426,7 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype)
 		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
 		return
 	end
-	
+
 	-- Message needs to be queued
 	msg = self.MsgBin:Get()
 	msg.f = self.ORIG_SendAddonMessage
@@ -435,7 +435,7 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype)
 	msg[3] = chattype
 	msg.n = 3
 	msg.nSize = nSize
-	
+
 	self:Enqueue(prio, ("%s/%s"):format(prefix, chattype), msg)
 end
 

@@ -169,7 +169,7 @@ local function _errorhandler(msg)
 	print("--------- geterrorhandler error -------\n"..msg.."\n-----end error-----\n")
 end
 
-function geterrorhandler() 
+function geterrorhandler()
 	return _errorhandler
 end
 

@@ -18,7 +18,7 @@ local opts = {
 	type = "group",
 	get = function() end,
 	set = function() end,
-	
+
 	args = {
 		first = {
 			type="toggle",
@@ -106,7 +106,7 @@ local opts = {
 			order=-4,
 		},
 	},
-	
+
 	plugins = {	-- test plugins
 		plugin1 = {
 			plugcmd = {
@@ -130,7 +130,7 @@ local opts = {
 				order=51,
 			},
 		}
-		
+
 	}
 }
 

@@ -49,7 +49,7 @@ _G.print = function(...)
 		return origprint(...)
 	end
 end
-	
+
 dofile("../AceComm-3.0/ChatThrottleLib.lua")
 
 assert(nAncient==1)	-- did it complain?

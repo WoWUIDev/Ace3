@@ -12,7 +12,7 @@ local AceAddon = LibStub("AceAddon-3.0")
 do -- Test create addon.
 
 	local success, reason, addon
-	
+
 	-- 'name' - string expected
 	success, reason = pcall( function() AceAddon:NewAddon() end )
 	assert( success == false and reason:find("'name' - string expected",1,true) )
@@ -24,7 +24,7 @@ do -- Test create addon.
 	-- Success.
 	addon = AceAddon:NewAddon("TestAddon-2")
 	assert( addon and addon == AceAddon:GetAddon("TestAddon-2") )
-	
+
 	-- Addon 'TestAddon-2' already exists.
 	success, reason = pcall( function() addon = AceAddon:NewAddon("TestAddon-2") end )
 	assert( success == false and reason:find("Addon 'TestAddon-2' already exists",1,true) )
@@ -64,10 +64,10 @@ do -- Test mixin.
 			end
 		end
 	end
-	
+
 	-- Create an AceAddon object with 2 libraries mixed.
 	local addon = AceAddon:NewAddon("TestAddon-3","LibStupid","LibSmart")
-	
+
 	-- Are the methods mixed correctly?
 	assert( addon.BecomeStupid == libA.BecomeStupid )
 	assert( addon.BecomeDumb == libA.BecomeDumb )
@@ -79,7 +79,7 @@ end
 do -- Test the call to OnInitialize, OnEnable and OnDisable.
 
 	local addon = AceAddon:NewAddon("TestAddon-4","LibStupid","LibSmart")
-	
+
 	local initialized = false
 	function addon:OnInitialize()
 		initialized = true
@@ -89,7 +89,7 @@ do -- Test the call to OnInitialize, OnEnable and OnDisable.
 	function addon:OnEnable()
 		enabled = true
 	end
-	
+
 	function addon:OnDisable()
 		enabled = false
 	end
@@ -104,11 +104,11 @@ do -- Test the call to OnInitialize, OnEnable and OnDisable.
 	-- Testing the call to addon:OnEnable()
 	WoWAPI_FireEvent("PLAYER_LOGIN")
 	assert(initialized and enabled)
-	
+
 	-- Testing the call to addon:OnDisable()
 	AceAddon:DisableAddon(addon)
 	assert(initialized and not enabled)
-	
+
 end
 
 print("Test finished.")

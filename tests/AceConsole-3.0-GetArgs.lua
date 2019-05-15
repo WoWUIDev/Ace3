@@ -13,7 +13,7 @@ local AC = assert(LibStub(MAJOR))
 
 
 ----------------------------------------------------------
--- Simple tests 
+-- Simple tests
 -- (no need to explicitly test startpos; if multi-arg tests work, it works)
 
 local a1,a2 = AC:GetArgs("")		-- no arg

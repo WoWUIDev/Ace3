@@ -145,7 +145,7 @@ do
 			end
 			if t>midpos and t<latepos then
 				-- prefix2 should have slightly less data transferred since the prefix name itself is longer and uses more bandwidth compared to useful data
-				assert(#received2 >= #received1*0.975 and #received2 < #received1*0.999, #received1.." : "..#received2)	
+				assert(#received2 >= #received1*0.975 and #received2 < #received1*0.999, #received1.." : "..#received2)
 			end
 			t=t+1
 		end
@@ -153,7 +153,7 @@ do
 		assert(t>=esttime*0.9 and t<=esttime*1.1, dump(t, esttime))
 
 		assert(sampledmid)
-		
+
 	end
 
 	assert(#received==MSGS*2)
@@ -162,14 +162,14 @@ do
 	function addon1:OnCommReceived()
 		assert(false,"We shouldn't receive more here now!!!!")
 	end
-	
+
 	function addon2:OnCommReceived()
 		assert(false,"We shouldn't receive more here now!!!!")
 	end
 
 	addon1:UnregisterComm(prefix1)
 	addon2:UnregisterAllComm()
-	
+
 end
 
 

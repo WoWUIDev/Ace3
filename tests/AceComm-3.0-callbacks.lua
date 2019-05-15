@@ -26,7 +26,7 @@ AceComm:Embed(addon1)
 -- Single message
 
 local nSingle=0
-addon1:SendCommMessage("single", "1234567890", "RAID", nil, "NORMAL", 
+addon1:SendCommMessage("single", "1234567890", "RAID", nil, "NORMAL",
 	function(arg,sent,total)
 		assert(arg=="singlearg")
 		nSingle=nSingle+1
@@ -37,7 +37,7 @@ addon1:SendCommMessage("single", "1234567890", "RAID", nil, "NORMAL",
 
 -- Multipart message
 local nMulti=0
-addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL", 
+addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL",
 	function(arg,sent,total)
 		assert(arg=="multiarg")
 		nMulti=nMulti+1
@@ -75,7 +75,7 @@ WoWAPI_FireUpdate(GetTime()+100)	-- 100 seconds later
 -- Single message
 
 local nSingle=0
-addon1:SendCommMessage("single", "1234567890", "RAID", nil, "NORMAL", 
+addon1:SendCommMessage("single", "1234567890", "RAID", nil, "NORMAL",
 	function(arg,sent,total)
 		assert(arg=="singlearg")
 		nSingle=nSingle+1
@@ -88,7 +88,7 @@ assert(nSingle==1)
 
 -- Multipart message
 local nMulti=0
-addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL", 
+addon1:SendCommMessage("multi", strrep("1234567890", 80), "RAID", nil, "NORMAL",
 	function(arg,sent,total)
 		assert(arg=="multiarg")
 		nMulti=nMulti+1

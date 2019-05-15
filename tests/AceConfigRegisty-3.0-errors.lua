@@ -15,7 +15,7 @@ local opts = {
 	get = function(info) return true end,
 	set = function(info,v) end,
 	validate = function() return end,
-	
+
 	args = {
 		input = {
 			type="input",
@@ -43,7 +43,7 @@ local opts = {
 			values={},
 		}
 	},
-	
+
 	plugins = {	-- test plugins
 		plugin1 = {
 			plugcmd = {

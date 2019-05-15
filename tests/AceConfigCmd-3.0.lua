@@ -27,7 +27,7 @@ end
 function app:get_toggle(info, ...)
 	assert(self==app)
 	assert(select("#",...)==0)
-	
+
 	n.get_toggle = n.get_toggle + 1
 	return true
 end
@@ -66,7 +66,7 @@ local opts = {
 	get = get_base,	 -- tests inheritance by declaring it at the bottom
 	set = set_base,
 	validate = validate_base,
-	
+
 	args = {
 		input = {
 			type="input",
@@ -90,7 +90,7 @@ local opts = {
 			get = function() assert(false) end,
 		}
 	},
-	
+
 	plugins = {	-- test plugins
 		plugin1 = {
 			plugcmd = {
@@ -114,7 +114,7 @@ local opts = {
 				type="toggle",
 			},
 		}
-		
+
 	}
 }
 
