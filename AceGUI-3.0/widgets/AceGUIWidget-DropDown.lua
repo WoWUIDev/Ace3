@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 31
+	local widgetVersion = 32
 
 	--[[ Static data ]]--
 
@@ -591,7 +591,10 @@ do
 	end
 
 	-- exported
-	local sortlist = {}
+	local sortlist, originalList = {}, nil
+	local function sortTbl(x,y)
+		return originalList[x] < originalList[y]
+	end
 	local function SetList(self, list, order, itemType)
 		self.list = list
 		self.pullout:Clear()
@@ -602,7 +605,9 @@ do
 			for v in pairs(list) do
 				sortlist[#sortlist + 1] = v
 			end
-			tsort(sortlist)
+			originalList = list
+			tsort(sortlist, sortTbl)
+			originalList = nil
 
 			for i, key in ipairs(sortlist) do
 				AddListItem(self, key, list[key], itemType)
