@@ -3,7 +3,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local select, pairs, ipairs, type = select, pairs, ipairs, type
+local select, pairs, ipairs, type, tostring = select, pairs, ipairs, type, tostring
 local tsort = table.sort
 
 -- WoW APIs
@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 32
+	local widgetVersion = 33
 
 	--[[ Static data ]]--
 
@@ -593,7 +593,7 @@ do
 	-- exported
 	local sortlist, originalList = {}, nil
 	local function sortTbl(x,y)
-		return originalList[x] < originalList[y]
+		return tostring(x) < tostring(y) -- Support numbers as keys
 	end
 	local function SetList(self, list, order, itemType)
 		self.list = list
