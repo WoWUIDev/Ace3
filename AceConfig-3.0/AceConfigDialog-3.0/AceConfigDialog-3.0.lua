@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 70
+local MAJOR, MINOR = "AceConfigDialog-3.0", 71
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1049,6 +1049,10 @@ local function CreateControl(userControlType, fallbackControlType)
 	return control
 end
 
+local function sortTblAsStrings(x,y)
+	return tostring(x) < tostring(y) -- Support numbers as keys
+end
+
 --[[
 	options - root of the options table being fed
 	container - widget that controls will be placed in
@@ -1186,12 +1190,14 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 
 						control:PauseLayout()
 						local optionValue = GetOptionsMemberValue("get",v, options, path, appName)
-						local t = {}
-						for value, text in pairs(values) do
-							t[#t+1]=value
+						if not sorting then
+							sorting = {}
+							for value, text in pairs(values) do
+								sorting[#sorting+1]=value
+							end
+							tsort(sorting, sortTblAsStrings)
 						end
-						tsort(t)
-						for k, value in ipairs(t) do
+						for k, value in ipairs(sorting) do
 							local text = values[value]
 							local radio = gui:Create("CheckBox")
 							radio:SetLabel(text)
