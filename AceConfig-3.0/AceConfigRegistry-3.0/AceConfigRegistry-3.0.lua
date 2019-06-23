@@ -11,7 +11,7 @@
 -- @release $Id$
 local CallbackHandler = LibStub("CallbackHandler-1.0")
 
-local MAJOR, MINOR = "AceConfigRegistry-3.0", 19
+local MAJOR, MINOR = "AceConfigRegistry-3.0", 20
 local AceConfigRegistry = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigRegistry then return end
@@ -160,6 +160,7 @@ local typedkeys={
 	},
 	select={
 		values=ismethodtable,
+		sorting=optmethodtable,
 		style={
 			["nil"]=true,
 			["string"]={dropdown=true,radio=true},

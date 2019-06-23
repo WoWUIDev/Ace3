@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 69
+local MAJOR, MINOR = "AceConfigDialog-3.0", 70
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1175,6 +1175,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 
 				elseif v.type == "select" then
 					local values = GetOptionsMemberValue("values", v, options, path, appName)
+					local sorting = GetOptionsMemberValue("sorting", v, options, path, appName)
 					if v.style == "radio" then
 						local disabled = CheckOptionDisabled(v, options, path, appName)
 						local width = GetOptionsMemberValue("width",v,options,path,appName)
@@ -1224,7 +1225,7 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 							itemType = nil
 						end
 						control:SetLabel(name)
-						control:SetList(values, nil, itemType)
+						control:SetList(values, sorting, itemType)
 						local value = GetOptionsMemberValue("get",v, options, path, appName)
 						if not values[value] then
 							value = nil
