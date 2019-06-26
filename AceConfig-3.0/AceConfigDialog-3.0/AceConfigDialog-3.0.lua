@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 72
+local MAJOR, MINOR = "AceConfigDialog-3.0", 73
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -296,7 +296,7 @@ local function compareOptions(a,b)
 		return NameA:upper() < NameB:upper()
 	end
 	if OrderA < 0 then
-		if OrderB > 0 then
+		if OrderB >= 0 then
 			return false
 		end
 	else
