@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 73
+local MAJOR, MINOR = "AceConfigDialog-3.0", 74
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -15,6 +15,7 @@ if not AceConfigDialog then return end
 AceConfigDialog.OpenFrames = AceConfigDialog.OpenFrames or {}
 AceConfigDialog.Status = AceConfigDialog.Status or {}
 AceConfigDialog.frame = AceConfigDialog.frame or CreateFrame("Frame")
+AceConfigDialog.tooltip = AceConfigDialog.tooltip or CreateFrame("GameTooltip", "AceConfigDialogTooltip", UIParent, "GameTooltipTemplate")
 
 AceConfigDialog.frame.apps = AceConfigDialog.frame.apps or {}
 AceConfigDialog.frame.closing = AceConfigDialog.frame.closing or {}
@@ -30,7 +31,7 @@ local math_min, math_max, math_floor = math.min, math.max, math.floor
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
 -- List them here for Mikk's FindGlobals script
--- GLOBALS: NORMAL_FONT_COLOR, GameTooltip, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
+-- GLOBALS: NORMAL_FONT_COLOR, StaticPopupDialogs, ACCEPT, CANCEL, StaticPopup_Show
 -- GLOBALS: PlaySound, GameFontHighlight, GameFontHighlightSmall, GameFontHighlightLarge
 -- GLOBALS: CloseSpecialWindows, InterfaceOptions_AddCategory, geterrorhandler
 
@@ -504,8 +505,9 @@ local function OptionOnMouseOver(widget, event)
 	local options = user.options
 	local path = user.path
 	local appName = user.appName
+	local tooltip = AceConfigDialog.tooltip
 
-	GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
 	local usage = GetOptionsMemberValue("usage", opt, options, path, appName)
@@ -513,23 +515,23 @@ local function OptionOnMouseOver(widget, event)
 
 	if descStyle and descStyle ~= "tooltip" then return end
 
-	GameTooltip:SetText(name, 1, .82, 0, true)
+	tooltip:SetText(name, 1, .82, 0, true)
 
 	if opt.type == "multiselect" then
-		GameTooltip:AddLine(user.text, 0.5, 0.5, 0.8, true)
+		tooltip:AddLine(user.text, 0.5, 0.5, 0.8, true)
 	end
 	if type(desc) == "string" then
-		GameTooltip:AddLine(desc, 1, 1, 1, true)
+		tooltip:AddLine(desc, 1, 1, 1, true)
 	end
 	if type(usage) == "string" then
-		GameTooltip:AddLine("Usage: "..usage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
+		tooltip:AddLine("Usage: "..usage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
 	end
 
-	GameTooltip:Show()
+	tooltip:Show()
 end
 
 local function OptionOnMouseLeave(widget, event)
-	GameTooltip:Hide()
+	AceConfigDialog.tooltip:Hide()
 end
 
 local function GetFuncName(option)
@@ -1433,6 +1435,7 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 	local option = user.option
 	local path = user.path
 	local appName = user.appName
+	local tooltip = AceConfigDialog.tooltip
 
 	local feedpath = new()
 	for i = 1, #path do
@@ -1449,25 +1452,25 @@ local function TreeOnButtonEnter(widget, event, uniquevalue, button)
 	local name = GetOptionsMemberValue("name", group, options, feedpath, appName)
 	local desc = GetOptionsMemberValue("desc", group, options, feedpath, appName)
 
-	GameTooltip:SetOwner(button, "ANCHOR_NONE")
-	GameTooltip:ClearAllPoints()
+	tooltip:SetOwner(button, "ANCHOR_NONE")
+	tooltip:ClearAllPoints()
 	if widget.type == "TabGroup" then
-		GameTooltip:SetPoint("BOTTOM",button,"TOP")
+		tooltip:SetPoint("BOTTOM",button,"TOP")
 	else
-		GameTooltip:SetPoint("LEFT",button,"RIGHT")
+		tooltip:SetPoint("LEFT",button,"RIGHT")
 	end
 
-	GameTooltip:SetText(name, 1, .82, 0, true)
+	tooltip:SetText(name, 1, .82, 0, true)
 
 	if type(desc) == "string" then
-		GameTooltip:AddLine(desc, 1, 1, 1, true)
+		tooltip:AddLine(desc, 1, 1, 1, true)
 	end
 
-	GameTooltip:Show()
+	tooltip:Show()
 end
 
 local function TreeOnButtonLeave(widget, event, value, button)
-	GameTooltip:Hide()
+	AceConfigDialog.tooltip:Hide()
 end
 
 

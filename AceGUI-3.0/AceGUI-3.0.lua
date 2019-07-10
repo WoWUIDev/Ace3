@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 36
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 37
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -51,6 +51,7 @@ AceGUI.LayoutRegistry = AceGUI.LayoutRegistry or {}
 AceGUI.WidgetBase = AceGUI.WidgetBase or {}
 AceGUI.WidgetContainerBase = AceGUI.WidgetContainerBase or {}
 AceGUI.WidgetVersions = AceGUI.WidgetVersions or {}
+AceGUI.tooltip = AceGUI.tooltip or CreateFrame("GameTooltip", "AceGUITooltip", UIParent, "GameTooltipTemplate")
 
 -- local upvalues
 local WidgetRegistry = AceGUI.WidgetRegistry
