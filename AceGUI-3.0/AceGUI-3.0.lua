@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 37
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 38
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -177,6 +177,7 @@ end
 -- @param widget The widget to release
 function AceGUI:Release(widget)
 	safecall(widget.PauseLayout, widget)
+	widget.frame:Hide()
 	widget:Fire("OnRelease")
 	safecall(widget.ReleaseChildren, widget)
 
