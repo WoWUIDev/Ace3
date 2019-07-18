@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 75
+local MAJOR, MINOR = "AceConfigDialog-3.0", 76
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -546,6 +546,8 @@ do
 	local frame = AceConfigDialog.popup
 	if not frame then
 		frame = CreateFrame("Frame", nil, UIParent)
+		AceConfigDialog.popup = frame
+		frame:Hide()
 		frame:SetPoint("CENTER", UIParent, "CENTER")
 		frame:SetSize(320, 72)
 		frame:SetFrameStrata("TOOLTIP")
@@ -558,7 +560,6 @@ do
 				end
 			end
 		end)
-		AceConfigDialog.popup = frame
 
 		local border = CreateFrame("Frame", nil, frame, "DialogBorderDarkTemplate")
 		border:SetAllPoints(frame)
