@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 76
+local MAJOR, MINOR = "AceConfigDialog-3.0", 77
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -553,11 +553,14 @@ do
 		frame:SetFrameStrata("TOOLTIP")
 		frame:SetScript("OnKeyDown", function(self, key)
 			if key == "ESCAPE" then
+				self:SetPropagateKeyboardInput(false)
 				if self.cancel:IsShown() then
 					self.cancel:Click()
 				else -- Showing a validation error
 					self:Hide()
 				end
+			else
+				self:SetPropagateKeyboardInput(true)
 			end
 		end)
 
