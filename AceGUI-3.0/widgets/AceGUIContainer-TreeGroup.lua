@@ -581,7 +581,6 @@ local methods = {
 	end,
 
 	["SetTreeWidth"] = function(self, treewidth, resizable)
-		print(treewidth, resizable)
 		if not resizable then
 			if type(treewidth) == 'number' then
 				resizable = false
