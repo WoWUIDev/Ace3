@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 79
+local MAJOR, MINOR = "AceConfigDialog-3.0", 80
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -551,6 +551,7 @@ do
 		frame:SetPoint("CENTER", UIParent, "CENTER")
 		frame:SetSize(320, 72)
 		frame:SetFrameStrata("TOOLTIP")
+		frame:SetFrameLevel(100) -- Lots of room to draw under it
 		frame:SetScript("OnKeyDown", function(self, key)
 			if key == "ESCAPE" then
 				self:SetPropagateKeyboardInput(false)
@@ -564,7 +565,7 @@ do
 			end
 		end)
 
-		if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+		if not frame.SetFixedFrameStrata then -- API capability check (classic check)
 			frame:SetBackdrop({
 				bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
 				edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
@@ -576,6 +577,8 @@ do
 		else
 			local border = CreateFrame("Frame", nil, frame, "DialogBorderDarkTemplate")
 			border:SetAllPoints(frame)
+			frame:SetFixedFrameStrata(true)
+			frame:SetFixedFrameLevel(true)
 		end
 
 		local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
