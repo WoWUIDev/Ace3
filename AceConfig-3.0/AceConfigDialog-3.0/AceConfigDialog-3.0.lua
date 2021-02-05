@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 80
+local MAJOR, MINOR = "AceConfigDialog-3.0", 81
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -544,12 +544,13 @@ local function GetFuncName(option)
 end
 do
 	local frame = AceConfigDialog.popup
-	if not frame then
+	if not frame or oldminor < 81 then
 		frame = CreateFrame("Frame", nil, UIParent)
 		AceConfigDialog.popup = frame
 		frame:Hide()
 		frame:SetPoint("CENTER", UIParent, "CENTER")
 		frame:SetSize(320, 72)
+		frame:EnableMouse(true) -- Do not allow click-through on the frame
 		frame:SetFrameStrata("TOOLTIP")
 		frame:SetFrameLevel(100) -- Lots of room to draw under it
 		frame:SetScript("OnKeyDown", function(self, key)
@@ -575,7 +576,7 @@ do
 				insets = { left = 11, right = 11, top = 11, bottom = 11 },
 			})
 		else
-			local border = CreateFrame("Frame", nil, frame, "DialogBorderDarkTemplate")
+			local border = CreateFrame("Frame", nil, frame, "DialogBorderOpaqueTemplate")
 			border:SetAllPoints(frame)
 			frame:SetFixedFrameStrata(true)
 			frame:SetFixedFrameLevel(true)
