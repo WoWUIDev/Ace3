@@ -1,4 +1,4 @@
-Ace3 Release - Revision r1259 (May 17th, 2021)
+Ace3 Release - Revision r1259 (February 23rd, 2022)
 --------------------------------------------------
 - AceGUI-3.0: Dropdown: Fix double click sound on toggling the dropdown (Issue #575)
 - AceConfigDialog-3.0: Fix width number multiplier on multiselects (Issue #584)
