@@ -2,6 +2,8 @@
 /.docmeta -text
 /.editorconfig -text
 /.pkgmeta -text
+/Ace3_TBC.toc -text
+/Ace3_Vanilla.toc -text
 /LICENSE.txt svneol=native#text/plain
 tests/AceAddon-3.0.lua svneol=native#text/plain
 tests/AceComm-3.0-pre-4.1.lua -text
