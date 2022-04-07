@@ -297,7 +297,7 @@ local function Constructor()
 	text:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -5, 1)
 	text:SetJustifyV("MIDDLE")
 
-	local scrollBG = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
+	local scrollBG = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	scrollBG:SetBackdrop(backdrop)
 	scrollBG:SetBackdropColor(0, 0, 0)
 	scrollBG:SetBackdropBorderColor(0.4, 0.4, 0.4)
