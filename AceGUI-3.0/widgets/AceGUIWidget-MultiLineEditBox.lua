@@ -261,10 +261,6 @@ local methods = {
 	["SetCursorPosition"] = function(self, ...)
 		return self.editBox:SetCursorPosition(...)
 	end,
-
-	["OnHeightSet"] = function(self, width)
-		OnVerticalScroll(self.scrollFrame, self.scrollFrame:GetVerticalScroll())
-	end,
 }
 
 --[[-----------------------------------------------------------------------------
