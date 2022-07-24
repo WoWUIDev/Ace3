@@ -1,4 +1,5 @@
 - AceGUI-3.0: MultiLineEditBox: Fixed an issue with mouse interactivity on re-cycled editboxes in certain circumstances.
+- AceGUI-3.0: Label: Use font objects to allow font fallback mechanics to be used.
 
 Ace3 Release - Revision r1259 (February 23rd, 2022)
 --------------------------------------------------
