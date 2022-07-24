@@ -1,3 +1,5 @@
+- AceGUI-3.0: MultiLineEditBox: Fixed an issue with mouse interactivity on re-cycled editboxes in certain circumstances.
+
 Ace3 Release - Revision r1259 (February 23rd, 2022)
 --------------------------------------------------
 - AceGUI-3.0: Dropdown: Fix double click sound on toggling the dropdown (Issue #575)

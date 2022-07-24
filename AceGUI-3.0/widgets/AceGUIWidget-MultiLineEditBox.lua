@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 29
+local Type, Version = "MultiLineEditBox", 30
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -161,6 +161,7 @@ Methods
 local methods = {
 	["OnAcquire"] = function(self)
 		self.editBox:SetText("")
+		self.editBox:SetHitRectInsets(0, 0, 0, 0)
 		self:SetDisabled(false)
 		self:SetWidth(200)
 		self:DisableButton(false)
