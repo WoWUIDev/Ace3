@@ -1,4 +1,4 @@
-local Type, Version = "MultiLineEditBox", 31
+local Type, Version = "MultiLineEditBox", 32
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -146,7 +146,11 @@ local function OnVerticalScroll(self, offset)                                   
 end
 
 local function OnScrollRangeChanged(self, xrange, yrange)
-	OnVerticalScroll(self, self:GetVerticalScroll())
+	if yrange == 0 then
+		self.obj.editBox:SetHitRectInsets(0, 0, 0, 0)
+	else
+		OnVerticalScroll(self, self:GetVerticalScroll())
+	end
 end
 
 local function OnShowFocus(frame)
