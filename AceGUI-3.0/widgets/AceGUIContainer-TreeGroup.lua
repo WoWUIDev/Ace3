@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 45
+local Type, Version = "TreeGroup", 46
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -646,8 +646,12 @@ local function Constructor()
 	treeframe:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
 	treeframe:SetBackdropBorderColor(0.4, 0.4, 0.4)
 	treeframe:SetResizable(true)
-	treeframe:SetMinResize(100, 1)
-	treeframe:SetMaxResize(400, 1600)
+	if treeframe.SetResizeBounds then -- WoW 10.0
+		-- treeframe:SetResizeBounds(100, 1, 400, 1600) -- broken in 10.0.0.45335
+	else
+		treeframe:SetMinResize(100, 1)
+		treeframe:SetMaxResize(400, 1600)
+	end
 	treeframe:SetScript("OnUpdate", FirstFrameUpdate)
 	treeframe:SetScript("OnSizeChanged", Tree_OnSizeChanged)
 	treeframe:SetScript("OnMouseWheel", Tree_OnMouseWheel)
