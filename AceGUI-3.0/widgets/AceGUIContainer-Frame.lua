@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 29
+local Type, Version = "Frame", 30
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -191,7 +191,7 @@ local function Constructor()
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0, 0, 0, 1)
 	if frame.SetResizeBounds then -- WoW 10.0
-		-- frame:SetResizeBounds(400, 200) -- broken in 10.0.0.45335
+		frame:SetResizeBounds(400, 200)
 	else
 		frame:SetMinResize(400, 200)
 	end

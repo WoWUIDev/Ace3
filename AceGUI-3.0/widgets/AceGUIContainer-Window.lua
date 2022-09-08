@@ -21,7 +21,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Window"
-	local Version = 7
+	local Version = 8
 
 	local function frameOnShow(this)
 		this.obj:Fire("OnShow")
@@ -187,7 +187,7 @@ do
 		frame:SetScript("OnShow",frameOnShow)
 		frame:SetScript("OnHide",frameOnClose)
 		if frame.SetResizeBounds then -- WoW 10.0
-			-- frame:SetResizeBounds(240,240) -- broken in 10.0.0.45335
+			frame:SetResizeBounds(240,240)
 		else
 			frame:SetMinResize(240,240)
 		end
