@@ -1,3 +1,4 @@
+- AceGUI-3.0: Preliminary support for WoW 10.0
 - AceGUI-3.0: MultiLineEditBox: Fixed an issue with mouse interactivity on re-cycled editboxes in certain circumstances.
 - AceGUI-3.0: Label: Use font objects to allow font fallback mechanics to be used.
 
