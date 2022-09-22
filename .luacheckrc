@@ -26,7 +26,6 @@ globals = {
 }
 
 read_globals = {
-	"strmatch", "format",
 	"geterrorhandler",
 	"table", "string",
 
