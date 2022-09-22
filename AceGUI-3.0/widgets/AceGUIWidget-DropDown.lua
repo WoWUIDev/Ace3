@@ -11,10 +11,6 @@ local PlaySound = PlaySound
 local UIParent, CreateFrame = UIParent, CreateFrame
 local _G = _G
 
--- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
--- List them here for Mikk's FindGlobals script
--- GLOBALS: CLOSE
-
 local function fixlevels(parent,...)
 	local i = 1
 	local child = select(i, ...)

@@ -40,12 +40,6 @@ local math_max = math.max
 -- WoW APIs
 local UIParent = UIParent
 
--- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
--- List them here for Mikk's FindGlobals script
--- GLOBALS: geterrorhandler, LibStub
-
---local con = LibStub("AceConsole-3.0",true)
-
 AceGUI.WidgetRegistry = AceGUI.WidgetRegistry or {}
 AceGUI.LayoutRegistry = AceGUI.LayoutRegistry or {}
 AceGUI.WidgetBase = AceGUI.WidgetBase or {}
@@ -94,38 +88,38 @@ do
 	AceGUI.objPools = AceGUI.objPools or {}
 	local objPools = AceGUI.objPools
 	--Returns a new instance, if none are available either returns a new table or calls the given contructor
-	function newWidget(type)
-		if not WidgetRegistry[type] then
+	function newWidget(widgetType)
+		if not WidgetRegistry[widgetType] then
 			error("Attempt to instantiate unknown widget type", 2)
 		end
 
-		if not objPools[type] then
-			objPools[type] = {}
+		if not objPools[widgetType] then
+			objPools[widgetType] = {}
 		end
 
-		local newObj = next(objPools[type])
+		local newObj = next(objPools[widgetType])
 		if not newObj then
-			newObj = WidgetRegistry[type]()
-			newObj.AceGUIWidgetVersion = WidgetVersions[type]
+			newObj = WidgetRegistry[widgetType]()
+			newObj.AceGUIWidgetVersion = WidgetVersions[widgetType]
 		else
-			objPools[type][newObj] = nil
+			objPools[widgetType][newObj] = nil
 			-- if the widget is older then the latest, don't even try to reuse it
 			-- just forget about it, and grab a new one.
-			if not newObj.AceGUIWidgetVersion or newObj.AceGUIWidgetVersion < WidgetVersions[type] then
-				return newWidget(type)
+			if not newObj.AceGUIWidgetVersion or newObj.AceGUIWidgetVersion < WidgetVersions[widgetType] then
+				return newWidget(widgetType)
 			end
 		end
 		return newObj
 	end
 	-- Releases an instance to the Pool
-	function delWidget(obj,type)
-		if not objPools[type] then
-			objPools[type] = {}
+	function delWidget(obj,widgetType)
+		if not objPools[widgetType] then
+			objPools[widgetType] = {}
 		end
 		if objPools[type][obj] then
 			error("Attempt to Release Widget that is already released", 2)
 		end
-		objPools[type][obj] = true
+		objPools[widgetType][obj] = true
 	end
 end
 
@@ -141,9 +135,9 @@ end
 -- OnAcquire function on it, before returning.
 -- @param type The type of the widget.
 -- @return The newly created widget.
-function AceGUI:Create(type)
-	if WidgetRegistry[type] then
-		local widget = newWidget(type)
+function AceGUI:Create(widgetType)
+	if WidgetRegistry[widgetType] then
+		local widget = newWidget(widgetType)
 
 		if rawget(widget, "Acquire") then
 			widget.OnAcquire = widget.Acquire
@@ -161,7 +155,7 @@ function AceGUI:Create(type)
 		if widget.OnAcquire then
 			widget:OnAcquire()
 		else
-			error(("Widget type %s doesn't supply an OnAcquire Function"):format(type))
+			error(("Widget type %s doesn't supply an OnAcquire Function"):format(widgetType))
 		end
 		-- Set the default Layout ("List")
 		safecall(widget.SetLayout, widget, "List")
@@ -589,25 +583,25 @@ AceGUI.counts = AceGUI.counts or {}
 -- This is used by widgets that require a named frame, e.g. when a Blizzard
 -- Template requires it.
 -- @param type The widget type
-function AceGUI:GetNextWidgetNum(type)
-	if not self.counts[type] then
-		self.counts[type] = 0
+function AceGUI:GetNextWidgetNum(widgetType)
+	if not self.counts[widgetType] then
+		self.counts[widgetType] = 0
 	end
-	self.counts[type] = self.counts[type] + 1
-	return self.counts[type]
+	self.counts[widgetType] = self.counts[widgetType] + 1
+	return self.counts[widgetType]
 end
 
 --- Return the number of created widgets for this type.
 -- In contrast to GetNextWidgetNum, the number is not incremented.
--- @param type The widget type
-function AceGUI:GetWidgetCount(type)
-	return self.counts[type] or 0
+-- @param widgetType The widget type
+function AceGUI:GetWidgetCount(widgetType)
+	return self.counts[widgetType] or 0
 end
 
 --- Return the version of the currently registered widget type.
--- @param type The widget type
-function AceGUI:GetWidgetVersion(type)
-	return WidgetVersions[type]
+-- @param widgetType The widget type
+function AceGUI:GetWidgetVersion(widgetType)
+	return WidgetVersions[widgetType]
 end
 
 -------------
@@ -770,7 +764,6 @@ AceGUI:RegisterLayout("Flow",
 
 				usedwidth = 0
 				rowstart = frame
-				rowstartoffset = frameoffset
 
 				if child.DoLayout then
 					child:DoLayout()
@@ -813,7 +806,8 @@ local GetCellAlign = function (dir, tableObj, colObj, cellObj, cell, child)
 			or colObj and (colObj["align" .. dir] or colObj.align)
 			or tableObj["align" .. dir] or tableObj.align
 			or "CENTERLEFT"
-	local child, cell, val = child or 0, cell or 0, nil
+	local val
+	child, cell = child or 0, cell or 0
 
 	if type(fn) == "string" then
 		fn = fn:lower()
