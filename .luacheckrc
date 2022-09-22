@@ -26,7 +26,6 @@ globals = {
 }
 
 read_globals = {
-	"ceil", "floor", "min", "max",
 	"strmatch", "format",
 	"geterrorhandler",
 	"table", "string",

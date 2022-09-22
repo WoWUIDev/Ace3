@@ -35,7 +35,7 @@ local tinsert, wipe = table.insert, table.wipe
 local select, pairs, next, type = select, pairs, next, type
 local error, assert = error, assert
 local setmetatable, rawget = setmetatable, rawget
-local math_max = math.max
+local math_max, math_min, math_ceil = math.max, math.min, math.ceil
 
 -- WoW APIs
 local UIParent = UIParent
@@ -821,7 +821,7 @@ local GetCellAlign = function (dir, tableObj, colObj, cellObj, cell, child)
 		val = fn
 	end
 
-	return fn, max(0, min(val, cell))
+	return fn, math_max(0, math_min(val, cell))
 end
 
 -- Get width or height for multiple cells combined
@@ -830,7 +830,7 @@ local GetCellDimension = function (dir, laneDim, from, to, space)
 	for cell=from,to do
 		dim = dim + (laneDim[cell] or 0)
 	end
-	return dim + max(0, to - from) * (space or 0)
+	return dim + math_max(0, to - from) * (space or 0)
 end
 
 --[[ Options
@@ -876,7 +876,7 @@ AceGUI:RegisterLayout("Table",
 				repeat
 					n = n + 1
 					local col = (n - 1) % #cols + 1
-					local row = ceil(n / #cols)
+					local row = math_ceil(n / #cols)
 					local rowspan = rowspans[col]
 					local cell = rowspan and rowspan.child or child
 					local cellObj = cell:GetUserData("cell")
@@ -892,7 +892,7 @@ AceGUI:RegisterLayout("Table",
 					end
 
 					-- Colspan
-					local colspan = max(0, min((cellObj and cellObj.colspan or 1) - 1, #cols - col))
+					local colspan = math_max(0, math_min((cellObj and cellObj.colspan or 1) - 1, #cols - col))
 					n = n + colspan
 
 					-- Place the cell
@@ -909,7 +909,7 @@ AceGUI:RegisterLayout("Table",
 			end
 		end
 
-		local rows = ceil(n / #cols)
+		local rows = math_ceil(n / #cols)
 
 		-- Determine fixed size cols and collect weights
 		local extantH, totalWeight = totalH, 0
@@ -934,16 +934,16 @@ AceGUI:RegisterLayout("Table",
 							f:ClearAllPoints()
 							local childH = f:GetWidth() or 0
 
-							laneH[col] = max(laneH[col], childH - GetCellDimension("H", laneH, colStart[child], col - 1, spaceH))
+							laneH[col] = math_max(laneH[col], childH - GetCellDimension("H", laneH, colStart[child], col - 1, spaceH))
 						end
 					end
 
-					laneH[col] = max(colObj.min or colObj[1] or 0, min(laneH[col], colObj.max or colObj[2] or laneH[col]))
+					laneH[col] = math_max(colObj.min or colObj[1] or 0, math_min(laneH[col], colObj.max or colObj[2] or laneH[col]))
 				else
 					-- Rel./Abs. width
 					laneH[col] = colObj.width < 1 and colObj.width * totalH or colObj.width
 				end
-				extantH = max(0, extantH - laneH[col])
+				extantH = math_max(0, extantH - laneH[col])
 			end
 		end
 
@@ -982,7 +982,7 @@ AceGUI:RegisterLayout("Table",
 						child:DoLayout()
 					end
 
-					rowV = max(rowV, (f:GetHeight() or 0) - GetCellDimension("V", laneV, rowStart[child], row - 1, spaceV))
+					rowV = math_max(rowV, (f:GetHeight() or 0) - GetCellDimension("V", laneV, rowStart[child], row - 1, spaceV))
 				end
 			end
 
