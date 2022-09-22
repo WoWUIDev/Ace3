@@ -60,8 +60,6 @@ local function hookFrame(f)
 	f.at3matches = {}
 end
 
-local firstPMLength
-
 local fallbacks, notfallbacks = {}, {}  -- classifies completions into those which have preconditions and those which do not.  Those without preconditions are only considered if no other completions have matches.
 local pmolengths = {}  -- holds the number of characters to overwrite according to pmoverwrite and the current prematch
 -- ------------------------------------------------------------------------------
@@ -233,11 +231,10 @@ end
 
 local IsSecureCmd = IsSecureCmd
 
-local cands, candUsage = {}, {}
+local candUsage = {}
 local numMatches = 0
 local firstMatch, hasNonFallback, allGCBS, setGCBS, usage
 local text_precursor, text_all, text_pmendToCursor
-local matches, usagefunc  -- convenience locals
 
 -- Fill the this.at3matches[descriptor] tables with matching completion pairs for each entry, based on
 -- the partial string preceding the cursor position and using the corresponding registered wordlist.
@@ -293,7 +290,7 @@ local function fillMatches(this, desc, fallback)
 						wordlist(cands, text_all, prematchEnd + 1, text_pmendToCursor)
 					end
 					if cands ~= false then
-						matches = this.at3matches[desc] or {}
+						local matches = this.at3matches[desc] or {}
 						for i in pairs(matches) do matches[i] = nil end
 
 						-- Check each of the entries in cands to see if it completes the word before the cursor.
@@ -305,7 +302,6 @@ local function fillMatches(this, desc, fallback)
 								numMatches = numMatches + 1
 								if numMatches == 1 then
 									firstMatch = matches[m]
-									firstPMLength = pmolengths[desc] or 0
 								end
 							end
 						end
@@ -355,7 +351,6 @@ function AceTab:OnTabPressed(this)
 
 	numMatches = 0
 	firstMatch = nil
-	firstPMLength = 0
 	hasNonFallback = false
 	for i in pairs(pmolengths) do pmolengths[i] = nil end
 
@@ -394,7 +389,7 @@ function AceTab:OnTabPressed(this)
 			-- Use the group's description as a heading for its usage statements.
 			DEFAULT_CHAT_FRAME:AddMessage(desc..":")
 
-			usagefunc = registry[desc].usagefunc
+			local usagefunc = registry[desc].usagefunc
 			if not usagefunc then
 				-- No special usage processing; just print a list of the (formatted) matches.
 				for m, fm in pairs(matches) do
