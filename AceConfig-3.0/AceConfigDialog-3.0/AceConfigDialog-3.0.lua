@@ -153,6 +153,7 @@ local stringIsLiteral = {
 	width = true,
 	image = true,
 	fontSize = true,
+	item = true
 }
 
 --Is Never a function or method
@@ -507,6 +508,21 @@ local function OptionOnMouseOver(widget, event)
 	local appName = user.appName
 	local tooltip = AceConfigDialog.tooltip
 
+
+	local item = GetOptionsMemberValue("item", opt, options, path, appName)
+	if item then
+		if type(item) == "number" then
+			item = "item:" .. tostring(item)
+		end
+		if GetItemInfoInstant(item) then
+			AceConfigDialog.GameTooltip = GameTooltip
+			AceConfigDialog.GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			AceConfigDialog.GameTooltip:SetHyperlink(item)
+			AceConfigDialog.GameTooltip:Show()
+			return
+		end
+	end
+
 	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
@@ -532,6 +548,10 @@ end
 
 local function OptionOnMouseLeave(widget, event)
 	AceConfigDialog.tooltip:Hide()
+	if AceConfigDialog.GameTooltip then
+		AceConfigDialog.GameTooltip:Hide()
+		AceConfigDialog.GameTooltip = nil
+	end
 end
 
 local function GetFuncName(option)

@@ -83,6 +83,7 @@ local basekeys={
 		dialogHidden=optmethodbool,
 		dropdownHidden=optmethodbool,
 	cmdHidden=optmethodbool,
+	item=optstringnumberfunc,
 	icon=optstringnumberfunc,
 	iconCoords=optmethodtable,
 	handler=opttable,
