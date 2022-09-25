@@ -511,13 +511,11 @@ local function OptionOnMouseOver(widget, event)
 
 	local tooltipHyperlink = GetOptionsMemberValue("tooltipHyperlink", opt, options, path, appName)
 	if tooltipHyperlink then
-		if GetItemInfoInstant(tooltipHyperlink) then
-			AceConfigDialog.GameTooltip = GameTooltip
-			AceConfigDialog.GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
-			AceConfigDialog.GameTooltip:SetHyperlink(tooltipHyperlink)
-			AceConfigDialog.GameTooltip:Show()
-			return
-		end
+		AceConfigDialog.GameTooltip = GameTooltip
+		AceConfigDialog.GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+		AceConfigDialog.GameTooltip:SetHyperlink(tooltipHyperlink)
+		AceConfigDialog.GameTooltip:Show()
+		return
 	end
 
 	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
