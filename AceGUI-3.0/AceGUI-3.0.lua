@@ -116,7 +116,7 @@ do
 		if not objPools[widgetType] then
 			objPools[widgetType] = {}
 		end
-		if objPools[type][obj] then
+		if objPools[widgetType][obj] then
 			error("Attempt to Release Widget that is already released", 2)
 		end
 		objPools[widgetType][obj] = true
