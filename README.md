@@ -12,9 +12,6 @@ https://www.wowace.com/projects/ace3/pages/getting-started
 Documentation can be found here:  
 https://www.wowace.com/addons/ace3/pages/
 
-For historic purposes, the "old" documentation is still around on the old wiki, some articles may not be converted yet, and only exist on the old wiki:  
-http://old.wowace.com/wiki/Ace3
-
 Resources
 ---------
 A development repository is available on GitHub:  
