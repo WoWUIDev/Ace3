@@ -153,7 +153,7 @@ local stringIsLiteral = {
 	width = true,
 	image = true,
 	fontSize = true,
-	item = true
+	tooltipHyperlink = true
 }
 
 --Is Never a function or method
@@ -509,15 +509,12 @@ local function OptionOnMouseOver(widget, event)
 	local tooltip = AceConfigDialog.tooltip
 
 
-	local item = GetOptionsMemberValue("item", opt, options, path, appName)
-	if item then
-		if type(item) == "number" then
-			item = "item:" .. tostring(item)
-		end
-		if GetItemInfoInstant(item) then
+	local tooltipHyperlink = GetOptionsMemberValue("tooltipHyperlink", opt, options, path, appName)
+	if tooltipHyperlink then
+		if GetItemInfoInstant(tooltipHyperlink) then
 			AceConfigDialog.GameTooltip = GameTooltip
 			AceConfigDialog.GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
-			AceConfigDialog.GameTooltip:SetHyperlink(item)
+			AceConfigDialog.GameTooltip:SetHyperlink(tooltipHyperlink)
 			AceConfigDialog.GameTooltip:Show()
 			return
 		end
