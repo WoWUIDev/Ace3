@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 83
+local MAJOR, MINOR = "AceConfigDialog-3.0", 84
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1961,6 +1961,7 @@ end
 -- @param parent The parent to use in the interface options tree.
 -- @param ... The path in the options table to feed into the interface options panel.
 -- @return The reference to the frame registered into the Interface Options.
+-- @return The category ID (on WoW 10.0 only)
 function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 	local BlizOptions = AceConfigDialog.BlizOptions
 
@@ -1989,19 +1990,32 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 		end
 		group:SetCallback("OnShow", FeedToBlizPanel)
 		group:SetCallback("OnHide", ClearBlizPanel)
+		local categoryID = nil
 		if Settings and Settings.RegisterCanvasLayoutCategory then
 			local categoryName = name or appName
 			if parent then
 				local category = Settings.GetCategory(parent)
-				Settings.RegisterCanvasLayoutSubcategory(category, group.frame, categoryName)
+				if not category then
+					error(("The parent category '%s' was not found"):format(parent), 2)
+				end
+				local subcategory = Settings.RegisterCanvasLayoutSubcategory(category, group.frame, categoryName)
+
+				-- force the generated ID to be used for subcategories, as these can have very simple names like "Profiles"
+				categoryID = subcategory.ID
+				group:SetName(subcategory.ID, parent)
 			else
 				local category = Settings.RegisterCanvasLayoutCategory(group.frame, categoryName)
+				-- using appName here would be cleaner, but would not be 100% compatible
+				-- but for top-level categories it should be fine, as these are typically addon names
+				category.ID = categoryName
+				categoryID = category.ID
 				Settings.RegisterAddOnCategory(category)
 			end
 		else
 			InterfaceOptions_AddCategory(group.frame)
 		end
-		return group.frame
+		group:SetCategory(categoryID)
+		return group.frame, categoryID
 	else
 		error(("%s has already been added to the Blizzard Options Window with the given path"):format(appName), 2)
 	end
