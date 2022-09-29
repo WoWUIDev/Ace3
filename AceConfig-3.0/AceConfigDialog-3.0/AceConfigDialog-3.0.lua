@@ -1961,7 +1961,7 @@ end
 -- @param parent The parent to use in the interface options tree.
 -- @param ... The path in the options table to feed into the interface options panel.
 -- @return The reference to the frame registered into the Interface Options.
--- @return The category ID (on WoW 10.0 only)
+-- @return The category ID to pass to Settings.OpenToCategory (or InterfaceOptionsFrame_OpenToCategory)
 function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 	local BlizOptions = AceConfigDialog.BlizOptions
 
@@ -2008,14 +2008,11 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 				group:SetName(categoryName, parent)
 				Settings.RegisterAddOnCategory(category)
 			end
-
-			-- category and name should always match here
-			group:SetCategory(group.frame.name)
 		else
 			group:SetName(name or appName, parent)
 			InterfaceOptions_AddCategory(group.frame)
 		end
-		return group.frame, group.frame.categoryID
+		return group.frame, group.frame.name
 	else
 		error(("%s has already been added to the Blizzard Options Window with the given path"):format(appName), 2)
 	end
