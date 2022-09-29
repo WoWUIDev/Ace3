@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 84
+local MAJOR, MINOR = "AceConfigDialog-3.0", 85
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1977,7 +1977,6 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 	if not BlizOptions[appName][key] then
 		local group = gui:Create("BlizOptionsGroup")
 		BlizOptions[appName][key] = group
-		group:SetName(name or appName, parent)
 
 		group:SetTitle(name or appName)
 		group:SetUserData("appName", appName)
@@ -1990,7 +1989,6 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 		end
 		group:SetCallback("OnShow", FeedToBlizPanel)
 		group:SetCallback("OnHide", ClearBlizPanel)
-		local categoryID = nil
 		if Settings and Settings.RegisterCanvasLayoutCategory then
 			local categoryName = name or appName
 			if parent then
@@ -2001,21 +1999,23 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 				local subcategory = Settings.RegisterCanvasLayoutSubcategory(category, group.frame, categoryName)
 
 				-- force the generated ID to be used for subcategories, as these can have very simple names like "Profiles"
-				categoryID = subcategory.ID
 				group:SetName(subcategory.ID, parent)
 			else
 				local category = Settings.RegisterCanvasLayoutCategory(group.frame, categoryName)
 				-- using appName here would be cleaner, but would not be 100% compatible
 				-- but for top-level categories it should be fine, as these are typically addon names
 				category.ID = categoryName
-				categoryID = category.ID
+				group:SetName(categoryName, parent)
 				Settings.RegisterAddOnCategory(category)
 			end
+
+			-- category and name should always match here
+			group:SetCategory(group.frame.name)
 		else
+			group:SetName(name or appName, parent)
 			InterfaceOptions_AddCategory(group.frame)
 		end
-		group:SetCategory(categoryID)
-		return group.frame, categoryID
+		return group.frame, group.frame.categoryID
 	else
 		error(("%s has already been added to the Blizzard Options Window with the given path"):format(appName), 2)
 	end

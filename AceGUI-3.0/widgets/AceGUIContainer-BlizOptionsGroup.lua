@@ -2,7 +2,7 @@
 BlizOptionsGroup Container
 Simple container widget for the integration of AceGUI into the Blizzard Interface Options
 -------------------------------------------------------------------------------]]
-local Type, Version = "BlizOptionsGroup", 24
+local Type, Version = "BlizOptionsGroup", 25
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -52,6 +52,7 @@ local methods = {
 	["OnAcquire"] = function(self)
 		self:SetName()
 		self:SetTitle()
+		self:SetCategory()
 	end,
 
 	-- ["OnRelease"] = nil,
