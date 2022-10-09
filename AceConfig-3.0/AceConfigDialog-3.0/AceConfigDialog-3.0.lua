@@ -507,18 +507,16 @@ local function OptionOnMouseOver(widget, event)
 	local path = user.path
 	local appName = user.appName
 	local tooltip = AceConfigDialog.tooltip
-
-
 	local tooltipHyperlink = GetOptionsMemberValue("tooltipHyperlink", opt, options, path, appName)
+
+	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	if tooltipHyperlink then
-		AceConfigDialog.GameTooltip = GameTooltip
-		AceConfigDialog.GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
-		AceConfigDialog.GameTooltip:SetHyperlink(tooltipHyperlink)
-		AceConfigDialog.GameTooltip:Show()
+		tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+		tooltip:SetHyperlink(tooltipHyperlink)
+		tooltip:Show()
 		return
 	end
 
-	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	local name = GetOptionsMemberValue("name", opt, options, path, appName)
 	local desc = GetOptionsMemberValue("desc", opt, options, path, appName)
 	local usage = GetOptionsMemberValue("usage", opt, options, path, appName)
@@ -543,10 +541,6 @@ end
 
 local function OptionOnMouseLeave(widget, event)
 	AceConfigDialog.tooltip:Hide()
-	if AceConfigDialog.GameTooltip then
-		AceConfigDialog.GameTooltip:Hide()
-		AceConfigDialog.GameTooltip = nil
-	end
 end
 
 local function GetFuncName(option)
