@@ -511,7 +511,6 @@ local function OptionOnMouseOver(widget, event)
 
 	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 	if tooltipHyperlink then
-		tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
 		tooltip:SetHyperlink(tooltipHyperlink)
 		tooltip:Show()
 		return
