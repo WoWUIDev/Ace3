@@ -12,7 +12,7 @@
 -- @release $Id$
 local MAJOR,MINOR = "AceConsole-3.0", 7
 
-local AceConsole, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+local AceConsole = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConsole then return end -- No upgrade needed
 
@@ -21,55 +21,82 @@ AceConsole.commands = AceConsole.commands or {} -- table containing commands reg
 AceConsole.weakcommands = AceConsole.weakcommands or {} -- table containing self, command => func references for weak commands that don't persist through enable/disable
 
 -- Lua APIs
-local tconcat, tostring, select = table.concat, tostring, select
-local type, pairs, error = type, pairs, error
+local tconcat, tgetn, tostring, select = table.concat, table.getn, tostring, select
+local type, pairs, error, unpack = type, pairs, error, unpack
 local format, strfind, strsub = string.format, string.find, string.sub
-local max = math.max
+local strlower, strupper = string.lower, string.upper
+local max, assert, loadstring = math.max, assert, loadstring
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
 
 -- WoW APIs
-local _G = _G
+local _G = getfenv() or _G or {}
 
-local tmp={}
-local function Print(self,frame,...)
-	local n=0
+local Print
+do
+local tmp = {}
+function Print(self, frame, arg)
 	if self ~= AceConsole then
-		n=n+1
-		tmp[n] = "|cff33ff99"..tostring( self ).."|r:"
-	end
-	for i=1, select("#", ...) do
-		n=n+1
-		tmp[n] = tostring(select(i, ...))
-	end
-	frame:AddMessage( tconcat(tmp," ",1,n) )
-end
-
---- Print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
--- @paramsig [chatframe ,] ...
--- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
--- @param ... List of any values to be printed
-function AceConsole:Print(...)
-	local frame = ...
-	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
-		return Print(self, frame, select(2,...))
+		tmp[1] = "|cff33ff99"..tostring(self).."|r:"
 	else
-		return Print(self, DEFAULT_CHAT_FRAME, ...)
+		tmp[1] = ''
+	end
+	if type(arg) == "string" then
+		frame:AddMessage(tmp[1]..arg)
+	else	-- arg is table and may contain frame as first element if argument frame is nil
+		local b, e = frame and 1 or 2, tgetn(arg)
+		if e >= b then
+			frame = frame or arg[1]
+			for i=0,e-b do
+				tmp[2+i] = tostring(arg[b+i])
+			end
+			frame:AddMessage(tconcat(tmp," ",1,e-b+2)) -- explicitly, because the length is not affected by assignment
+		end
 	end
 end
+end	-- Print
 
+AceConsole.Print = vararg(1, function(self, arg)
+	local frame = arg[1]
+	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
+		return Print(self, frame, select(2, arg))
+	else
+		return Print(self, DEFAULT_CHAT_FRAME, arg)
+	end
+end)
 
 --- Formatted (using format()) print to DEFAULT_CHAT_FRAME or given ChatFrame (anything with an .AddMessage function)
 -- @paramsig [chatframe ,] "format"[, ...]
 -- @param chatframe Custom ChatFrame to print to (or any frame with an .AddMessage function)
 -- @param format Format string - same syntax as standard Lua format()
 -- @param ... Arguments to the format string
-function AceConsole:Printf(...)
-	local frame = ...
+AceConsole.Printf = vararg(1, function(self, arg)
+	local frame = arg[1]
 	if type(frame) == "table" and frame.AddMessage then	-- Is first argument something with an .AddMessage member?
-		return Print(self, frame, format(select(2,...)))
+		return Print(self, frame, format(select(2, arg)))
 	else
-		return Print(self, DEFAULT_CHAT_FRAME, format(...))
+		return Print(self, DEFAULT_CHAT_FRAME, format(unpack(arg)))
 	end
-end
+end)
 
 
 
@@ -83,7 +110,7 @@ function AceConsole:RegisterChatCommand( command, func, persist )
 
 	if persist==nil then persist=true end	-- I'd rather have my addon's "/addon enable" around if the author screws up. Having some extra slash regged when it shouldnt be isn't as destructive. True is a better default. /Mikk
 
-	local name = "ACECONSOLE_"..command:upper()
+	local name = "ACECONSOLE_"..strupper(command)
 
 	if type( func ) == "string" then
 		SlashCmdList[name] = function(input, editBox)
@@ -92,7 +119,7 @@ function AceConsole:RegisterChatCommand( command, func, persist )
 	else
 		SlashCmdList[name] = func
 	end
-	_G["SLASH_"..name.."1"] = "/"..command:lower()
+	_G["SLASH_"..name.."1"] = "/"..strlower(command)
 	AceConsole.commands[command] = name
 	-- non-persisting commands are registered for enabling disabling
 	if not persist then
@@ -109,7 +136,7 @@ function AceConsole:UnregisterChatCommand( command )
 	if name then
 		SlashCmdList[name] = nil
 		_G["SLASH_" .. name .. "1"] = nil
-		hash_SlashCmdList["/" .. command:upper()] = nil
+		hash_SlashCmdList["/" .. strupper(command)] = nil
 		AceConsole.commands[command] = nil
 	end
 end
@@ -119,15 +146,15 @@ end
 function AceConsole:IterateChatCommands() return pairs(AceConsole.commands) end
 
 
-local function nils(n, ...)
+AceConsole.nils = vararg(1, function(n,arg)
 	if n>1 then
-		return nil, nils(n-1, ...)
+		return nil, AceConsole.nils(n-1, unpack(arg))
 	elseif n==1 then
-		return nil, ...
+		return nil,unpack(arg)
 	else
-		return ...
+		return unpack(arg)
 	end
-end
+end)
 
 
 --- Retreive one or more space-separated arguments from a string.
@@ -146,7 +173,7 @@ function AceConsole:GetArgs(str, numargs, startpos)
 	-- find start of new arg
 	pos = strfind(str, "[^ ]", pos)
 	if not pos then	-- whoops, end of string
-		return nils(numargs, 1e9)
+		return AceConsole.nils(numargs, 1e9)
 	end
 
 	if numargs<1 then
@@ -201,7 +228,7 @@ function AceConsole:GetArgs(str, numargs, startpos)
 	end
 
 	-- search aborted, we hit end of string. return it all as one argument. (yes, even if it's an unterminated quote or hyperlink)
-	return strsub(str, startpos), nils(numargs-1, 1e9)
+	return strsub(str, startpos), AceConsole.nils(numargs-1, 1e9)
 end
 
 

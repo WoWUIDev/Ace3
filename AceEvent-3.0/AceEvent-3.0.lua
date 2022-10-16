@@ -18,7 +18,35 @@ local AceEvent = LibStub:NewLibrary(MAJOR, MINOR)
 if not AceEvent then return end
 
 -- Lua APIs
-local pairs = pairs
+local pairs, tconcat, unpack, assert, loadstring = pairs, table.concat, unpack, assert, loadstring
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
+
+local wowLegacy
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowLegacy = (interface < 11300)
+end
 
 AceEvent.frame = AceEvent.frame or CreateFrame("Frame", "AceEvent30Frame") -- our event frame
 AceEvent.embeds = AceEvent.embeds or {} -- what objects embed this lib
@@ -116,9 +144,15 @@ end
 
 -- Script to fire blizzard events into the event listeners
 local events = AceEvent.events
-AceEvent.frame:SetScript("OnEvent", function(this, event, ...)
-	events:Fire(event, ...)
-end)
+if wowLegacy then
+	AceEvent.frame:SetScript("OnEvent", function()
+		events:Fire(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+	end)
+else
+	AceEvent.frame:SetScript("OnEvent", vararg(2, function(this, event, arg)
+		events:Fire(event, unpack(arg))
+	end))
+end
 
 --- Finally: upgrade our old embeds
 for target, v in pairs(AceEvent.embeds) do

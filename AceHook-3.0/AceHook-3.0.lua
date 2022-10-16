@@ -31,13 +31,49 @@ local scripts = AceHook.scripts
 local onceSecure = AceHook.onceSecure
 
 -- Lua APIs
-local pairs, next, type = pairs, next, type
-local format = string.format
-local assert, error = assert, error
+local pairs, next, type, unpack = pairs, next, type, unpack
+local format, tconcat = string.format, table.concat
+local assert, error, loadstring = assert, error, loadstring
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
 
 -- WoW APIs
-local issecurevariable, hooksecurefunc = issecurevariable, hooksecurefunc
-local _G = _G
+local issecurevariable = issecurevariable
+local _G = getfenv() or _G or {}
+
+local hooksecurefunc = hooksecurefunc or function (table, functionName, hookfunc)
+	if type(table) == "string" then
+		table, functionName, hookfunc = _G, table, functionName
+	end
+	local orig = table[functionName]
+	if type(orig) ~= "function" then
+		error("The function "..functionName.." does not exist", 2)
+	end
+	table[functionName] = vararg(0, function(arg)
+		local tmp = {orig(unpack(arg))}
+		hookfunc(unpack(arg))
+		return unpack(tmp)
+	end)
+end
 
 -- functions for later definition
 local donothing, createHook, hook

@@ -3,33 +3,52 @@ local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local select, pairs, ipairs, type, tostring = select, pairs, ipairs, type, tostring
-local tsort = table.sort
+local pairs, ipairs, type, tostring, format = pairs, ipairs, type, tostring, string.format
+local tsort, tinsert, tgetn = table.sort, table.insert, table.getn
+
+local wowLegacy, wowBfa, wowThirdLegion, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowLegacy = (interface < 11300)
+	wowBfa = (interface >= 80000)
+	wowThirdLegion = (interface >= 70300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+end
+
+local setn = function(t,n)
+	if wowLegacy then
+		table.setn(t,n)
+	end
+end
 
 -- WoW APIs
 local PlaySound = PlaySound
 local UIParent, CreateFrame = UIParent, CreateFrame
-local _G = _G
+local _G = getfenv() or _G or {}
 
-local function fixlevels(parent,...)
-	local i = 1
-	local child = select(i, ...)
-	while child do
-		child:SetFrameLevel(parent:GetFrameLevel()+1)
-		fixlevels(child, child:GetChildren())
-		i = i + 1
-		child = select(i, ...)
+local function fixlevels(parent)
+	local child
+	local childList = {parent:GetChildren()}
+	local level = parent:GetFrameLevel() + 1
+
+	for i = 1, tgetn(childList) do
+		child = childList[i]
+		child:SetFrameLevel(level)
+		fixlevels(child)
 	end
 end
 
-local function fixstrata(strata, parent, ...)
-	local i = 1
-	local child = select(i, ...)
+local function fixstrata(strata, parent)
+	local child
+	local childList = {parent:GetChildren()}
+
 	parent:SetFrameStrata(strata)
-	while child do
-		fixstrata(strata, child, child:GetChildren())
-		i = i + 1
-		child = select(i, ...)
+	for i = 1, tgetn(childList) do
+		child = childList[i]
+		fixstrata(strata, child)
 	end
 end
 
@@ -72,16 +91,21 @@ do
 	end
 
 	-- See the note in Constructor() for each scroll related function
-	local function OnMouseWheel(this, value)
-		this.obj:MoveScroll(value)
+	local function OnMouseWheel(frame, value)
+		frame = frame or this
+		value = value or arg1
+		frame.obj:MoveScroll(value)
 	end
 
-	local function OnScrollValueChanged(this, value)
-		this.obj:SetScroll(value)
+	local function OnScrollValueChanged(frame, value)
+		frame = frame or this
+		value = value or arg1
+		frame.obj:SetScroll(value)
 	end
 
-	local function OnSizeChanged(this)
-		this.obj:FixScroll()
+	local function OnSizeChanged(frame)
+		frame = frame or this
+		frame.obj:FixScroll()
 	end
 
 	--[[ Exported methods ]]--
@@ -100,7 +124,9 @@ do
 		end
 		child:ClearAllPoints()
 		child:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, offset)
-		child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", self.slider:IsShown() and -12 or 0, offset)
+		if not wowLegacy then
+			child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", self.slider:IsShown() and -12 or 0, offset)
+		end
 		status.offset = offset
 		status.scrollvalue = value
 	end
@@ -144,7 +170,9 @@ do
 			if value < 1000 then
 				child:ClearAllPoints()
 				child:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, offset)
-				child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -12, offset)
+				if not wowLegacy then
+					child:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -12, offset)
+				end
 				status.offset = offset
 			end
 		end
@@ -165,9 +193,9 @@ do
 
 	-- exported
 	local function AddItem(self, item)
-		self.items[#self.items + 1] = item
+		tinsert(self.items, item)
 
-		local h = #self.items * 16
+		local h = tgetn(self.items) * 16
 		self.itemFrame:SetHeight(h)
 		self.frame:SetHeight(min(h + 34, self.maxHeight)) -- +34: 20 for scrollFrame placement (10 offset) and +14 for item placement
 
@@ -189,13 +217,22 @@ do
 
 		local height = 8
 		for i, item in pairs(items) do
-			item:SetPoint("TOP", itemFrame, "TOP", 0, -2 + (i - 1) * -16)
+			if not wowLegacy then
+				item:SetPoint("TOP", itemFrame, "TOP", 0, -2 + (i - 1) * -16)
+			else
+				if i == 1 then
+					item:SetPoint("TOP", itemFrame, "TOP", 0, -2)
+				else
+					item:SetPoint("TOP", items[i-1].frame, "BOTTOM", 0, 1)
+				end
+			end
+
 			item:Show()
 
 			height = height + 16
 		end
 		itemFrame:SetHeight(height)
-		fixstrata("TOOLTIP", frame, frame:GetChildren())
+		fixstrata("TOOLTIP", frame)
 		frame:Show()
 		self:Fire("OnOpen")
 	end
@@ -213,6 +250,7 @@ do
 			AceGUI:Release(item)
 			items[i] = nil
 		end
+		setn(items, 0)
 	end
 
 	-- exported
@@ -249,7 +287,7 @@ do
 
 	local function Constructor()
 		local count = AceGUI:GetNextWidgetNum(widgetType)
-		local frame = CreateFrame("Frame", "AceGUI30Pullout"..count, UIParent, "BackdropTemplate")
+		local frame = CreateFrame("Frame", "AceGUI30Pullout"..count, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
 		local self = {}
 		self.count = count
 		self.type = widgetType
@@ -300,7 +338,7 @@ do
 		scrollFrame.obj = self
 		itemFrame.obj = self
 
-		local slider = CreateFrame("Slider", "AceGUI30PulloutScrollbar"..count, scrollFrame, "BackdropTemplate")
+		local slider = CreateFrame("Slider", "AceGUI30PulloutScrollbar"..count, scrollFrame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 		slider:SetOrientation("VERTICAL")
 		slider:SetHitRectInsets(0, 0, -10, 0)
 		slider:SetBackdrop(sliderBackdrop)
@@ -311,16 +349,27 @@ do
 		slider.obj = self
 
 		scrollFrame:SetScrollChild(itemFrame)
+		if wowLegacy then
+			scrollFrame:SetWidth(defaultWidth - 12)
+			scrollFrame:SetHeight(self.maxHeight - 24)
+		end
 		scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 6, -12)
-		scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -6, 12)
+		if not wowLegacy then
+			scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -6, 12)
+		end
 		scrollFrame:EnableMouseWheel(true)
 		scrollFrame:SetScript("OnMouseWheel", OnMouseWheel)
 		scrollFrame:SetScript("OnSizeChanged", OnSizeChanged)
 		scrollFrame:SetToplevel(true)
 		scrollFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 
+		if wowLegacy then
+			itemFrame:SetWidth(defaultWidth - 12)
+		end
 		itemFrame:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
-		itemFrame:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", -12, 0)
+		if not wowLegacy then
+			itemFrame:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", -12, 0)
+		end
 		itemFrame:SetHeight(400)
 		itemFrame:SetToplevel(true)
 		itemFrame:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -353,32 +402,44 @@ do
 
 	--[[ UI event handler ]]--
 
-	local function Control_OnEnter(this)
-		this.obj.button:LockHighlight()
-		this.obj:Fire("OnEnter")
+	local function Control_OnEnter(frame)
+		frame = frame or this
+		frame.obj.button:LockHighlight()
+		frame.obj:Fire("OnEnter")
 	end
 
-	local function Control_OnLeave(this)
-		this.obj.button:UnlockHighlight()
-		this.obj:Fire("OnLeave")
+	local function Control_OnLeave(frame)
+		frame = frame or this
+		frame.obj.button:UnlockHighlight()
+		frame.obj:Fire("OnLeave")
 	end
 
-	local function Dropdown_OnHide(this)
-		local self = this.obj
+	local function Dropdown_OnHide(frame)
+		frame = frame or this
+		local self = frame.obj
 		if self.open then
 			self.pullout:Close()
 		end
 	end
 
-	local function Dropdown_TogglePullout(this)
-		local self = this.obj
+	local function Dropdown_TogglePullout(frame)
+		frame = frame or this
+		local self = frame.obj
+		if not wowBfa then
+			PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 856 or "igMainMenuOptionCheckBoxOn") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+		end
 		if self.open then
 			self.open = nil
 			self.pullout:Close()
 			AceGUI:ClearFocus()
 		else
 			self.open = true
-			self.pullout:SetWidth(self.pulloutWidth or self.frame:GetWidth())
+			local width = self.pulloutWidth or self.frame:GetWidth()
+			self.pullout:SetWidth(width)
+			if wowLegacy then
+				self.pullout.scrollFrame:SetWidth(width - 12)
+				self.pullout.itemFrame:SetWidth(width - (self.pullout.slider:IsShown() and 24 or 12))
+			end
 			self.pullout:Open("TOPLEFT", self.frame, "BOTTOMLEFT", 0, self.label:IsShown() and -2 or 0)
 			AceGUI:SetFocus(self)
 		end
@@ -449,7 +510,7 @@ do
 		pullout:SetCallback("OnClose", OnPulloutClose)
 		pullout:SetCallback("OnOpen", OnPulloutOpen)
 		self.pullout.frame:SetFrameLevel(self.frame:GetFrameLevel() + 1)
-		fixlevels(self.pullout.frame, self.pullout.frame:GetChildren())
+		fixlevels(self.pullout.frame)
 
 		self:SetHeight(44)
 		self:SetWidth(200)
@@ -560,7 +621,7 @@ do
 	local function AddListItem(self, value, text, itemType)
 		if not itemType then itemType = "Dropdown-Item-Toggle" end
 		local exists = AceGUI:GetWidgetVersion(itemType)
-		if not exists then error(("The given item type, %q, does not exist within AceGUI-3.0"):format(tostring(itemType)), 2) end
+		if not exists then error(format("The given item type, %q, does not exist within AceGUI-3.0", tostring(itemType)), 2) end
 
 		local item = AceGUI:Create(itemType)
 		item:SetText(text)
@@ -597,7 +658,7 @@ do
 
 		if type(order) ~= "table" then
 			for v in pairs(list) do
-				sortlist[#sortlist + 1] = v
+				tinsert(sortlist, v)
 			end
 			tsort(sortlist, sortTbl)
 
@@ -605,6 +666,7 @@ do
 				AddListItem(self, key, list[key], itemType)
 				sortlist[i] = nil
 			end
+			setn(sortlist, 0)
 		else
 			for i, key in ipairs(order) do
 				AddListItem(self, key, list[key], itemType)

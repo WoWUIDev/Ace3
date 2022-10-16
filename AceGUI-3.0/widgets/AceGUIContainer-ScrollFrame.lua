@@ -9,6 +9,14 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 -- Lua APIs
 local pairs, assert, type = pairs, assert, type
 local min, max, floor = math.min, math.max, math.floor
+local format = string.format
+
+local wowLegacy
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowLegacy = (interface < 11300)
+end
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -17,6 +25,7 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 Support functions
 -------------------------------------------------------------------------------]]
 local function FixScrollOnUpdate(frame)
+	frame = frame or this
 	frame:SetScript("OnUpdate", nil)
 	frame.obj:FixScroll()
 end
@@ -25,14 +34,19 @@ end
 Scripts
 -------------------------------------------------------------------------------]]
 local function ScrollFrame_OnMouseWheel(frame, value)
+	frame = frame or this
+	value = value or arg1
 	frame.obj:MoveScroll(value)
 end
 
 local function ScrollFrame_OnSizeChanged(frame)
+	frame = frame or this
 	frame:SetScript("OnUpdate", FixScrollOnUpdate)
 end
 
 local function ScrollBar_OnScrollValueChanged(frame, value)
+	frame = frame or this
+	value = value or arg1
 	frame.obj:SetScroll(value)
 end
 
@@ -50,7 +64,7 @@ local methods = {
 		for k in pairs(self.localstatus) do
 			self.localstatus[k] = nil
 		end
-		self.scrollframe:SetPoint("BOTTOMRIGHT")
+		self.scrollframe:SetPoint("BOTTOMRIGHT", 0, 0)
 		self.scrollbar:Hide()
 		self.scrollBarShown = nil
 		self.content.height, self.content.width, self.content.original_width = nil, nil, nil
@@ -101,32 +115,47 @@ local methods = {
 				self.scrollBarShown = nil
 				self.scrollbar:Hide()
 				self.scrollbar:SetValue(0)
-				self.scrollframe:SetPoint("BOTTOMRIGHT")
-				if self.content.original_width then
+				self.scrollframe:SetPoint("BOTTOMRIGHT", 0, 0)
+				if not wowLegacy and self.content.original_width then
 					self.content.width = self.content.original_width
 				end
 				self:DoLayout()
+			end
+			if wowLegacy then
+				offset = 0
 			end
 		else
 			if not self.scrollBarShown then
 				self.scrollBarShown = true
 				self.scrollbar:Show()
 				self.scrollframe:SetPoint("BOTTOMRIGHT", -20, 0)
-				if self.content.original_width then
+				if not wowLegacy and self.content.original_width then
 					self.content.width = self.content.original_width - 20
 				end
 				self:DoLayout()
 			end
 			local value = (offset / (viewheight - height) * 1000)
-			if value > 1000 then value = 1000 end
+			if value > 1000 then
+				value = 1000
+				if wowLegacy then
+					offset = height - viewheight + 2
+				end
+			end
 			self.scrollbar:SetValue(value)
 			self:SetScroll(value)
-			if value < 1000 then
+			if value < 1000 and not wowLegacy then
 				self.content:ClearAllPoints()
 				self.content:SetPoint("TOPLEFT", 0, offset)
 				self.content:SetPoint("TOPRIGHT", 0, offset)
 				status.offset = offset
 			end
+		end
+		if wowLegacy then
+			status.offset = offset
+			self.scrollframe:SetScrollChild(self.content)
+			self.content:ClearAllPoints()
+			self.content:SetPoint("TOPLEFT", 0, offset)
+			self.content:SetPoint("TOPRIGHT", 0, offset)
 		end
 		self.updateLock = nil
 	end,
@@ -151,11 +180,25 @@ local methods = {
 
 	["OnWidthSet"] = function(self, width)
 		local content = self.content
-		content.width = width - (self.scrollBarShown and 20 or 0)
-		content.original_width = width
+		if wowLegacy then
+			content:SetWidth(width)
+			content.width = width
+		else
+			content.width = width - (self.scrollBarShown and 20 or 0)
+			content.original_width = width
+		end
 	end,
 
 	["OnHeightSet"] = function(self, height)
+		if wowLegacy then
+			local parent = self.parent
+			if parent and height then
+				height = (parent.content.height or 0) or height
+				self.frame.height = parent.content.height or 0
+			end
+			self.scrollframe:SetHeight(height)
+		end
+
 		local content = self.content
 		content.height = height
 	end
@@ -168,13 +211,13 @@ local function Constructor()
 	local num = AceGUI:GetNextWidgetNum(Type)
 
 	local scrollframe = CreateFrame("ScrollFrame", nil, frame)
-	scrollframe:SetPoint("TOPLEFT")
-	scrollframe:SetPoint("BOTTOMRIGHT")
+	scrollframe:SetPoint("TOPLEFT", 0, 0)
+	scrollframe:SetPoint("BOTTOMRIGHT", 0, 0)
 	scrollframe:EnableMouseWheel(true)
 	scrollframe:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
 	scrollframe:SetScript("OnSizeChanged", ScrollFrame_OnSizeChanged)
 
-	local scrollbar = CreateFrame("Slider", ("AceConfigDialogScrollFrame%dScrollBar"):format(num), scrollframe, "UIPanelScrollBarTemplate")
+	local scrollbar = CreateFrame("Slider", format("AceConfigDialogScrollFrame%dScrollBar", num), scrollframe, "UIPanelScrollBarTemplate")
 	scrollbar:SetPoint("TOPLEFT", scrollframe, "TOPRIGHT", 4, -16)
 	scrollbar:SetPoint("BOTTOMLEFT", scrollframe, "BOTTOMRIGHT", 4, 16)
 	scrollbar:SetMinMaxValues(0, 1000)
@@ -187,12 +230,16 @@ local function Constructor()
 
 	local scrollbg = scrollbar:CreateTexture(nil, "BACKGROUND")
 	scrollbg:SetAllPoints(scrollbar)
-	scrollbg:SetColorTexture(0, 0, 0, 0.4)
+	if scrollbg.SetColorTexture then
+		scrollbg:SetColorTexture(0, 0, 0, 0.4)
+	else
+		scrollbg:SetTexture(0, 0, 0, 0.4)
+	end
 
 	--Container Support
 	local content = CreateFrame("Frame", nil, scrollframe)
-	content:SetPoint("TOPLEFT")
-	content:SetPoint("TOPRIGHT")
+	content:SetPoint("TOPLEFT", 0, 0)
+	content:SetPoint("TOPRIGHT", 0, 0)
 	content:SetHeight(400)
 	scrollframe:SetScrollChild(content)
 

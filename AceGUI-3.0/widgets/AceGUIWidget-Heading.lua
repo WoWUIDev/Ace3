@@ -43,22 +43,22 @@ local function Constructor()
 	frame:Hide()
 
 	local label = frame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
-	label:SetPoint("TOP")
-	label:SetPoint("BOTTOM")
+	label:SetPoint("TOP", 0, 0)
+	label:SetPoint("BOTTOM", 0, 0)
 	label:SetJustifyH("CENTER")
 
 	local left = frame:CreateTexture(nil, "BACKGROUND")
 	left:SetHeight(8)
 	left:SetPoint("LEFT", 3, 0)
 	left:SetPoint("RIGHT", label, "LEFT", -5, 0)
-	left:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+	left:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
 	left:SetTexCoord(0.81, 0.94, 0.5, 1)
 
 	local right = frame:CreateTexture(nil, "BACKGROUND")
 	right:SetHeight(8)
 	right:SetPoint("RIGHT", -3, 0)
 	right:SetPoint("LEFT", label, "RIGHT", 5, 0)
-	right:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+	right:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
 	right:SetTexCoord(0.81, 0.94, 0.5, 1)
 
 	local widget = {

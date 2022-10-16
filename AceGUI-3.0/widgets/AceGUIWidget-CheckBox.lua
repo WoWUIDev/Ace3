@@ -6,11 +6,43 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
-local select, pairs = select, pairs
+local pairs, assert, loadstring = pairs, assert, loadstring
+local tgetn, tconcat = table.getn, table.concat
 
 -- WoW APIs
 local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
+
+local wowThirdLegion, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowThirdLegion = (interface >= 70300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+end
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -20,10 +52,10 @@ local function AlignImage(self)
 	self.text:ClearAllPoints()
 	if not img then
 		self.text:SetPoint("LEFT", self.checkbg, "RIGHT")
-		self.text:SetPoint("RIGHT")
+		self.text:SetPoint("RIGHT", 0, 0)
 	else
 		self.text:SetPoint("LEFT", self.image, "RIGHT", 1, 0)
-		self.text:SetPoint("RIGHT")
+		self.text:SetPoint("RIGHT", 0, 0)
 	end
 end
 
@@ -31,14 +63,17 @@ end
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeave")
 end
 
 local function CheckBox_OnMouseDown(frame)
+	frame = frame or this
 	local self = frame.obj
 	if not self.disabled then
 		if self.image:GetTexture() then
@@ -51,14 +86,15 @@ local function CheckBox_OnMouseDown(frame)
 end
 
 local function CheckBox_OnMouseUp(frame)
+	frame = frame or this
 	local self = frame.obj
 	if not self.disabled then
 		self:ToggleChecked()
 
 		if self.checked then
-			PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+			PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 856 or "igMainMenuOptionCheckBoxOn") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		else -- for both nil and false (tristate)
-			PlaySound(857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+			PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 857 or "igMainMenuOptionCheckBoxOff") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
 		end
 
 		self:Fire("OnValueChanged", self.checked)
@@ -87,7 +123,7 @@ local methods = {
 		if self.desc then
 			self.desc:SetWidth(width - 30)
 			if self.desc:GetText() and self.desc:GetText() ~= "" then
-				self:SetHeight(28 + self.desc:GetStringHeight())
+				self:SetHeight(28 + (self.desc.GetStringHeight and self.desc:GetStringHeight() or self.desc:GetHeight()))
 			end
 		end
 	end,
@@ -151,21 +187,21 @@ local methods = {
 		local size
 		if type == "radio" then
 			size = 16
-			checkbg:SetTexture(130843) -- Interface\\Buttons\\UI-RadioButton
+			checkbg:SetTexture("Interface\\Buttons\\UI-RadioButton")
 			checkbg:SetTexCoord(0, 0.25, 0, 1)
-			check:SetTexture(130843) -- Interface\\Buttons\\UI-RadioButton
+			check:SetTexture("Interface\\Buttons\\UI-RadioButton")
 			check:SetTexCoord(0.25, 0.5, 0, 1)
 			check:SetBlendMode("ADD")
-			highlight:SetTexture(130843) -- Interface\\Buttons\\UI-RadioButton
+			highlight:SetTexture("Interface\\Buttons\\UI-RadioButton")
 			highlight:SetTexCoord(0.5, 0.75, 0, 1)
 		else
 			size = 24
-			checkbg:SetTexture(130755) -- Interface\\Buttons\\UI-CheckBox-Up
+			checkbg:SetTexture("Interface\\Buttons\\UI-CheckBox-Up")
 			checkbg:SetTexCoord(0, 1, 0, 1)
-			check:SetTexture(130751) -- Interface\\Buttons\\UI-CheckBox-Check
+			check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 			check:SetTexCoord(0, 1, 0, 1)
 			check:SetBlendMode("BLEND")
-			highlight:SetTexture(130753) -- Interface\\Buttons\\UI-CheckBox-Highlight
+			highlight:SetTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
 			highlight:SetTexCoord(0, 1, 0, 1)
 		end
 		checkbg:SetHeight(size)
@@ -207,7 +243,7 @@ local methods = {
 			self.desc:Show()
 			--self.text:SetFontObject(GameFontNormal)
 			self.desc:SetText(desc)
-			self:SetHeight(28 + self.desc:GetStringHeight())
+			self:SetHeight(28 + (self.desc.GetStringHeight and self.desc:GetStringHeight() or self.desc:GetHeight()))
 		else
 			if self.desc then
 				self.desc:SetText("")
@@ -218,20 +254,20 @@ local methods = {
 		end
 	end,
 
-	["SetImage"] = function(self, path, ...)
+	["SetImage"] = vararg(2, function(self, path, arg)
 		local image = self.image
 		image:SetTexture(path)
 
 		if image:GetTexture() then
-			local n = select("#", ...)
+			local n = tgetn(arg)
 			if n == 4 or n == 8 then
-				image:SetTexCoord(...)
+				image:SetTexCoord(unpack(arg))
 			else
 				image:SetTexCoord(0, 1, 0, 1)
 			end
 		end
 		AlignImage(self)
-	end
+	end)
 }
 
 --[[-----------------------------------------------------------------------------
@@ -250,21 +286,21 @@ local function Constructor()
 	local checkbg = frame:CreateTexture(nil, "ARTWORK")
 	checkbg:SetWidth(24)
 	checkbg:SetHeight(24)
-	checkbg:SetPoint("TOPLEFT")
-	checkbg:SetTexture(130755) -- Interface\\Buttons\\UI-CheckBox-Up
+	checkbg:SetPoint("TOPLEFT", 0, 0)
+	checkbg:SetTexture("Interface\\Buttons\\UI-CheckBox-Up")
 
 	local check = frame:CreateTexture(nil, "OVERLAY")
 	check:SetAllPoints(checkbg)
-	check:SetTexture(130751) -- Interface\\Buttons\\UI-CheckBox-Check
+	check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 
 	local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	text:SetJustifyH("LEFT")
 	text:SetHeight(18)
 	text:SetPoint("LEFT", checkbg, "RIGHT")
-	text:SetPoint("RIGHT")
+	text:SetPoint("RIGHT", 0, 0)
 
 	local highlight = frame:CreateTexture(nil, "HIGHLIGHT")
-	highlight:SetTexture(130753) -- Interface\\Buttons\\UI-CheckBox-Highlight
+	highlight:SetTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
 	highlight:SetBlendMode("ADD")
 	highlight:SetAllPoints(checkbg)
 

@@ -8,7 +8,17 @@ if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
 local min, max, floor = math.min, math.max, math.floor
-local tonumber, pairs = tonumber, pairs
+local tonumber, pairs, strgsub, format = tonumber, pairs, string.gsub, string.format
+
+local wowThirdLegion, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowThirdLegion = (interface >= 70300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+end
 
 -- WoW APIs
 local PlaySound = PlaySound
@@ -20,7 +30,7 @@ Support functions
 local function UpdateText(self)
 	local value = self.value or 0
 	if self.ispercent then
-		self.editbox:SetText(("%s%%"):format(floor(value * 1000 + 0.5) / 10))
+		self.editbox:SetText(format("%s%%", floor(value * 1000 + 0.5) / 10))
 	else
 		self.editbox:SetText(floor(value * 100 + 0.5) / 100)
 	end
@@ -29,8 +39,8 @@ end
 local function UpdateLabels(self)
 	local min_value, max_value = (self.min or 0), (self.max or 100)
 	if self.ispercent then
-		self.lowtext:SetFormattedText("%s%%", (min_value * 100))
-		self.hightext:SetFormattedText("%s%%", (max_value * 100))
+		self.lowtext:SetText(format("%s%%", (min_value * 100)))
+		self.hightext:SetText(format("%s%%", (max_value * 100)))
 	else
 		self.lowtext:SetText(min_value)
 		self.hightext:SetText(max_value)
@@ -41,19 +51,24 @@ end
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeave")
 end
 
 local function Frame_OnMouseDown(frame)
+	frame = frame or this
 	frame.obj.slider:EnableMouseWheel(true)
 	AceGUI:ClearFocus()
 end
 
 local function Slider_OnValueChanged(frame, newvalue)
+	frame = frame or this
+	newvalue = newvalue or arg1
 	local self = frame.obj
 	if not frame.setup then
 		if self.step and self.step > 0 then
@@ -71,11 +86,14 @@ local function Slider_OnValueChanged(frame, newvalue)
 end
 
 local function Slider_OnMouseUp(frame)
+	frame = frame or this
 	local self = frame.obj
 	self:Fire("OnMouseUp", self.value)
 end
 
 local function Slider_OnMouseWheel(frame, v)
+	frame = frame or this
+	v = v or arg1
 	local self = frame.obj
 	if not self.disabled then
 		local value = self.value
@@ -89,31 +107,35 @@ local function Slider_OnMouseWheel(frame, v)
 end
 
 local function EditBox_OnEscapePressed(frame)
+	frame = frame or this
 	frame:ClearFocus()
 end
 
 local function EditBox_OnEnterPressed(frame)
+	frame = frame or this
 	local self = frame.obj
 	local value = frame:GetText()
 	if self.ispercent then
-		value = value:gsub('%%', '')
+		value = strgsub(value, '%%', '')
 		value = tonumber(value) / 100
 	else
 		value = tonumber(value)
 	end
 
 	if value then
-		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+		PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 856 or "igMainMenuOptionCheckBoxOn") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		self.slider:SetValue(value)
 		self:Fire("OnMouseUp", value)
 	end
 end
 
 local function EditBox_OnEnter(frame)
+	frame = frame or this
 	frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
 end
 
 local function EditBox_OnLeave(frame)
+	frame = frame or this
 	frame:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
 end
 
@@ -137,6 +159,7 @@ local methods = {
 		self.disabled = disabled
 		if disabled then
 			self.slider:EnableMouse(false)
+			self.slider:GetThumbTexture():SetDesaturated(true) -- ElvUI
 			self.label:SetTextColor(.5, .5, .5)
 			self.hightext:SetTextColor(.5, .5, .5)
 			self.lowtext:SetTextColor(.5, .5, .5)
@@ -146,6 +169,7 @@ local methods = {
 			self.editbox:ClearFocus()
 		else
 			self.slider:EnableMouse(true)
+			self.slider:GetThumbTexture():SetDesaturated(false) -- ElvUI
 			self.label:SetTextColor(1, .82, 0)
 			self.hightext:SetTextColor(1, 1, 1)
 			self.lowtext:SetTextColor(1, 1, 1)
@@ -216,12 +240,12 @@ local function Constructor()
 	frame:SetScript("OnMouseDown", Frame_OnMouseDown)
 
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	label:SetPoint("TOPLEFT")
-	label:SetPoint("TOPRIGHT")
+	label:SetPoint("TOPLEFT", 0, 0)
+	label:SetPoint("TOPRIGHT", 0, 0)
 	label:SetJustifyH("CENTER")
 	label:SetHeight(15)
 
-	local slider = CreateFrame("Slider", nil, frame, "BackdropTemplate")
+	local slider = CreateFrame("Slider", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	slider:SetOrientation("HORIZONTAL")
 	slider:SetHeight(15)
 	slider:SetHitRectInsets(0, 0, -10, 0)
@@ -243,7 +267,7 @@ local function Constructor()
 	local hightext = slider:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 	hightext:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", -2, 3)
 
-	local editbox = CreateFrame("EditBox", nil, frame, "BackdropTemplate")
+	local editbox = CreateFrame("EditBox", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	editbox:SetAutoFocus(false)
 	editbox:SetFontObject(GameFontHighlightSmall)
 	editbox:SetPoint("TOP", slider, "BOTTOM")

@@ -23,10 +23,31 @@ if not AceConfigRegistry.callbacks then
 end
 
 -- Lua APIs
-local tinsert, tconcat = table.insert, table.concat
-local strfind, strmatch = string.find, string.match
-local type, tostring, select, pairs = type, tostring, select, pairs
-local error, assert = error, assert
+local tinsert, tconcat, tgetn = table.insert, table.concat, table.getn
+local strfind, unpack = string.find, unpack
+local type, tostring, pairs = type, tostring, pairs
+local error, assert, loadstring = error, assert, loadstring
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
 
 -----------------------------------------------------------------------
 -- Validating options table consistency:
@@ -42,13 +63,13 @@ AceConfigRegistry.validated = {
 
 
 
-local function err(msg, errlvl, ...)
+local err = vararg(2, function(msg, errlvl, arg)
 	local t = {}
-	for i=select("#",...),1,-1 do
-		tinsert(t, (select(i, ...)))
+	for i=tgetn(arg),1,-1 do
+		tinsert(t, arg[i])
 	end
 	error(MAJOR..":ValidateOptionsTable(): "..tconcat(t,".")..msg, errlvl+2)
-end
+end)
 
 
 local isstring={["string"]=true, _="string"}
@@ -79,9 +100,9 @@ local basekeys={
 	confirmText=optstring,
 	disabled=optmethodbool,
 	hidden=optmethodbool,
-		guiHidden=optmethodbool,
-		dialogHidden=optmethodbool,
-		dropdownHidden=optmethodbool,
+	guiHidden=optmethodbool,
+	dialogHidden=optmethodbool,
+	dropdownHidden=optmethodbool,
 	cmdHidden=optmethodbool,
 	icon=optstringnumberfunc,
 	iconCoords=optmethodtable,
@@ -91,6 +112,8 @@ local basekeys={
 	func=optmethodfalse,
 	arg={["*"]=true},
 	width=optstringnumber,
+	-- This key is used by legacy versions of ElvUI --
+	buttonElvUI=optmethodbool,
 }
 
 local typedkeys={
@@ -113,10 +136,10 @@ local typedkeys={
 		args=istable,
 		plugins=opttable,
 		inline=optbool,
-			cmdInline=optbool,
-			guiInline=optbool,
-			dropdownInline=optbool,
-			dialogInline=optbool,
+		cmdInline=optbool,
+		guiInline=optbool,
+		dropdownInline=optbool,
+		dialogInline=optbool,
 		childGroups=optstring,
 	},
 	execute={
@@ -192,80 +215,80 @@ local typedkeys={
 	},
 }
 
-local function validateKey(k,errlvl,...)
+local validateKey = vararg(2, function(k,errlvl,arg)
 	errlvl=(errlvl or 0)+1
 	if type(k)~="string" then
-		err("["..tostring(k).."] - key is not a string", errlvl,...)
+		err("["..tostring(k).."] - key is not a string", errlvl,unpack(arg))
 	end
 	if strfind(k, "[%c\127]") then
-		err("["..tostring(k).."] - key name contained control characters", errlvl,...)
+		err("["..tostring(k).."] - key name contained control characters", errlvl,unpack(arg))
 	end
-end
+end)
 
-local function validateVal(v, oktypes, errlvl,...)
+local validateVal = vararg(3, function(v, oktypes, errlvl,arg)
 	errlvl=(errlvl or 0)+1
 	local isok=oktypes[type(v)] or oktypes["*"]
 
 	if not isok then
-		err(": expected a "..oktypes._..", got '"..tostring(v).."'", errlvl,...)
+		err(": expected a "..oktypes._..", got '"..tostring(v).."'", errlvl,unpack(arg))
 	end
 	if type(isok)=="table" then		-- isok was a table containing specific values to be tested for!
 		if not isok[v] then
-			err(": did not expect "..type(v).." value '"..tostring(v).."'", errlvl,...)
+			err(": did not expect "..type(v).." value '"..tostring(v).."'", errlvl,unpack(arg))
 		end
 	end
-end
+end)
 
-local function validate(options,errlvl,...)
+AceConfigRegistry.validate = vararg(2, function(options,errlvl,arg)
 	errlvl=(errlvl or 0)+1
 	-- basic consistency
 	if type(options)~="table" then
-		err(": expected a table, got a "..type(options), errlvl,...)
+		err(": expected a table, got a "..type(options), errlvl,unpack(arg))
 	end
 	if type(options.type)~="string" then
-		err(".type: expected a string, got a "..type(options.type), errlvl,...)
+		err(".type: expected a string, got a "..type(options.type), errlvl,unpack(arg))
 	end
 
 	-- get type and 'typedkeys' member
 	local tk = typedkeys[options.type]
 	if not tk then
-		err(".type: unknown type '"..options.type.."'", errlvl,...)
+		err(".type: unknown type '"..options.type.."'", errlvl,unpack(arg))
 	end
 
 	-- make sure that all options[] are known parameters
 	for k,v in pairs(options) do
 		if not (tk[k] or basekeys[k]) then
-			err(": unknown parameter", errlvl,tostring(k),...)
+			err(": unknown parameter", errlvl,tostring(k),unpack(arg))
 		end
 	end
 
 	-- verify that required params are there, and that everything is the right type
 	for k,oktypes in pairs(basekeys) do
-		validateVal(options[k], oktypes, errlvl,k,...)
+		validateVal(options[k], oktypes, errlvl,k,unpack(arg))
 	end
 	for k,oktypes in pairs(tk) do
-		validateVal(options[k], oktypes, errlvl,k,...)
+		validateVal(options[k], oktypes, errlvl,k,unpack(arg))
 	end
 
 	-- extra logic for groups
 	if options.type=="group" then
 		for k,v in pairs(options.args) do
-			validateKey(k,errlvl,"args",...)
-			validate(v, errlvl,k,"args",...)
+			validateKey(k,errlvl,"args",unpack(arg))
+			AceConfigRegistry.validate(v, errlvl,k,"args",unpack(arg))
 		end
 		if options.plugins then
 			for plugname,plugin in pairs(options.plugins) do
 				if type(plugin)~="table" then
-					err(": expected a table, got '"..tostring(plugin).."'", errlvl,tostring(plugname),"plugins",...)
+					err(": expected a table, got '"..tostring(plugin).."'", errlvl,tostring(plugname),"plugins",unpack(arg))
 				end
 				for k,v in pairs(plugin) do
-					validateKey(k,errlvl,tostring(plugname),"plugins",...)
-					validate(v, errlvl,k,tostring(plugname),"plugins",...)
+					validateKey(k,errlvl,tostring(plugname),"plugins",unpack(arg))
+					AceConfigRegistry.validate(v, errlvl,k,tostring(plugname),"plugins",unpack(arg))
 				end
 			end
 		end
 	end
-end
+end)
 
 
 --- Validates basic structure and integrity of an options table \\
@@ -279,7 +302,7 @@ function AceConfigRegistry:ValidateOptionsTable(options,name,errlvl)
 	if not options.name then
 		options.name=name	-- bit of a hack, the root level doesn't really need a .name :-/
 	end
-	validate(options,errlvl,name)
+	AceConfigRegistry.validate(options,errlvl,name)
 end
 
 --- Fires a "ConfigTableChange" callback for those listening in on it, allowing config GUIs to refresh.
@@ -302,7 +325,7 @@ local function validateGetterArgs(uiType, uiName, errlvl)
 	if uiType~="cmd" and uiType~="dropdown" and uiType~="dialog" then
 		error(MAJOR..": Requesting options table: 'uiType' - invalid configuration UI type, expected 'cmd', 'dropdown' or 'dialog'", errlvl)
 	end
-	if not strmatch(uiName, "[A-Za-z]%-[0-9]") then	-- Expecting e.g. "MyLib-1.2"
+	if not strfind(uiName, "[A-Za-z]+-[0-9]") then	-- Expecting e.g. "MyLib-1.2"
 		error(MAJOR..": Requesting options table: 'uiName' - badly formatted or missing version number. Expected e.g. 'MyLib-1.2'", errlvl)
 	end
 end

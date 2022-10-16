@@ -21,14 +21,13 @@ local CallbackHandler = LibStub("CallbackHandler-1.0")
 local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
 local MAJOR, MINOR = "AceComm-3.0", 12
-local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+local AceComm = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceComm then return end
 
 -- Lua APIs
 local type, next, pairs, tostring = type, next, pairs, tostring
-local strsub, strfind = string.sub, string.find
-local match = string.match
+local strsub, match = string.sub, string.match
 local tinsert, tconcat = table.insert, table.concat
 local error, assert = error, assert
 

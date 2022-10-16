@@ -35,14 +35,17 @@ end
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeave")
 end
 
 local function ColorSwatch_OnClick(frame)
+	frame = frame or this
 	ColorPickerFrame:Hide()
 	local self = frame.obj
 	if not self.disabled then
@@ -136,14 +139,18 @@ local function Constructor()
 	local colorSwatch = frame:CreateTexture(nil, "OVERLAY")
 	colorSwatch:SetWidth(19)
 	colorSwatch:SetHeight(19)
-	colorSwatch:SetTexture(130939) -- Interface\\ChatFrame\\ChatFrameColorSwatch
-	colorSwatch:SetPoint("LEFT")
+	colorSwatch:SetTexture("Interface\\ChatFrame\\ChatFrameColorSwatch")
+	colorSwatch:SetPoint("LEFT", 0, 0)
 
 	local texture = frame:CreateTexture(nil, "BACKGROUND")
 	colorSwatch.background = texture
 	texture:SetWidth(16)
 	texture:SetHeight(16)
-	texture:SetColorTexture(1, 1, 1)
+	if texture.SetColorTexture then
+		texture:SetColorTexture(1, 1, 1)
+	else
+		texture:SetTexture(1, 1, 1)
+	end
 	texture:SetPoint("CENTER", colorSwatch)
 	texture:Show()
 
@@ -151,7 +158,7 @@ local function Constructor()
 	colorSwatch.checkers = checkers
 	checkers:SetWidth(14)
 	checkers:SetHeight(14)
-	checkers:SetTexture(188523) -- Tileset\\Generic\\Checkers
+	checkers:SetTexture("Tileset\\Generic\\Checkers")
 	checkers:SetTexCoord(.25, 0, 0.5, .25)
 	checkers:SetDesaturated(true)
 	checkers:SetVertexColor(1, 1, 1, 0.75)
@@ -163,10 +170,10 @@ local function Constructor()
 	text:SetJustifyH("LEFT")
 	text:SetTextColor(1, 1, 1)
 	text:SetPoint("LEFT", colorSwatch, "RIGHT", 2, 0)
-	text:SetPoint("RIGHT")
+	text:SetPoint("RIGHT", 0, 0)
 
 	--local highlight = frame:CreateTexture(nil, "HIGHLIGHT")
-	--highlight:SetTexture(136810) -- Interface\\QuestFrame\\UI-QuestTitleHighlight
+	--highlight:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
 	--highlight:SetBlendMode("ADD")
 	--highlight:SetAllPoints(frame)
 

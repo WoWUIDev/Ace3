@@ -3,31 +3,63 @@
 local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
-local select, assert = select, assert
+local assert, loadstring, tconcat, tgetn = assert, loadstring, table.concat, table.getn
 
 -- WoW APIs
 local PlaySound = PlaySound
 local CreateFrame = CreateFrame
 
-local function fixlevels(parent,...)
-	local i = 1
-	local child = select(i, ...)
-	while child do
-		child:SetFrameLevel(parent:GetFrameLevel()+1)
-		fixlevels(child, child:GetChildren())
-		i = i + 1
-		child = select(i, ...)
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
+
+local wowThirdLegion, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowThirdLegion = (interface >= 70300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+end
+
+local function fixlevels(parent)
+	local child
+	local childList = {parent:GetChildren()}
+	local level = parent:GetFrameLevel() + 1
+
+	for i = 1, tgetn(childList) do
+		child = childList[i]
+		child:SetFrameLevel(level)
+		fixlevels(child)
 	end
 end
 
-local function fixstrata(strata, parent, ...)
-	local i = 1
-	local child = select(i, ...)
+local function fixstrata(strata, parent)
+	local child
+	local childList = {parent:GetChildren()}
+
 	parent:SetFrameStrata(strata)
-	while child do
-		fixstrata(strata, child, child:GetChildren())
-		i = i + 1
-		child = select(i, ...)
+	for i = 1, tgetn(childList) do
+		child = childList[i]
+		fixstrata(strata, child)
 	end
 end
 
@@ -45,8 +77,9 @@ local ItemBase = {
 	counter = 0,
 }
 
-function ItemBase.Frame_OnEnter(this)
-	local self = this.obj
+function ItemBase.Frame_OnEnter(frame)
+	frame = frame or this
+	local self = frame.obj
 
 	if self.useHighlight then
 		self.highlight:Show()
@@ -58,8 +91,9 @@ function ItemBase.Frame_OnEnter(this)
 	end
 end
 
-function ItemBase.Frame_OnLeave(this)
-	local self = this.obj
+function ItemBase.Frame_OnLeave(frame)
+	frame = frame or this
+	local self = frame.obj
 
 	self.highlight:Hide()
 	self:Fire("OnLeave")
@@ -93,7 +127,7 @@ function ItemBase.SetPullout(self, pullout)
 	self.frame:SetParent(nil)
 	self.frame:SetParent(pullout.itemFrame)
 	self.parent = pullout.itemFrame
-	fixlevels(pullout.itemFrame, pullout.itemFrame:GetChildren())
+	fixlevels(pullout.itemFrame)
 end
 
 -- exported
@@ -107,9 +141,9 @@ function ItemBase.GetText(self)
 end
 
 -- exported
-function ItemBase.SetPoint(self, ...)
-	self.frame:SetPoint(...)
-end
+ItemBase.SetPoint = vararg(1, function(self, arg)
+	self.frame:SetPoint(unpack(arg))
+end)
 
 -- exported
 function ItemBase.Show(self)
@@ -169,7 +203,7 @@ function ItemBase.Create(type)
 	self.text = text
 
 	local highlight = frame:CreateTexture(nil, "OVERLAY")
-	highlight:SetTexture(136810) -- Interface\\QuestFrame\\UI-QuestTitleHighlight
+	highlight:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
 	highlight:SetBlendMode("ADD")
 	highlight:SetHeight(14)
 	highlight:ClearAllPoints()
@@ -182,7 +216,7 @@ function ItemBase.Create(type)
 	check:SetWidth(16)
 	check:SetHeight(16)
 	check:SetPoint("LEFT",frame,"LEFT",3,-1)
-	check:SetTexture(130751) -- Interface\\Buttons\\UI-CheckBox-Check
+	check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 	check:Hide()
 	self.check = check
 
@@ -190,7 +224,7 @@ function ItemBase.Create(type)
 	sub:SetWidth(16)
 	sub:SetHeight(16)
 	sub:SetPoint("RIGHT",frame,"RIGHT",-3,-1)
-	sub:SetTexture(130940) -- Interface\\ChatFrame\\ChatFrameExpandArrow
+	sub:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
 	sub:Hide()
 	self.sub = sub
 
@@ -248,8 +282,9 @@ do
 	local widgetType = "Dropdown-Item-Header"
 	local widgetVersion = 1
 
-	local function OnEnter(this)
-		local self = this.obj
+	local function OnEnter(frame)
+		frame = frame or this
+		local self = frame.obj
 		self:Fire("OnEnter")
 
 		if self.specialOnEnter then
@@ -257,8 +292,9 @@ do
 		end
 	end
 
-	local function OnLeave(this)
-		local self = this.obj
+	local function OnLeave(frame)
+		frame = frame or this
+		local self = frame.obj
 		self:Fire("OnLeave")
 
 		if self.specialOnLeave then
@@ -297,8 +333,10 @@ do
 	local widgetType = "Dropdown-Item-Execute"
 	local widgetVersion = 1
 
-	local function Frame_OnClick(this, button)
-		local self = this.obj
+	local function Frame_OnClick(frame, button)
+		frame = frame or this
+		--button = button or arg1
+		local self = frame.obj
 		if self.disabled then return end
 		self:Fire("OnClick")
 		if self.pullout then
@@ -338,14 +376,16 @@ do
 		self:SetValue(nil)
 	end
 
-	local function Frame_OnClick(this, button)
-		local self = this.obj
+	local function Frame_OnClick(frame, button)
+		frame = frame or this
+		--button = button or arg1
+		local self = frame.obj
 		if self.disabled then return end
 		self.value = not self.value
 		if self.value then
-			PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+			PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 856 or "igMainMenuOptionCheckBoxOn") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		else
-			PlaySound(857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+			PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 857 or "igMainMenuOptionCheckBoxOff") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
 		end
 		UpdateToggle(self)
 		self:Fire("OnValueChanged", self.value)
@@ -385,8 +425,9 @@ do
 	local widgetType = "Dropdown-Item-Menu"
 	local widgetVersion = 2
 
-	local function OnEnter(this)
-		local self = this.obj
+	local function OnEnter(frame)
+		frame = frame or this
+		local self = frame.obj
 		self:Fire("OnEnter")
 
 		if self.specialOnEnter then
@@ -400,8 +441,9 @@ do
 		end
 	end
 
-	local function OnHide(this)
-		local self = this.obj
+	local function OnHide(frame)
+		frame = frame or this
+		local self = frame.obj
 		if self.submenu then
 			self.submenu:Close()
 		end
@@ -455,7 +497,11 @@ do
 
 		local line = self.frame:CreateTexture(nil, "OVERLAY")
 		line:SetHeight(1)
-		line:SetColorTexture(.5, .5, .5)
+		if line.SetColorTexture then
+			line:SetColorTexture(.5, .5, .5)
+		else
+			line:SetTexture(.5, .5, .5)
+		end
 		line:SetPoint("LEFT", self.frame, "LEFT", 10, 0)
 		line:SetPoint("RIGHT", self.frame, "RIGHT", -10, 0)
 

@@ -6,8 +6,31 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
-local pairs, assert, type = pairs, assert, type
-local wipe = table.wipe
+local pairs, assert, type, wipe = pairs, assert, type, table.wipe
+
+local tsetn = function(t,n)
+	setmetatable(t,{__len=function() return n end})
+end
+
+wipe = (wipe or function(table)
+	for k, _ in pairs(table) do
+		table[k] = nil
+	end
+	tsetn(table, 0)
+	return table
+end)
+
+local wowLegacy, wowBfa, wowThirdLegion, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowBfa = (interface >= 80000)
+	wowThirdLegion = (interface >= 70300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+	wowLegacy = (interface < 11300)
+end
 
 -- WoW APIs
 local PlaySound = PlaySound
@@ -17,28 +40,34 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 Scripts
 -------------------------------------------------------------------------------]]
 local function Button_OnClick(frame)
-	PlaySound(799) -- SOUNDKIT.GS_TITLE_OPTION_EXIT
+	frame = frame or this
+	PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 799 or "gsTitleOptionExit") -- SOUNDKIT.GS_TITLE_OPTION_EXIT
 	frame.obj:Hide()
 end
 
 local function Frame_OnShow(frame)
+	frame = frame or this
 	frame.obj:Fire("OnShow")
 end
 
 local function Frame_OnClose(frame)
+	frame = frame or this
 	frame.obj:Fire("OnClose")
 end
 
 local function Frame_OnMouseDown(frame)
+	--frame = frame or this
 	AceGUI:ClearFocus()
 end
 
 local function Title_OnMouseDown(frame)
+	frame = frame or this
 	frame:GetParent():StartMoving()
 	AceGUI:ClearFocus()
 end
 
 local function MoverSizer_OnMouseUp(mover)
+	mover = mover or this
 	local frame = mover:GetParent()
 	frame:StopMovingOrSizing()
 	local self = frame.obj
@@ -50,25 +79,30 @@ local function MoverSizer_OnMouseUp(mover)
 end
 
 local function SizerSE_OnMouseDown(frame)
+	frame = frame or this
 	frame:GetParent():StartSizing("BOTTOMRIGHT")
 	AceGUI:ClearFocus()
 end
 
 local function SizerS_OnMouseDown(frame)
+	frame = frame or this
 	frame:GetParent():StartSizing("BOTTOM")
 	AceGUI:ClearFocus()
 end
 
 local function SizerE_OnMouseDown(frame)
+	frame = frame or this
 	frame:GetParent():StartSizing("RIGHT")
 	AceGUI:ClearFocus()
 end
 
 local function StatusBar_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnterStatusBar")
 end
 
 local function StatusBar_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeaveStatusBar")
 end
 
@@ -79,7 +113,9 @@ local methods = {
 	["OnAcquire"] = function(self)
 		self.frame:SetParent(UIParent)
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
-		self.frame:SetFrameLevel(100) -- Lots of room to draw under it
+		if wowBfa then
+			self.frame:SetFrameLevel(100) -- Lots of room to draw under it
+		end
 		self:SetTitle()
 		self:SetStatusText()
 		self:ApplyStatus()
@@ -104,7 +140,7 @@ local methods = {
 
 	["OnHeightSet"] = function(self, height)
 		local content = self.content
-		local contentheight = height - 57
+		local contentheight = height - (wowLegacy and 67 or 57)
 		if contentheight < 0 then
 			contentheight = 0
 		end
@@ -153,7 +189,7 @@ local methods = {
 			frame:SetPoint("TOP", UIParent, "BOTTOM", 0, status.top)
 			frame:SetPoint("LEFT", UIParent, "LEFT", status.left, 0)
 		else
-			frame:SetPoint("CENTER")
+			frame:SetPoint("CENTER", 0, 0)
 		end
 	end
 }
@@ -176,14 +212,16 @@ local PaneBackdrop  = {
 }
 
 local function Constructor()
-	local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+	local frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	frame:Hide()
 
 	frame:EnableMouse(true)
 	frame:SetMovable(true)
 	frame:SetResizable(true)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")
-	frame:SetFrameLevel(100) -- Lots of room to draw under it
+	if wowBfa then
+		frame:SetFrameLevel(100) -- Lots of room to draw under it
+	end
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0, 0, 0, 1)
 	if frame.SetResizeBounds then -- WoW 10.0
@@ -203,7 +241,7 @@ local function Constructor()
 	closebutton:SetWidth(100)
 	closebutton:SetText(CLOSE)
 
-	local statusbg = CreateFrame("Button", nil, frame, "BackdropTemplate")
+	local statusbg = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	statusbg:SetPoint("BOTTOMLEFT", 15, 15)
 	statusbg:SetPoint("BOTTOMRIGHT", -132, 15)
 	statusbg:SetHeight(24)
@@ -221,7 +259,7 @@ local function Constructor()
 	statustext:SetText("")
 
 	local titlebg = frame:CreateTexture(nil, "OVERLAY")
-	titlebg:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
+	titlebg:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
 	titlebg:SetTexCoord(0.31, 0.67, 0, 0.63)
 	titlebg:SetPoint("TOP", 0, 12)
 	titlebg:SetWidth(100)
@@ -237,21 +275,21 @@ local function Constructor()
 	titletext:SetPoint("TOP", titlebg, "TOP", 0, -14)
 
 	local titlebg_l = frame:CreateTexture(nil, "OVERLAY")
-	titlebg_l:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
+	titlebg_l:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
 	titlebg_l:SetTexCoord(0.21, 0.31, 0, 0.63)
 	titlebg_l:SetPoint("RIGHT", titlebg, "LEFT")
 	titlebg_l:SetWidth(30)
 	titlebg_l:SetHeight(40)
 
 	local titlebg_r = frame:CreateTexture(nil, "OVERLAY")
-	titlebg_r:SetTexture(131080) -- Interface\\DialogFrame\\UI-DialogBox-Header
+	titlebg_r:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
 	titlebg_r:SetTexCoord(0.67, 0.77, 0, 0.63)
 	titlebg_r:SetPoint("LEFT", titlebg, "RIGHT")
 	titlebg_r:SetWidth(30)
 	titlebg_r:SetHeight(40)
 
 	local sizer_se = CreateFrame("Frame", nil, frame)
-	sizer_se:SetPoint("BOTTOMRIGHT")
+	sizer_se:SetPoint("BOTTOMRIGHT", 0, 0)
 	sizer_se:SetWidth(25)
 	sizer_se:SetHeight(25)
 	sizer_se:EnableMouse()
@@ -262,7 +300,7 @@ local function Constructor()
 	line1:SetWidth(14)
 	line1:SetHeight(14)
 	line1:SetPoint("BOTTOMRIGHT", -8, 8)
-	line1:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+	line1:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
 	local x = 0.1 * 14/17
 	line1:SetTexCoord(0.05 - x, 0.5, 0.05, 0.5 + x, 0.05, 0.5 - x, 0.5 + x, 0.5)
 
@@ -270,13 +308,13 @@ local function Constructor()
 	line2:SetWidth(8)
 	line2:SetHeight(8)
 	line2:SetPoint("BOTTOMRIGHT", -8, 8)
-	line2:SetTexture(137057) -- Interface\\Tooltips\\UI-Tooltip-Border
+	line2:SetTexture("Interface\\Tooltips\\UI-Tooltip-Border")
 	x = 0.1 * 8/17
 	line2:SetTexCoord(0.05 - x, 0.5, 0.05, 0.5 + x, 0.05, 0.5 - x, 0.5 + x, 0.5)
 
 	local sizer_s = CreateFrame("Frame", nil, frame)
 	sizer_s:SetPoint("BOTTOMRIGHT", -25, 0)
-	sizer_s:SetPoint("BOTTOMLEFT")
+	sizer_s:SetPoint("BOTTOMLEFT", 0, 0)
 	sizer_s:SetHeight(25)
 	sizer_s:EnableMouse(true)
 	sizer_s:SetScript("OnMouseDown", SizerS_OnMouseDown)
@@ -284,7 +322,7 @@ local function Constructor()
 
 	local sizer_e = CreateFrame("Frame", nil, frame)
 	sizer_e:SetPoint("BOTTOMRIGHT", 0, 25)
-	sizer_e:SetPoint("TOPRIGHT")
+	sizer_e:SetPoint("TOPRIGHT", 0, 0)
 	sizer_e:SetWidth(25)
 	sizer_e:EnableMouse(true)
 	sizer_e:SetScript("OnMouseDown", SizerE_OnMouseDown)
@@ -293,7 +331,9 @@ local function Constructor()
 	--Container Support
 	local content = CreateFrame("Frame", nil, frame)
 	content:SetPoint("TOPLEFT", 17, -27)
-	content:SetPoint("BOTTOMRIGHT", -17, 40)
+	if not wowLegacy then
+		content:SetPoint("BOTTOMRIGHT", -17, 40)
+	end
 
 	local widget = {
 		localstatus = {},

@@ -31,21 +31,41 @@ local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 if not AceGUI then return end -- No upgrade needed
 
 -- Lua APIs
-local tinsert, wipe = table.insert, table.wipe
-local select, pairs, next, type = select, pairs, next, type
-local error, assert = error, assert
+local tinsert, tremove, tgetn, wipe, tconcat = table.insert, table.remove, table.getn, table.wipe, table.concat
+local pairs, next, type = pairs, next, type
+local strgsub, strsub, strupper, format, tostring = string.gsub, string.sub, string.upper, string.format, tostring
+local loadstring, assert, error, unpack = loadstring, assert, error, unpack
 local setmetatable, rawget = setmetatable, rawget
-local math_max, math_min, math_ceil = math.max, math.min, math.ceil
+local math_max, math_min, math_ceil, math_mod = math.max, math.min, math.ceil, (math.mod or math.fmod)
+
+local tsetn = function(t,n)
+	setmetatable(t,{__len=function() return n end})
+end
+
+wipe = (wipe or function(table)
+	for k, _ in pairs(table) do
+		table[k] = nil
+	end
+	tsetn(table, 0)
+	return table
+end)
 
 -- WoW APIs
 local UIParent = UIParent
+
+local wowLegacy
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowLegacy = (interface < 11300)
+end
 
 AceGUI.WidgetRegistry = AceGUI.WidgetRegistry or {}
 AceGUI.LayoutRegistry = AceGUI.LayoutRegistry or {}
 AceGUI.WidgetBase = AceGUI.WidgetBase or {}
 AceGUI.WidgetContainerBase = AceGUI.WidgetContainerBase or {}
 AceGUI.WidgetVersions = AceGUI.WidgetVersions or {}
-AceGUI.tooltip = AceGUI.tooltip or CreateFrame("GameTooltip", "AceGUITooltip", UIParent, "GameTooltipTemplate")
+AceGUI.tooltip = AceGUI.tooltip or (wowLegacy and GameTooltip) or CreateFrame("GameTooltip", "AceGUITooltip", UIParent, "GameTooltipTemplate")
 
 -- local upvalues
 local WidgetRegistry = AceGUI.WidgetRegistry
@@ -57,15 +77,69 @@ local WidgetVersions = AceGUI.WidgetVersions
 ]]
 local xpcall = xpcall
 
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+function AceGUI:vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
+
 local function errorhandler(err)
 	return geterrorhandler()(err)
 end
+AceGUI.errorhandler = errorhandler
 
-local function safecall(func, ...)
-	if func then
-		return xpcall(func, errorhandler, ...)
-	end
+local function CreateDispatcher(argCount)
+	local code = [[
+		local root = LibStub("AceGUI-3.0")
+		local xpcall, eh = xpcall, root.errorhandler
+		local method, ARGS
+		local function call() return method(ARGS) end
+
+		local dispatch = root:vararg(1, function(func, arg)
+			 method = func
+			 if not method then return end
+			 ARGS = unpack(arg)
+			 return xpcall(call, eh)
+		end)
+
+		return dispatch
+	]]
+
+	local ARGS = {}
+	for i = 1, argCount do ARGS[i] = "arg"..i end
+	code = strgsub(code, "ARGS", tconcat(ARGS, ", "))
+	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
+
+local Dispatchers = setmetatable({}, {__index=function(self, argCount)
+	local dispatcher = CreateDispatcher(argCount)
+	rawset(self, argCount, dispatcher)
+	return dispatcher
+end})
+Dispatchers[0] = function(func)
+	return xpcall(func, errorhandler)
+end
+
+local safecall = AceGUI:vararg(1, function(func, arg)
+	if func then
+		return Dispatchers[tgetn(arg)](func, unpack(arg))
+	end
+end)
 
 -- Recycling functions
 local newWidget, delWidget
@@ -124,6 +198,18 @@ do
 end
 
 
+local function fixlevels(parent)
+	local child
+	local childList = {parent:GetChildren()}
+	local level = parent:GetFrameLevel() + 1
+
+	for i = 1, tgetn(childList) do
+		child = childList[i]
+		child:SetFrameLevel(level)
+		fixlevels(child)
+	end
+end
+
 -------------------
 -- API Functions --
 -------------------
@@ -155,7 +241,7 @@ function AceGUI:Create(widgetType)
 		if widget.OnAcquire then
 			widget:OnAcquire()
 		else
-			error(("Widget type %s doesn't supply an OnAcquire Function"):format(widgetType))
+			error(format("Widget type %s doesn't supply an OnAcquire Function", widgetType))
 		end
 		-- Set the default Layout ("List")
 		safecall(widget.SetLayout, widget, "List")
@@ -180,7 +266,7 @@ function AceGUI:Release(widget)
 	if widget.OnRelease then
 		widget:OnRelease()
 --	else
---		error(("Widget type %s doesn't supply an OnRelease Function"):format(widget.type))
+--		error(format("Widget type %s doesn't supply an OnRelease Function", widget.type))
 	end
 	for k in pairs(widget.userdata) do
 		widget.userdata[k] = nil
@@ -287,6 +373,9 @@ do
 		frame:SetParent(nil)
 		frame:SetParent(parent.content)
 		self.parent = parent
+		if wowLegacy then
+			fixlevels(frame)
+		end
 	end
 
 	WidgetBase.SetCallback = function(self, name, func)
@@ -295,14 +384,14 @@ do
 		end
 	end
 
-	WidgetBase.Fire = function(self, name, ...)
+	WidgetBase.Fire = AceGUI:vararg(2, function(self, name, arg)
 		if self.events[name] then
-			local success, ret = safecall(self.events[name], self, name, ...)
+			local success, ret = safecall(self.events[name], self, name, unpack(arg))
 			if success then
 				return ret
 			end
 		end
-	end
+	end)
 
 	WidgetBase.SetWidth = function(self, width)
 		self.frame:SetWidth(width)
@@ -352,9 +441,9 @@ do
 		return AceGUI:IsReleasing(self)
 	end
 
-	WidgetBase.SetPoint = function(self, ...)
-		return self.frame:SetPoint(...)
-	end
+	WidgetBase.SetPoint = AceGUI:vararg(1, function(self, arg)
+		return self.frame:SetPoint(unpack(arg))
+	end)
 
 	WidgetBase.ClearAllPoints = function(self)
 		return self.frame:ClearAllPoints()
@@ -364,9 +453,9 @@ do
 		return self.frame:GetNumPoints()
 	end
 
-	WidgetBase.GetPoint = function(self, ...)
-		return self.frame:GetPoint(...)
-	end
+	WidgetBase.GetPoint = AceGUI:vararg(1, function(self, arg)
+		return self.frame:GetPoint(unpack(arg))
+	end)
 
 	WidgetBase.GetUserDataTable = function(self)
 		return self.userdata
@@ -452,21 +541,32 @@ do
 		self:DoLayout()
 	end
 
-	WidgetContainerBase.AddChildren = function(self, ...)
-		for i = 1, select("#", ...) do
-			local child = select(i, ...)
+	WidgetContainerBase.AddChildren = AceGUI:vararg(1, function(self, arg)
+		for i = 1, tgetn(arg) do
+			local child = arg[i]
 			tinsert(self.children, child)
 			child:SetParent(self)
 			child.frame:Show()
 		end
 		self:DoLayout()
-	end
+	end)
 
 	WidgetContainerBase.ReleaseChildren = function(self)
 		local children = self.children
-		for i = 1,#children do
-			AceGUI:Release(children[i])
-			children[i] = nil
+		for i = 1,tgetn(children) do
+			AceGUI:Release(tremove(children))
+		end
+	end
+
+	WidgetContainerBase.SetParent = function(self, parent)
+		WidgetBase.SetParent(self, parent)
+
+		local level = self.frame:GetFrameLevel()
+		self.content:SetFrameLevel(level + 1)
+		local children = self.children
+		for i = 1,tgetn(children) do
+			local child = children[i]
+			child:SetParent(self)
 		end
 	end
 
@@ -482,23 +582,25 @@ do
 		end
 	end
 
-	local function FrameResize(this)
-		local self = this.obj
-		if this:GetWidth() and this:GetHeight() then
+	local function FrameResize(frame)
+		frame = frame or this
+		local self = frame.obj
+		if frame:GetWidth() and frame:GetHeight() then
 			if self.OnWidthSet then
-				self:OnWidthSet(this:GetWidth())
+				self:OnWidthSet(frame:GetWidth())
 			end
 			if self.OnHeightSet then
-				self:OnHeightSet(this:GetHeight())
+				self:OnHeightSet(frame:GetHeight())
 			end
 		end
 	end
 
-	local function ContentResize(this)
-		if this:GetWidth() and this:GetHeight() then
-			this.width = this:GetWidth()
-			this.height = this:GetHeight()
-			this.obj:DoLayout()
+	local function ContentResize(frame)
+		frame = frame or this
+		if frame:GetWidth() and frame:GetHeight() then
+			frame.width = frame:GetWidth()
+			frame.height = frame:GetHeight()
+			frame.obj:DoLayout()
 		end
 	end
 
@@ -563,7 +665,7 @@ end
 function AceGUI:RegisterLayout(Name, LayoutFunc)
 	assert(type(LayoutFunc) == "function")
 	if type(Name) == "string" then
-		Name = Name:upper()
+		Name = strupper(Name)
 	end
 	LayoutRegistry[Name] = LayoutFunc
 end
@@ -572,7 +674,7 @@ end
 -- @param Name The name of the layout
 function AceGUI:GetLayout(Name)
 	if type(Name) == "string" then
-		Name = Name:upper()
+		Name = strupper(Name)
 	end
 	return LayoutRegistry[Name]
 end
@@ -582,7 +684,7 @@ AceGUI.counts = AceGUI.counts or {}
 --- A type-based counter to count the number of widgets created.
 -- This is used by widgets that require a named frame, e.g. when a Blizzard
 -- Template requires it.
--- @param type The widget type
+-- @param widgetType The widget type
 function AceGUI:GetNextWidgetNum(widgetType)
 	if not self.counts[widgetType] then
 		self.counts[widgetType] = 0
@@ -619,7 +721,7 @@ AceGUI:RegisterLayout("List",
 	function(content, children)
 		local height = 0
 		local width = content.width or content:GetWidth() or 0
-		for i = 1, #children do
+		for i = 1, tgetn(children) do
 			local child = children[i]
 
 			local frame = child.frame
@@ -665,11 +767,11 @@ AceGUI:RegisterLayout("Fill",
 	end)
 
 local layoutrecursionblock = nil
-local function safelayoutcall(object, func, ...)
+local safelayoutcall = AceGUI:vararg(2, function(object, func, arg)
 	layoutrecursionblock = true
-	object[func](object, ...)
+	object[func](object, unpack(arg))
 	layoutrecursionblock = nil
-end
+end)
 
 AceGUI:RegisterLayout("Flow",
 	function(content, children)
@@ -692,7 +794,7 @@ AceGUI:RegisterLayout("Flow",
 		local frameoffset
 		local lastframeoffset
 		local oversize
-		for i = 1, #children do
+		for i = 1, tgetn(children) do
 			local child = children[i]
 			oversize = nil
 			local frame = child.frame
@@ -810,7 +912,7 @@ local GetCellAlign = function (dir, tableObj, colObj, cellObj, cell, child)
 	child, cell = child or 0, cell or 0
 
 	if type(fn) == "string" then
-		fn = fn:lower()
+		fn = string.lower(fn)
 		fn = dir == "V" and (fn:sub(1, 3) == "top" and "start" or fn:sub(1, 6) == "bottom" and "end" or fn:sub(1, 6) == "center" and "middle")
 		  or dir == "H" and (fn:sub(-4) == "left" and "start" or fn:sub(-5) == "right" and "end" or fn:sub(-6) == "center" and "middle")
 		  or fn
@@ -859,7 +961,7 @@ AceGUI:RegisterLayout("Table",
 		local cols = tableObj.columns
 		local spaceH = tableObj.spaceH or tableObj.space or 0
 		local spaceV = tableObj.spaceV or tableObj.space or 0
-		local totalH = (content:GetWidth() or content.width or 0) - spaceH * (#cols - 1)
+		local totalH = (content:GetWidth() or content.width or 0) - spaceH * (tgetn(cols) - 1)
 
 		-- We need to reuse these because layout events can come in very frequently
 		local layoutCache = obj:GetUserData("layoutCache")
@@ -875,8 +977,8 @@ AceGUI:RegisterLayout("Table",
 			if child:IsShown() then
 				repeat
 					n = n + 1
-					local col = (n - 1) % #cols + 1
-					local row = math_ceil(n / #cols)
+					local col = math_mod(n - 1, tgetn(cols) + 1)
+					local row = math_ceil(n / tgetn(cols))
 					local rowspan = rowspans[col]
 					local cell = rowspan and rowspan.child or child
 					local cellObj = cell:GetUserData("cell")
@@ -887,12 +989,12 @@ AceGUI:RegisterLayout("Table",
 						rowspan = {child = child, from = row, to = row + cellObj.rowspan - 1}
 						rowspans[col] = rowspan
 					end
-					if rowspan and i == #children then
+					if rowspan and i == tgetn(children) then
 						rowspan.to = row
 					end
 
 					-- Colspan
-					local colspan = math_max(0, math_min((cellObj and cellObj.colspan or 1) - 1, #cols - col))
+					local colspan = math_max(0, math_min((cellObj and cellObj.colspan or 1) - 1, tgetn(cols) - col))
 					n = n + colspan
 
 					-- Place the cell
@@ -909,7 +1011,7 @@ AceGUI:RegisterLayout("Table",
 			end
 		end
 
-		local rows = math_ceil(n / #cols)
+		local rows = math_ceil(n / tgetn(cols))
 
 		-- Determine fixed size cols and collect weights
 		local extantH, totalWeight = totalH, 0
@@ -928,7 +1030,7 @@ AceGUI:RegisterLayout("Table",
 				if not colObj.width or colObj.width <= 0 then
 					-- Content width
 					for row=1,rows do
-						local child = t[(row - 1) * #cols + col]
+						local child = t[(row - 1) * tgetn(cols) + col]
 						if child then
 							local f = child.frame
 							f:ClearAllPoints()
@@ -960,8 +1062,8 @@ AceGUI:RegisterLayout("Table",
 			local rowV = 0
 
 			-- Horizontal placement and sizing
-			for col=1,#cols do
-				local child = t[(row - 1) * #cols + col]
+			for col=1,tgetn(cols) do
+				local child = t[(row - 1) * tgetn(cols) + col]
 				if child then
 					local colObj = cols[colStart[child]]
 					local cellObj = child:GetUserData("cell")
@@ -989,8 +1091,8 @@ AceGUI:RegisterLayout("Table",
 			laneV[row] = rowV
 
 			-- Vertical placement and sizing
-			for col=1,#cols do
-				local child = t[(row - 1) * #cols + col]
+			for col=1,tgetn(cols) do
+				local child = t[(row - 1) * tgetn(cols) + col]
 				if child then
 					local colObj = cols[colStart[child]]
 					local cellObj = child:GetUserData("cell")
@@ -1010,7 +1112,7 @@ AceGUI:RegisterLayout("Table",
 		end
 
 		-- Calculate total height
-		local totalV = GetCellDimension("V", laneV, 1, #laneV, spaceV)
+		local totalV = GetCellDimension("V", laneV, 1, tgetn(laneV), spaceV)
 
 		-- Cleanup
 		for _,v in pairs(layoutCache) do wipe(v) end

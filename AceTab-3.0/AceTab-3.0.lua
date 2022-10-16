@@ -12,7 +12,7 @@ if not AceTab then return end -- No upgrade needed
 AceTab.registry = AceTab.registry or {}
 
 -- local upvalues
-local _G = _G
+local _G = getfenv() or _G or {}
 local pairs = pairs
 local ipairs = ipairs
 local type = type

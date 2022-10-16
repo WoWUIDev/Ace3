@@ -6,26 +6,187 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
-local tostring, pairs = tostring, pairs
+local tostring, pairs, tconcat, unpack = tostring, pairs, table.concat, unpack
+local assert, type, error, loadstring = assert, type, error, loadstring
+local gsub, sub = string.gsub, string.sub
+
+local wowThirdLegion, wowLegacy, wowClassicRebased, wowTBCRebased, wowWrathRebased
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowThirdLegion = (interface >= 70300)
+	wowLegacy = (interface < 11300)
+	wowClassicRebased = (interface >= 11300 and interface < 20000)
+	wowTBCRebased = (interface >= 20500 and interface < 30000)
+	wowWrathRebased = (interface >= 30400 and interface < 40000)
+end
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
 
 -- WoW APIs
 local PlaySound = PlaySound
-local GetCursorInfo, ClearCursor, GetSpellInfo = GetCursorInfo, ClearCursor, GetSpellInfo
+local GetCursorInfo, ClearCursor = GetCursorInfo, ClearCursor
 local CreateFrame, UIParent = CreateFrame, UIParent
-local _G = _G
+local _G = getfenv() or _G or {}
+
+local hooksecurefunc = hooksecurefunc or function (table, functionName, hookfunc)
+	if type(table) == "string" then
+		table, functionName, hookfunc = _G, table, functionName
+	end
+	local orig = table[functionName]
+	if type(orig) ~= "function" then
+		error("The function "..functionName.." does not exist", 2)
+	end
+	table[functionName] = vararg(0, function(arg)
+		local tmp = {orig(unpack(arg))}
+		hookfunc(unpack(arg))
+		return unpack(tmp)
+	end)
+end
 
 --[[-----------------------------------------------------------------------------
 Support functions
 -------------------------------------------------------------------------------]]
 if not AceGUIEditBoxInsertLink then
-	-- upgradeable hook
-	hooksecurefunc("ChatEdit_InsertLink", function(...) return _G.AceGUIEditBoxInsertLink(...) end)
+	-- upgradeable hooks
+	if wowLegacy then
+		local GetContainerItemLink = GetContainerItemLink
+		local GetInventoryItemLink = GetInventoryItemLink
+		local GetLootSlotLink = GetLootSlotLink
+		local GetMerchantItemLink = GetMerchantItemLink
+		local GetQuestItemLink = GetQuestItemLink
+		local GetQuestLogItemLink = GetQuestLogItemLink
+		local GetSpellName = GetSpellName
+		local IsShiftKeyDown = IsShiftKeyDown
+		local IsSpellPassive = IsSpellPassive
+		local SpellBook_GetSpellID = SpellBook_GetSpellID
+
+		local BANK_CONTAINER = BANK_CONTAINER
+		local KEYRING_CONTAINER = KEYRING_CONTAINER
+		local MAX_SPELLS = MAX_SPELLS
+
+		hooksecurefunc("BankFrameItemButtonGeneric_OnClick", function(button)
+			if button == "LeftButton" and IsShiftKeyDown() and not this.isBag then
+				return _G.AceGUIEditBoxInsertLink(GetContainerItemLink(BANK_CONTAINER, this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("ContainerFrameItemButton_OnClick", function(button, ignoreModifiers)
+			if button == "LeftButton" and IsShiftKeyDown() and not ignoreModifiers then
+				return _G.AceGUIEditBoxInsertLink(GetContainerItemLink(this:GetParent():GetID(), this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("KeyRingItemButton_OnClick", function(button)
+			if button == "LeftButton" and IsShiftKeyDown() and not this.isBag then
+				return _G.AceGUIEditBoxInsertLink(GetContainerItemLink(KEYRING_CONTAINER, this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("LootFrameItem_OnClick", function(button)
+			if button == "LeftButton" and IsShiftKeyDown() then
+				return _G.AceGUIEditBoxInsertLink(GetLootSlotLink(this.slot))
+			end
+		end)
+
+		hooksecurefunc("SetItemRef", function(link, text, button)
+			if IsShiftKeyDown() then
+				if sub(link, 1, 6) == "player" then
+					local name = sub(link, 8)
+					if name and name ~= "" then
+						return _G.AceGUIEditBoxInsertLink(name)
+					end
+				else
+					return _G.AceGUIEditBoxInsertLink(text)
+				end
+			end
+		end)
+
+		hooksecurefunc("MerchantItemButton_OnClick", function(button, ignoreModifiers)
+			if MerchantFrame.selectedTab == 1 and button == "LeftButton" and IsShiftKeyDown() and not ignoreModifiers then
+				return _G.AceGUIEditBoxInsertLink(GetMerchantItemLink(this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("PaperDollItemSlotButton_OnClick", function(button, ignoreModifiers)
+			if button == "LeftButton" and IsShiftKeyDown() and not ignoreModifiers then
+				return _G.AceGUIEditBoxInsertLink(GetInventoryItemLink("player", this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("QuestItem_OnClick", function()
+			if IsShiftKeyDown() and this.rewardType ~= "spell" then
+				return _G.AceGUIEditBoxInsertLink(GetQuestItemLink(this.type, this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("QuestRewardItem_OnClick", function()
+			if IsShiftKeyDown() and this.rewardType ~= "spell" then
+				return _G.AceGUIEditBoxInsertLink(GetQuestItemLink(this.type, this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("QuestLogTitleButton_OnClick", function(button)
+			if IsShiftKeyDown() and (not this.isHeader) then
+				return _G.AceGUIEditBoxInsertLink(gsub(this:GetText(), " *(.*)", "%1"))
+			end
+		end)
+
+		hooksecurefunc("QuestLogRewardItem_OnClick", function()
+			if IsShiftKeyDown() and this.rewardType ~= "spell" then
+				return _G.AceGUIEditBoxInsertLink(GetQuestLogItemLink(this.type, this:GetID()))
+			end
+		end)
+
+		hooksecurefunc("SpellButton_OnClick", function(drag)
+			local id = SpellBook_GetSpellID(this:GetID())
+			if id <= MAX_SPELLS and (not drag) and IsShiftKeyDown() then
+				local spellName, subSpellName = GetSpellName(id, SpellBookFrame.bookType)
+				if spellName and not IsSpellPassive(id, SpellBookFrame.bookType) then
+					if subSpellName and subSpellName ~= "" then
+						_G.AceGUIEditBoxInsertLink(spellName.."("..subSpellName..")")
+					else
+						_G.AceGUIEditBoxInsertLink(spellName)
+					end
+				end
+			end
+		end)
+	else
+		hooksecurefunc("ChatEdit_InsertLink", vararg(0, function(arg)
+			return _G.AceGUIEditBoxInsertLink(unpack(arg))
+		end))
+	end
 end
 
 function _G.AceGUIEditBoxInsertLink(text)
 	for i = 1, AceGUI:GetWidgetCount(Type) do
 		local editbox = _G["AceGUI-3.0EditBox"..i]
-		if editbox and editbox:IsVisible() and editbox:HasFocus() then
+		local hasfocus
+		if editbox.HasFocus then
+			hasfocus = editbox:HasFocus()
+		else
+			hasfocus = editbox.hasfocus
+		end
+		if editbox and editbox:IsVisible() and hasfocus then
 			editbox:Insert(text)
 			return true
 		end
@@ -48,41 +209,57 @@ end
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeave")
 end
 
 local function Frame_OnShowFocus(frame)
+	frame = frame or this
 	frame.obj.editbox:SetFocus()
 	frame:SetScript("OnShow", nil)
 end
 
 local function EditBox_OnEscapePressed(frame)
+	--frame = frame or this
 	AceGUI:ClearFocus()
 end
 
 local function EditBox_OnEnterPressed(frame)
+	frame = frame or this
 	local self = frame.obj
 	local value = frame:GetText()
 	local cancel = self:Fire("OnEnterPressed", value)
 	if not cancel then
-		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+		PlaySound((wowThirdLegion or wowClassicRebased or wowTBCRebased or wowWrathRebased) and 856 or "igMainMenuOptionCheckBoxOn") -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 		HideButton(self)
 	end
 end
 
 local function EditBox_OnReceiveDrag(frame)
+	if not GetCursorInfo then return end
+
+	frame = frame or this
 	local self = frame.obj
-	local type, id, info = GetCursorInfo()
+	local infoType, id, info = GetCursorInfo()
 	local name
-	if type == "item" then
+	if infoType == "item" then
 		name = info
-	elseif type == "spell" then
-		name = GetSpellInfo(id, info)
-	elseif type == "macro" then
+	elseif infoType == "spell" then
+		if GetSpellInfo then
+			name = GetSpellInfo(id, info)
+		else
+			local spellName, rank = GetSpellName(id, info)
+			if rank ~= "" then
+				spellName = spellName.."("..rank..")"
+			end
+			name = spellName
+		end
+	elseif infoType == "macro" then
 		name = GetMacroInfo(id)
 	end
 	if name then
@@ -95,6 +272,7 @@ local function EditBox_OnReceiveDrag(frame)
 end
 
 local function EditBox_OnTextChanged(frame)
+	frame = frame or this
 	local self = frame.obj
 	local value = frame:GetText()
 	if tostring(value) ~= tostring(self.lasttext) then
@@ -105,10 +283,12 @@ local function EditBox_OnTextChanged(frame)
 end
 
 local function EditBox_OnFocusGained(frame)
+	frame = frame or this
 	AceGUI:SetFocus(frame.obj)
 end
 
 local function Button_OnClick(frame)
+	frame = frame or this
 	local editbox = frame.obj.editbox
 	editbox:ClearFocus()
 	EditBox_OnEnterPressed(editbox)
@@ -149,7 +329,11 @@ local methods = {
 	["SetText"] = function(self, text)
 		self.lasttext = text or ""
 		self.editbox:SetText(text or "")
-		self.editbox:SetCursorPosition(0)
+		if self.editbox.SetCursorPosition then
+			self.editbox:SetCursorPosition(0)
+		else
+			EditBoxSetCursorPosition(self.editbox, 0)
+		end
 		HideButton(self)
 	end,
 
@@ -220,10 +404,11 @@ local function Constructor()
 	editbox:SetScript("OnReceiveDrag", EditBox_OnReceiveDrag)
 	editbox:SetScript("OnMouseDown", EditBox_OnReceiveDrag)
 	editbox:SetScript("OnEditFocusGained", EditBox_OnFocusGained)
+	editbox:SetScript("OnEditFocusLost", EditBox_OnFocusLost)
 	editbox:SetTextInsets(0, 0, 3, 3)
 	editbox:SetMaxLetters(256)
 	editbox:SetPoint("BOTTOMLEFT", 6, 0)
-	editbox:SetPoint("BOTTOMRIGHT")
+	editbox:SetPoint("BOTTOMRIGHT", 0, 0)
 	editbox:SetHeight(19)
 
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")

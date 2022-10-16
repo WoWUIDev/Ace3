@@ -1,4 +1,4 @@
-local _G = getfenv(0)
+local _G = getfenv() or _G or {}
 
 local donothing = function() end
 

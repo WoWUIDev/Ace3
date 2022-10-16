@@ -6,7 +6,15 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
-local select, pairs, print = select, pairs, print
+local pairs, print = pairs, print
+local tgetn = table.getn
+
+local wowCata
+do
+	local _, build, _, interface = GetBuildInfo()
+	interface = interface or tonumber(build)
+	wowCata = (interface >= 40000)
+end
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -15,14 +23,18 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 Scripts
 -------------------------------------------------------------------------------]]
 local function Control_OnEnter(frame)
+	frame = frame or this
 	frame.obj:Fire("OnEnter")
 end
 
 local function Control_OnLeave(frame)
+	frame = frame or this
 	frame.obj:Fire("OnLeave")
 end
 
 local function Button_OnClick(frame, button)
+	frame = frame or this
+	button = button or arg1
 	frame.obj:Fire("OnClick", button)
 	AceGUI:ClearFocus()
 end
@@ -53,19 +65,19 @@ local methods = {
 		end
 	end,
 
-	["SetImage"] = function(self, path, ...)
+	["SetImage"] = AceGUI:vararg(2, function(self, path, arg)
 		local image = self.image
 		image:SetTexture(path)
 
 		if image:GetTexture() then
-			local n = select("#", ...)
+			local n = tgetn(arg)
 			if n == 4 or n == 8 then
-				image:SetTexCoord(...)
+				image:SetTexCoord(unpack(arg))
 			else
 				image:SetTexCoord(0, 1, 0, 1)
 			end
 		end
-	end,
+	end),
 
 	["SetImageSize"] = function(self, width, height)
 		self.image:SetWidth(width)
@@ -105,8 +117,8 @@ local function Constructor()
 	frame:SetScript("OnClick", Button_OnClick)
 
 	local label = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
-	label:SetPoint("BOTTOMLEFT")
-	label:SetPoint("BOTTOMRIGHT")
+	label:SetPoint("BOTTOMLEFT", 0, 0)
+	label:SetPoint("BOTTOMRIGHT", 0, 0)
 	label:SetJustifyH("CENTER")
 	label:SetJustifyV("TOP")
 	label:SetHeight(18)
@@ -118,7 +130,7 @@ local function Constructor()
 
 	local highlight = frame:CreateTexture(nil, "HIGHLIGHT")
 	highlight:SetAllPoints(image)
-	highlight:SetTexture(136580) -- Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight
+	highlight:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight")
 	highlight:SetTexCoord(0, 1, 0.23, 0.77)
 	highlight:SetBlendMode("ADD")
 
@@ -131,8 +143,15 @@ local function Constructor()
 	for method, func in pairs(methods) do
 		widget[method] = func
 	end
-
-	widget.SetText = function(self, ...) print("AceGUI-3.0-Icon: SetText is deprecated! Use SetLabel instead!"); self:SetLabel(...) end
+	-- SetText is deprecated, but keep it around for a while. (say, to WoW 4.0)
+	if not wowCata then
+		widget.SetText = widget.SetLabel
+	else
+		widget.SetText = AceGUI:vararg(1, function(self, arg)
+			print("AceGUI-3.0-Icon: SetText is deprecated! Use SetLabel instead!")
+			self:SetLabel(unpack(arg))
+		end)
+	end
 
 	return AceGUI:RegisterAsWidget(widget)
 end

@@ -17,10 +17,12 @@ Scripts
 -------------------------------------------------------------------------------]]
 
 local function OnShow(frame)
+	frame = frame or this
 	frame.obj:Fire("OnShow")
 end
 
 local function OnHide(frame)
+	frame = frame or this
 	frame.obj:Fire("OnHide")
 end
 
@@ -29,18 +31,22 @@ Support functions
 -------------------------------------------------------------------------------]]
 
 local function okay(frame)
+	frame = frame or this
 	frame.obj:Fire("okay")
 end
 
 local function cancel(frame)
+	frame = frame or this
 	frame.obj:Fire("cancel")
 end
 
 local function default(frame)
+	frame = frame or this
 	frame.obj:Fire("default")
 end
 
 local function refresh(frame)
+	frame = frame or this
 	frame.obj:Fire("refresh")
 end
 

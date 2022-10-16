@@ -7,10 +7,32 @@ local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
 -- Lua APIs
-local max, select, pairs = math.max, select, pairs
+local max, pairs = math.max, pairs
+local tgetn, tconcat, loadstring = table.getn, table.concat, loadstring
 
 -- WoW APIs
 local CreateFrame, UIParent = CreateFrame, UIParent
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = tconcat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
 
 --[[-----------------------------------------------------------------------------
 Support functions
@@ -31,27 +53,27 @@ local function UpdateImageAnchor(self)
 		local imagewidth = image:GetWidth()
 		if (width - imagewidth) < 200 or (label:GetText() or "") == "" then
 			-- image goes on top centered when less than 200 width for the text, or if there is no text
-			image:SetPoint("TOP")
+			image:SetPoint("TOP", 0, 0)
 			label:SetPoint("TOP", image, "BOTTOM")
-			label:SetPoint("LEFT")
+			label:SetPoint("LEFT", 0, 0)
 			label:SetWidth(width)
-			height = image:GetHeight() + label:GetStringHeight()
+			height = image:GetHeight() + (label.GetStringHeight and label:GetStringHeight() or label:GetHeight())
 		else
 			-- image on the left
-			image:SetPoint("TOPLEFT")
-			if image:GetHeight() > label:GetStringHeight() then
+			image:SetPoint("TOPLEFT", 0, 0)
+			if image:GetHeight() > (label.GetStringHeight and label:GetStringHeight() or label:GetHeight()) then
 				label:SetPoint("LEFT", image, "RIGHT", 4, 0)
 			else
 				label:SetPoint("TOPLEFT", image, "TOPRIGHT", 4, 0)
 			end
 			label:SetWidth(width - imagewidth - 4)
-			height = max(image:GetHeight(), label:GetStringHeight())
+			height = max(image:GetHeight(), (label.GetStringHeight and label:GetStringHeight() or label:GetHeight()))
 		end
 	else
 		-- no image shown
-		label:SetPoint("TOPLEFT")
+		label:SetPoint("TOPLEFT", 0, 0)
 		label:SetWidth(width)
-		height = label:GetStringHeight()
+		height = (label.GetStringHeight and label:GetStringHeight() or label:GetHeight())
 	end
 
 	-- avoid zero-height labels, since they can used as spacers
@@ -106,15 +128,15 @@ local methods = {
 		self.label:SetVertexColor(r, g, b)
 	end,
 
-	["SetImage"] = function(self, path, ...)
+	["SetImage"] = vararg(2, function(self, path, arg)
 		local image = self.image
 		image:SetTexture(path)
 
 		if image:GetTexture() then
 			self.imageshown = true
-			local n = select("#", ...)
+			local n = tgetn(arg)
 			if n == 4 or n == 8 then
-				image:SetTexCoord(...)
+				image:SetTexCoord(unpack(arg))
 			else
 				image:SetTexCoord(0, 1, 0, 1)
 			end
@@ -122,7 +144,7 @@ local methods = {
 			self.imageshown = nil
 		end
 		UpdateImageAnchor(self)
-	end,
+	end),
 
 	["SetFont"] = function(self, font, height, flags)
 		if not self.fontObject then
@@ -134,7 +156,6 @@ local methods = {
 
 	["SetFontObject"] = function(self, font)
 		self.label:SetFontObject(font or GameFontHighlightSmall)
-		UpdateImageAnchor(self)
 	end,
 
 	["SetImageSize"] = function(self, width, height)

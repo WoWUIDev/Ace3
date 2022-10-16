@@ -25,7 +25,7 @@
 
 local CTL_VERSION = 24
 
-local _G = _G
+local _G = getfenv() or _G or {}
 
 if _G.ChatThrottleLib then
 	if _G.ChatThrottleLib.version >= CTL_VERSION then
@@ -65,18 +65,50 @@ ChatThrottleLib.BURST = 4000				-- WoW's server buffer seems to be about 32KB. 8
 ChatThrottleLib.MIN_FPS = 20				-- Reduce output CPS to half (and don't burst) if FPS drops below this value
 
 
-local setmetatable = setmetatable
-local table_remove = table.remove
-local tostring = tostring
-local GetTime = GetTime
-local math_min = math.min
-local math_max = math.max
-local next = next
-local strlen = string.len
-local GetFramerate = GetFramerate
-local strlower = string.lower
+local setmetatable, loadstring = setmetatable, loadstring
+local table_remove, table_concat = table.remove, table.concat
+local tostring, next, assert, error = tostring, next, assert, error
+local GetTime, GetFramerate = GetTime, GetFramerate
+local math_min, math_max = math.min, math.max
+local strlen, strlower = string.len, string.lower
 local unpack,type,pairs,wipe = unpack,type,pairs,table.wipe
 local UnitInRaid,UnitInParty = UnitInRaid,UnitInParty
+
+local supports_ellipsis = loadstring("return ...") ~= nil
+local template_args = supports_ellipsis and "{...}" or "arg"
+
+local function vararg(n, f)
+	local t = {}
+	local params = ""
+	if n > 0 then
+		for i = 1, n do t[ i ] = "_"..i end
+		params = table_concat(t, ", ", 1, n)
+		params = params .. ", "
+	end
+	local code = [[
+        return function( f )
+        return function( ]]..params..[[... )
+            return f( ]]..params..template_args..[[ )
+        end
+        end
+    ]]
+	return assert(loadstring(code, "=(vararg)"))()(f)
+end
+
+local hooksecurefunc = hooksecurefunc or function (table, functionName, hookfunc)
+	if type(table) == "string" then
+		table, functionName, hookfunc = _G, table, functionName
+	end
+	local orig = table[functionName]
+	if type(orig) ~= "function" then
+		error("The function "..functionName.." does not exist", 2)
+	end
+	table[functionName] = vararg(0, function(arg)
+		local tmp = {orig(unpack(arg))}
+		hookfunc(unpack(arg))
+		return unpack(tmp)
+	end)
+end
 
 
 -----------------------------------------------------------------------
@@ -209,18 +241,18 @@ function ChatThrottleLib:Init()
 		-- Use secure hooks as of v16. Old regular hook support yanked out in v21.
 		self.securelyHooked = true
 		--SendChatMessage
-		hooksecurefunc("SendChatMessage", function(...)
-			return ChatThrottleLib.Hook_SendChatMessage(...)
-		end)
+		hooksecurefunc("SendChatMessage", vararg(0, function(arg)
+			return ChatThrottleLib.Hook_SendChatMessage(unpack(arg))
+		end))
 		--SendAddonMessage
 		if _G.C_ChatInfo then
-			hooksecurefunc(_G.C_ChatInfo, "SendAddonMessage", function(...)
-				return ChatThrottleLib.Hook_SendAddonMessage(...)
-			end)
+			hooksecurefunc(_G.C_ChatInfo, "SendAddonMessage", vararg(0, function(arg)
+				return ChatThrottleLib.Hook_SendAddonMessage(unpack(arg))
+			end))
 		else
-			hooksecurefunc("SendAddonMessage", function(...)
-				return ChatThrottleLib.Hook_SendAddonMessage(...)
-			end)
+			hooksecurefunc("SendAddonMessage", vararg(0, function(arg)
+				return ChatThrottleLib.Hook_SendAddonMessage(unpack(arg))
+			end))
 		end
 	end
 	self.nBypass = 0
