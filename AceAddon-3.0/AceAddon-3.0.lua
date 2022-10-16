@@ -682,10 +682,10 @@ local function onEvent(this, event, arg1)
 			tinsert(AceAddon.enablequeue, addon)
 		end
 
-		if event == "PLAYER_LOGIN" then
-			LoggedIn = true
-		elseif IsLoggedIn then
+		if IsLoggedIn then
 			LoggedIn = IsLoggedIn()
+		elseif event == "PLAYER_LOGIN" then
+			LoggedIn = true
 		end
 
 		if LoggedIn then
