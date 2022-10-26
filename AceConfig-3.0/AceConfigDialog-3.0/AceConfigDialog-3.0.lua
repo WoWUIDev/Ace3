@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 85
+local MAJOR, MINOR = "AceConfigDialog-3.0", 86
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -500,9 +500,9 @@ local function OptionOnMouseOver(widget, event)
 	local path = user.path
 	local appName = user.appName
 	local tooltip = AceConfigDialog.tooltip
-	local tooltipHyperlink = GetOptionsMemberValue("tooltipHyperlink", opt, options, path, appName)
-
 	tooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+
+	local tooltipHyperlink = GetOptionsMemberValue("tooltipHyperlink", opt, options, path, appName)
 	if tooltipHyperlink then
 		tooltip:SetHyperlink(tooltipHyperlink)
 		tooltip:Show()
