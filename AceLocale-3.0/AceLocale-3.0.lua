@@ -12,10 +12,6 @@ if not AceLocale then return end -- no upgrade needed
 local assert, tostring, error = assert, tostring, error
 local getmetatable, setmetatable, rawset, rawget = getmetatable, setmetatable, rawset, rawget
 
--- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
--- List them here for Mikk's FindGlobals script
--- GLOBALS: GAME_LOCALE, geterrorhandler
-
 local gameLocale = GetLocale()
 if gameLocale == "enGB" then
 	gameLocale = "enUS"
@@ -93,7 +89,7 @@ local writedefaultproxy = setmetatable({}, {
 function AceLocale:NewLocale(application, locale, isDefault, silent)
 
 	-- GAME_LOCALE allows translators to test translations of addons without having that wow client installed
-	local gameLocale = GAME_LOCALE or gameLocale
+	local activeGameLocale = GAME_LOCALE or gameLocale
 
 	local app = AceLocale.apps[application]
 
@@ -111,7 +107,7 @@ function AceLocale:NewLocale(application, locale, isDefault, silent)
 		AceLocale.appnames[app] = application
 	end
 
-	if locale ~= gameLocale and not isDefault then
+	if locale ~= activeGameLocale and not isDefault then
 		return -- nop, we don't need these translations
 	end
 
