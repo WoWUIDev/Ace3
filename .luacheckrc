@@ -27,6 +27,7 @@ globals = {
 
 read_globals = {
 	"geterrorhandler",
+	"securecallfunction",
 	"table", "string",
 
 	"LibStub",
