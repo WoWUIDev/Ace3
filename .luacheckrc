@@ -40,6 +40,7 @@ read_globals = {
 	"CreateFont",
 	"CreateFrame",
 	"GetCurrentRegion",
+	"GetCurrentRegionName",
 	"GetCursorInfo",
 	"GetFramerate",
 	"GetLocale",
