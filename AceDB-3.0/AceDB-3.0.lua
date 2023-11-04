@@ -111,7 +111,12 @@ local function copyDefaults(dest, src)
 				end
 			else
 				-- Values are not tables, so this is just a simple return
-				local mt = {__index = function(t,k2) return k2~=nil and v or nil end}
+				local mt = {
+					__index = function(t,k2)
+							if k2 == nil then return nil end
+							return v
+						end,
+				}
 				setmetatable(dest, mt)
 			end
 		elseif type(v) == "table" then
