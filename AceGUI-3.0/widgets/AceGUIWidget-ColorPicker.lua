@@ -58,29 +58,57 @@ local function ColorSwatch_OnClick(frame)
 		if ColorPickerFrame.SetupColorPickerAndShow then -- 10.2.5 color picker overhaul
 			local r2, g2, b2, a2 = self.r, self.g, self.b, self.a
 
-			local info = {
-				swatchFunc = function()
-					local r, g, b = ColorPickerFrame:GetColorRGB()
-					local a = ColorPickerFrame:GetColorAlpha()
-					ColorCallback(self, r, g, b, a)
-				end,
+			local info
 
-				hasOpacity = self.HasAlpha,
-				opacityFunc = function()
-					local r, g, b = ColorPickerFrame:GetColorRGB()
-					local a = ColorPickerFrame:GetColorAlpha()
-					ColorCallback(self, r, g, b, a, true)
-				end,
-				opacity = (a2 or 1),
+			if ColorPickerFrame.GetBackdrop then
+				info = {
+					swatchFunc = function()
+						local r, g, b = ColorPickerFrame:GetColorRGB()
+						local a = 1 - ColorPickerFrame:GetColorAlpha()
+						ColorCallback(self, r, g, b, a)
+					end,
+	
+					hasOpacity = self.HasAlpha,
+					opacityFunc = function()
+						local r, g, b = ColorPickerFrame:GetColorRGB()
+						local a = 1 - ColorPickerFrame:GetColorAlpha()
+						ColorCallback(self, r, g, b, a, true)
+					end,
+					opacity = 1 - (a2 or 1),
+	
+					cancelFunc = function()
+						ColorCallback(self, r2, g2, b2, a2, true)
+					end,
+	
+					r = r2,
+					g = g2,
+					b = b2,
+				}
+			else
+				info = {
+					swatchFunc = function()
+						local r, g, b = ColorPickerFrame:GetColorRGB()
+						local a = ColorPickerFrame:GetColorAlpha()
+						ColorCallback(self, r, g, b, a)
+					end,
 
-				cancelFunc = function()
-					ColorCallback(self, r2, g2, b2, a2, true)
-				end,
+					hasOpacity = self.HasAlpha,
+					opacityFunc = function()
+						local r, g, b = ColorPickerFrame:GetColorRGB()
+						local a = ColorPickerFrame:GetColorAlpha()
+						ColorCallback(self, r, g, b, a, true)
+					end,
+					opacity = (a2 or 1),
 
-				r = r2,
-				g = g2,
-				b = b2,
-			}
+					cancelFunc = function()
+						ColorCallback(self, r2, g2, b2, a2, true)
+					end,
+
+					r = r2,
+					g = g2,
+					b = b2,
+				}
+			end
 
 			ColorPickerFrame:SetupColorPickerAndShow(info)
 		else
