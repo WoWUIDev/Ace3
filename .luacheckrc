@@ -94,6 +94,8 @@ read_globals = {
 	"OpacitySliderFrame",
 	"SELECTED_CHAT_FRAME",
 	"UIParent",
+	"WOW_PROJECT_ID",
+	"WOW_PROJECT_MAINLINE",
 
 	-- Custom Globals
 	"GAME_LOCALE",
