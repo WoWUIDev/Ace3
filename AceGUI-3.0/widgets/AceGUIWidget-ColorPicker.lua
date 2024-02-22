@@ -19,7 +19,7 @@ local INVERTED_ALPHA = (WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE)
 Support functions
 -------------------------------------------------------------------------------]]
 local function ColorCallback(self, r, g, b, a, isAlpha)
-	if INVERTED_ALPHA then
+	if INVERTED_ALPHA and a then
 		a = 1 - a
 	end
 	if not self.HasAlpha then
