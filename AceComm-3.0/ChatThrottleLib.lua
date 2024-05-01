@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 24
+local CTL_VERSION = 25
 
 local _G = _G
 
@@ -168,6 +168,14 @@ end
 -- ChatThrottleLib:Init
 -- Initialize queues, set up frame for OnUpdate, etc
 
+local getIsThrottled
+if Enum.SendAddonMessageResult then
+	getIsThrottled = function(sendSuccess, sendError)
+		return not sendSuccess and sendError == Enum.SendAddonMessageResult.AddonMessageThrottle
+	end
+else
+	getIsThrottled = function() return false end
+end
 
 function ChatThrottleLib:Init()
 
@@ -295,16 +303,9 @@ end
 function ChatThrottleLib:Despool(Prio)
 	local ring = Prio.Ring
 	while ring.pos and Prio.avail > ring.pos[1].nSize do
-		local msg = table_remove(ring.pos, 1)
-		if not ring.pos[1] then  -- did we remove last msg in this pipe?
-			local pipe = Prio.Ring.pos
-			Prio.Ring:Remove(pipe)
-			Prio.ByName[pipe.name] = nil
-			DelPipe(pipe)
-		else
-			Prio.Ring.pos = Prio.Ring.pos.next
-		end
+		local msg = ring.pos[1]
 		local didSend=false
+		local isThrottled = false
 		local lowerDest = strlower(msg[3] or "")
 		if lowerDest == "raid" and not UnitInRaid("player") then
 			-- do nothing
@@ -313,17 +314,30 @@ function ChatThrottleLib:Despool(Prio)
 		else
 			Prio.avail = Prio.avail - msg.nSize
 			bMyTraffic = true
-			msg.f(unpack(msg, 1, msg.n))
+			isThrottled = getIsThrottled(msg.f(unpack(msg, 1, msg.n)))
 			bMyTraffic = false
-			Prio.nTotalSent = Prio.nTotalSent + msg.nSize
-			DelMsg(msg)
-			didSend = true
+			if not isThrottled then
+				Prio.nTotalSent = Prio.nTotalSent + msg.nSize
+				DelMsg(msg)
+				didSend = true
+			end
 		end
-		-- notify caller of delivery (even if we didn't send it)
-		if msg.callbackFn then
-			msg.callbackFn (msg.callbackArg, didSend)
+		if not isThrottled then
+			table_remove(ring.pos, 1)
+			if not ring.pos[1] then  -- did we remove last msg in this pipe?
+				local pipe = Prio.Ring.pos
+				Prio.Ring:Remove(pipe)
+				Prio.ByName[pipe.name] = nil
+				DelPipe(pipe)
+			else
+				Prio.Ring.pos = Prio.Ring.pos.next
+			end
+			-- notify caller of delivery (even if we didn't send it)
+			if msg.callbackFn then
+				msg.callbackFn (msg.callbackArg, didSend)
+			end
+			-- USER CALLBACK MAY ERROR
 		end
-		-- USER CALLBACK MAY ERROR
 	end
 end
 
@@ -431,14 +445,16 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 	if not self.bQueueing and nSize < self:UpdateAvail() then
 		self.avail = self.avail - nSize
 		bMyTraffic = true
-		_G.SendChatMessage(text, chattype, language, destination)
+		local isThrottled = getIsThrottled(_G.SendChatMessage(text, chattype, language, destination))
 		bMyTraffic = false
-		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
-		if callbackFn then
-			callbackFn (callbackArg, true)
+		if not isThrottled then
+			self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
+			if callbackFn then
+				callbackFn (callbackArg, true)
+			end
+			-- USER CALLBACK MAY ERROR
+			return
 		end
-		-- USER CALLBACK MAY ERROR
-		return
 	end
 
 	-- Message needs to be queued
@@ -482,20 +498,23 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
+		local isThrottled
 		self.avail = self.avail - nSize
 		bMyTraffic = true
 		if _G.C_ChatInfo then
-			_G.C_ChatInfo.SendAddonMessage(prefix, text, chattype, target)
+			isThrottled = getIsThrottled(_G.C_ChatInfo.SendAddonMessage(prefix, text, chattype, target))
 		else
-			_G.SendAddonMessage(prefix, text, chattype, target)
+			isThrottled = getIsThrottled(_G.SendAddonMessage(prefix, text, chattype, target))
 		end
 		bMyTraffic = false
-		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
-		if callbackFn then
-			callbackFn (callbackArg, true)
+		if not isThrottled then
+			self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
+			if callbackFn then
+				callbackFn (callbackArg, true)
+			end
+			-- USER CALLBACK MAY ERROR
+			return
 		end
-		-- USER CALLBACK MAY ERROR
-		return
 	end
 
 	-- Message needs to be queued

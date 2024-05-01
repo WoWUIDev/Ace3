@@ -63,6 +63,15 @@ read_globals = {
 	"UnitInRaid",
 	"UnitName",
 	"UnitRace",
+	Enum = {
+		fields = {
+			SendAddonMessageResult = {
+				fields = {
+					"AddonMessageThrottle"
+				}
+			}
+		}
+	},
 
 	-- FrameXML API
 	"ChatEdit_GetActiveWindow",
