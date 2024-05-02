@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 24
+local CTL_VERSION = 25
 
 local _G = _G
 
@@ -115,6 +115,20 @@ function Ring:Remove(obj)
 	end
 end
 
+function Ring:Link(other)  -- Move and append all contents of another ring to this ring
+	if not self.pos then
+		-- This ring is empty, so just transfer ownership.
+		self.pos = other.pos
+		other.pos = nil
+	elseif other.pos then
+		-- Our tail should point to their head, and their tail to our head.
+		self.pos.prev.next, other.pos.prev.next = other.pos, self.pos
+		-- Our head should point to their tail, and their head to our tail.
+		self.pos.prev, other.pos.prev = other.pos.prev, self.pos.prev
+		other.pos = nil
+	end
+end
+
 
 
 -----------------------------------------------------------------------
@@ -179,6 +193,13 @@ function ChatThrottleLib:Init()
 		self.Prio["BULK"] = { ByName = {}, Ring = Ring:New(), avail = 0 }
 	end
 
+	if not self.BlockedQueuesDelay then
+		-- v25: Add blocked queues to rings to handle new client throttles.
+		for _, Prio in pairs(self.Prio) do
+			Prio.Blocked = Ring:New()
+		end
+	end
+
 	-- v4: total send counters per priority
 	for _, Prio in pairs(self.Prio) do
 		Prio.nTotalSent = Prio.nTotalSent or 0
@@ -201,6 +222,7 @@ function ChatThrottleLib:Init()
 	self.Frame:SetScript("OnEvent", self.OnEvent)	-- v11: Monitor P_E_W so we can throttle hard for a few seconds
 	self.Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self.OnUpdateDelay = 0
+	self.BlockedQueuesDelay = 0
 	self.LastAvailUpdate = GetTime()
 	self.HardThrottlingBeginTime = GetTime()	-- v11: Throttle hard for a few seconds after startup
 
@@ -292,38 +314,78 @@ end
 -- - ... made up of N "Pipe"s (1 for each destination/pipename)
 -- - and each pipe contains messages
 
+local SendAddonMessageResult = Enum.SendAddonMessageResult or {
+	Success = 0,
+	AddonMessageThrottle = 3,
+	NotInGroup = 5,
+	ChannelThrottle = 8,
+	GeneralError = 9,
+}
+
+local function MapToSendResult(result)
+	if result == true then
+		result = SendAddonMessageResult.Success
+	elseif result == false then
+		result = SendAddonMessageResult.GeneralError
+	end
+
+	return result
+end
+
+local function IsThrottledSendResult(result)
+	return result == SendAddonMessageResult.AddonMessageThrottle
+end
+
+local function PerformSend(sendFunction, ...)
+	-- The select(-1, true, ...) incantation grabs the last return value
+	-- from the called function, defaulting to true if it returned nothing.
+	--
+	-- The default case is required for SendChatMessage. The selection of
+	-- the last return value is required due to per-flavor API divergences.
+
+	bMyTraffic = true
+	local sendResult = select(-1, true, sendFunction(...))
+	bMyTraffic = false
+
+	return MapToSendResult(sendResult)
+end
+
 function ChatThrottleLib:Despool(Prio)
 	local ring = Prio.Ring
 	while ring.pos and Prio.avail > ring.pos[1].nSize do
-		local msg = table_remove(ring.pos, 1)
-		if not ring.pos[1] then  -- did we remove last msg in this pipe?
-			local pipe = Prio.Ring.pos
+		local pipe = ring.pos
+		local msg = pipe[1]
+		local sendResult = PerformSend(msg.f, unpack(msg, 1, msg.n))
+
+		if IsThrottledSendResult(sendResult) then
+			-- Message was throttled; move the pipe into the blocked ring.
 			Prio.Ring:Remove(pipe)
-			Prio.ByName[pipe.name] = nil
-			DelPipe(pipe)
+			Prio.Blocked:Add(pipe)
 		else
-			Prio.Ring.pos = Prio.Ring.pos.next
-		end
-		local didSend=false
-		local lowerDest = strlower(msg[3] or "")
-		if lowerDest == "raid" and not UnitInRaid("player") then
-			-- do nothing
-		elseif lowerDest == "party" and not UnitInParty("player") then
-			-- do nothing
-		else
-			Prio.avail = Prio.avail - msg.nSize
-			bMyTraffic = true
-			msg.f(unpack(msg, 1, msg.n))
-			bMyTraffic = false
-			Prio.nTotalSent = Prio.nTotalSent + msg.nSize
+			-- Dequeue message after submission.
+			table_remove(pipe, 1)
 			DelMsg(msg)
-			didSend = true
+
+			if not pipe[1] then  -- did we remove last msg in this pipe?
+				Prio.Ring:Remove(pipe)
+				Prio.ByName[pipe.name] = nil
+				DelPipe(pipe)
+			else
+				ring.pos = ring.pos.next
+			end
+
+			-- Update bandwidth counters on successful sends.
+			local didSend = (sendResult == SendAddonMessageResult.Success)
+			if didSend then
+				Prio.avail = Prio.avail - msg.nSize
+				Prio.nTotalSent = Prio.nTotalSent + msg.nSize
+			end
+
+			-- Notify caller of message submission.
+			if msg.callbackFn then
+				securecallfunction(msg.callbackFn, msg.callbackArg, didSend, sendResult)
+			end
 		end
-		-- notify caller of delivery (even if we didn't send it)
-		if msg.callbackFn then
-			msg.callbackFn (msg.callbackArg, didSend)
-		end
-		-- USER CALLBACK MAY ERROR
 	end
 end
 
@@ -342,6 +404,7 @@ function ChatThrottleLib.OnUpdate(this,delay)
 	local self = ChatThrottleLib
 
 	self.OnUpdateDelay = self.OnUpdateDelay + delay
+	self.BlockedQueuesDelay = self.BlockedQueuesDelay + delay
 	if self.OnUpdateDelay < 0.08 then
 		return
 	end
@@ -353,40 +416,60 @@ function ChatThrottleLib.OnUpdate(this,delay)
 		return -- argh. some bastard is spewing stuff past the lib. just bail early to save cpu.
 	end
 
-	-- See how many of our priorities have queued messages (we only have 3, don't worry about the loop)
-	local n = 0
-	for prioname,Prio in pairs(self.Prio) do
-		if Prio.Ring.pos or Prio.avail < 0 then
-			n = n + 1
+	-- Integrate blocked queues back into their rings periodically.
+	if self.BlockedQueuesDelay >= 0.35 then
+		for _, Prio in pairs(self.Prio) do
+			Prio.Ring:Link(Prio.Blocked)
 		end
+
+		self.BlockedQueuesDelay = 0
 	end
 
-	-- Anything queued still?
-	if n<1 then
-		-- Nope. Move spillover bandwidth to global availability gauge and clear self.bQueueing
-		for prioname, Prio in pairs(self.Prio) do
+	-- See how many of our priorities have queued messages. This is split
+	-- into two counters because priorities that consist only of blocked
+	-- queues must keep our OnUpdate alive, but shouldn't count toward
+	-- bandwidth distribution.
+	local nSendablePrios = 0
+	local nBlockedPrios = 0
+
+	for prioname, Prio in pairs(self.Prio) do
+		if Prio.Ring.pos then
+			nSendablePrios = nSendablePrios + 1
+		elseif Prio.Blocked.pos then
+			nBlockedPrios = nBlockedPrios + 1
+		end
+
+		-- Collect unused bandwidth from priorities with nothing to send.
+		if not Prio.Ring.pos then
 			self.avail = self.avail + Prio.avail
 			Prio.avail = 0
 		end
-		self.bQueueing = false
-		self.Frame:Hide()
+	end
+
+	-- Bandwidth reclamation may take us back over the burst cap.
+	self.avail = math_min(self.avail, self.BURST)
+
+	-- If we can't currently send on any priorities, stop processing early.
+	if nSendablePrios == 0 then
+		-- If we're completely out of data to send, disable queue processing.
+		if nBlockedPrios == 0 then
+			self.bQueueing = false
+			self.Frame:Hide()
+		end
+
 		return
 	end
 
 	-- There's stuff queued. Hand out available bandwidth to priorities as needed and despool their queues
-	local avail = self.avail/n
+	local avail = self.avail / nSendablePrios
 	self.avail = 0
 
 	for prioname, Prio in pairs(self.Prio) do
-		if Prio.Ring.pos or Prio.avail < 0 then
+		if Prio.Ring.pos then
 			Prio.avail = Prio.avail + avail
-			if Prio.Ring.pos and Prio.avail > Prio.Ring.pos[1].nSize then
-				self:Despool(Prio)
-				-- Note: We might not get here if the user-supplied callback function errors out! Take care!
-			end
+			self:Despool(Prio)
 		end
 	end
-
 end
 
 
@@ -429,16 +512,22 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
-		self.avail = self.avail - nSize
-		bMyTraffic = true
-		_G.SendChatMessage(text, chattype, language, destination)
-		bMyTraffic = false
-		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
-		if callbackFn then
-			callbackFn (callbackArg, true)
+		local sendResult = PerformSend(_G.SendChatMessage, text, chattype, language, destination)
+
+		if not IsThrottledSendResult(sendResult) then
+			local didSend = (sendResult == SendAddonMessageResult.Success)
+
+			if didSend then
+				self.avail = self.avail - nSize
+				self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
+			end
+
+			if callbackFn then
+				securecallfunction(callbackFn, callbackArg, didSend, sendResult)
+			end
+
+			return
 		end
-		-- USER CALLBACK MAY ERROR
-		return
 	end
 
 	-- Message needs to be queued
@@ -482,25 +571,27 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
-		self.avail = self.avail - nSize
-		bMyTraffic = true
-		if _G.C_ChatInfo then
-			_G.C_ChatInfo.SendAddonMessage(prefix, text, chattype, target)
-		else
-			_G.SendAddonMessage(prefix, text, chattype, target)
+		local sendResult = PerformSend(_G.C_ChatInfo.SendAddonMessage, prefix, text, chattype, target)
+
+		if not IsThrottledSendResult(sendResult) then
+			local didSend = (sendResult == SendAddonMessageResult.Success)
+
+			if didSend then
+				self.avail = self.avail - nSize
+				self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
+			end
+
+			if callbackFn then
+				securecallfunction(callbackFn, callbackArg, didSend, sendResult)
+			end
+
+			return
 		end
-		bMyTraffic = false
-		self.Prio[prio].nTotalSent = self.Prio[prio].nTotalSent + nSize
-		if callbackFn then
-			callbackFn (callbackArg, true)
-		end
-		-- USER CALLBACK MAY ERROR
-		return
 	end
 
 	-- Message needs to be queued
 	local msg = NewMsg()
-	msg.f = _G.C_ChatInfo and _G.C_ChatInfo.SendAddonMessage or _G.SendAddonMessage
+	msg.f = _G.C_ChatInfo.SendAddonMessage
 	msg[1] = prefix
 	msg[2] = text
 	msg[3] = chattype
