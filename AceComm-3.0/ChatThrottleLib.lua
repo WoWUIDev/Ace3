@@ -542,7 +542,7 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 	msg.callbackFn = callbackFn
 	msg.callbackArg = callbackArg
 
-	self:Enqueue(prio, queueName or (prefix..(chattype or "SAY")..(destination or "")), msg)
+	self:Enqueue(prio, queueName or prefix, msg)
 end
 
 
@@ -601,7 +601,7 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 	msg.callbackFn = callbackFn
 	msg.callbackArg = callbackArg
 
-	self:Enqueue(prio, queueName or (prefix..chattype..(target or "")), msg)
+	self:Enqueue(prio, queueName or prefix, msg)
 end
 
 
