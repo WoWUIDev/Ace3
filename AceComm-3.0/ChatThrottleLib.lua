@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 25
+local CTL_VERSION = 26
 
 local _G = _G
 
@@ -235,16 +235,19 @@ function ChatThrottleLib:Init()
 			return ChatThrottleLib.Hook_SendChatMessage(...)
 		end)
 		--SendAddonMessage
-		if _G.C_ChatInfo then
-			hooksecurefunc(_G.C_ChatInfo, "SendAddonMessage", function(...)
-				return ChatThrottleLib.Hook_SendAddonMessage(...)
-			end)
-		else
-			hooksecurefunc("SendAddonMessage", function(...)
-				return ChatThrottleLib.Hook_SendAddonMessage(...)
-			end)
-		end
+		hooksecurefunc(_G.C_ChatInfo, "SendAddonMessage", function(...)
+			return ChatThrottleLib.Hook_SendAddonMessage(...)
+		end)
 	end
+
+	-- v26: Hook SendAddonMessageLogged for traffic logging
+	if not self.securelyHookedLogged then
+		self.securelyHookedLogged = true
+		hooksecurefunc(_G.C_ChatInfo, "SendAddonMessageLogged", function(...)
+			return ChatThrottleLib.Hook_SendAddonMessageLogged(...)
+		end)
+	end
+
 	self.nBypass = 0
 end
 
@@ -272,6 +275,9 @@ function ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destinati
 	size = size + tostring(destination or ""):len() + self.MSG_OVERHEAD
 	self.avail = self.avail - size
 	self.nBypass = self.nBypass + size	-- just a statistic
+end
+function ChatThrottleLib.Hook_SendAddonMessageLogged(prefix, text, chattype, destination, ...)
+	ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destination, ...)
 end
 
 
@@ -546,32 +552,12 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 end
 
 
-function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
-	if not self or not prio or not prefix or not text or not chattype or not self.Prio[prio] then
-		error('Usage: ChatThrottleLib:SendAddonMessage("{BULK||NORMAL||ALERT}", "prefix", "text", "chattype"[, "target"])', 2)
-	end
-	if callbackFn and type(callbackFn)~="function" then
-		error('ChatThrottleLib:SendAddonMessage(): callbackFn: expected function, got '..type(callbackFn), 2)
-	end
-
-	local nSize = text:len();
-
-	if C_ChatInfo or RegisterAddonMessagePrefix then
-		if nSize>255 then
-			error("ChatThrottleLib:SendAddonMessage(): message length cannot exceed 255 bytes", 2)
-		end
-	else
-		nSize = nSize + prefix:len() + 1
-		if nSize>255 then
-			error("ChatThrottleLib:SendAddonMessage(): prefix + message length cannot exceed 254 bytes", 2)
-		end
-	end
-
-	nSize = nSize + self.MSG_OVERHEAD;
+local function SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+	local nSize = #text + self.MSG_OVERHEAD
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
-		local sendResult = PerformSend(_G.C_ChatInfo.SendAddonMessage, prefix, text, chattype, target)
+		local sendResult = PerformSend(sendFunction, prefix, text, chattype, target)
 
 		if not IsThrottledSendResult(sendResult) then
 			local didSend = (sendResult == SendAddonMessageResult.Success)
@@ -591,7 +577,7 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 
 	-- Message needs to be queued
 	local msg = NewMsg()
-	msg.f = _G.C_ChatInfo.SendAddonMessage
+	msg.f = sendFunction
 	msg[1] = prefix
 	msg[2] = text
 	msg[3] = chattype
@@ -605,6 +591,32 @@ function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, 
 end
 
 
+function ChatThrottleLib:SendAddonMessage(prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+	if not self or not prio or not prefix or not text or not chattype or not self.Prio[prio] then
+		error('Usage: ChatThrottleLib:SendAddonMessage("{BULK||NORMAL||ALERT}", "prefix", "text", "chattype"[, "target"])', 2)
+	elseif callbackFn and type(callbackFn)~="function" then
+		error('ChatThrottleLib:SendAddonMessage(): callbackFn: expected function, got '..type(callbackFn), 2)
+	elseif #text>255 then
+		error("ChatThrottleLib:SendAddonMessage(): message length cannot exceed 255 bytes", 2)
+	end
+
+	local sendFunction = _G.C_ChatInfo.SendAddonMessage
+	SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+end
+
+
+function ChatThrottleLib:SendAddonMessageLogged(prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+	if not self or not prio or not prefix or not text or not chattype or not self.Prio[prio] then
+		error('Usage: ChatThrottleLib:SendAddonMessageLogged("{BULK||NORMAL||ALERT}", "prefix", "text", "chattype"[, "target"])', 2)
+	elseif callbackFn and type(callbackFn)~="function" then
+		error('ChatThrottleLib:SendAddonMessageLogged(): callbackFn: expected function, got '..type(callbackFn), 2)
+	elseif #text>255 then
+		error("ChatThrottleLib:SendAddonMessageLogged(): message length cannot exceed 255 bytes", 2)
+	end
+
+	local sendFunction = _G.C_ChatInfo.SendAddonMessageLogged
+	SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+end
 
 
 -----------------------------------------------------------------------
