@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 27
+local CTL_VERSION = 28
 
 local _G = _G
 
@@ -331,11 +331,24 @@ local SendAddonMessageResult = Enum.SendAddonMessageResult or {
 	GeneralError = 9,
 }
 
-local function MapToSendResult(result)
-	if result == true then
-		result = SendAddonMessageResult.Success
-	elseif result == false then
+local function MapToSendResult(ok, ...)
+	local result
+
+	if not ok then
+		-- The send function itself errored; don't look at anything else.
 		result = SendAddonMessageResult.GeneralError
+	else
+		-- Grab the last return value from the send function and remap
+		-- it from a boolean to an enum code. If there are no results,
+		-- assume success (true).
+
+		result = select(-1, true, ...)
+
+		if result == true then
+			result = SendAddonMessageResult.Success
+		elseif result == false then
+			result = SendAddonMessageResult.GeneralError
+		end
 	end
 
 	return result
@@ -345,18 +358,16 @@ local function IsThrottledSendResult(result)
 	return result == SendAddonMessageResult.AddonMessageThrottle
 end
 
+-- A copy of this function exists in FrameXML, but for clarity it's here too.
+local function CallErrorHandler(...)
+	return geterrorhandler()(...)
+end
+
 local function PerformSend(sendFunction, ...)
-	-- The select(-1, true, ...) incantation grabs the last return value
-	-- from the called function, defaulting to true if it returned nothing.
-	--
-	-- The default case is required for SendChatMessage. The selection of
-	-- the last return value is required due to per-flavor API divergences.
-
 	bMyTraffic = true
-	local sendResult = select(-1, true, sendFunction(...))
+	local sendResult = MapToSendResult(xpcall(sendFunction, CallErrorHandler, ...))
 	bMyTraffic = false
-
-	return MapToSendResult(sendResult)
+	return sendResult
 end
 
 function ChatThrottleLib:Despool(Prio)
