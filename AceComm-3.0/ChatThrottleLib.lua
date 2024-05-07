@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 28
+local CTL_VERSION = 29
 
 local _G = _G
 
@@ -249,6 +249,14 @@ function ChatThrottleLib:Init()
 		end)
 	end
 
+	-- v29: Hook BNSendGameData for traffic logging
+	if not self.securelyHookedBNGameData then
+		self.securelyHookedBNGameData = true
+		hooksecurefunc("BNSendGameData", function(...)
+			return ChatThrottleLib.Hook_BNSendGameData(...)
+		end)
+	end
+
 	self.nBypass = 0
 end
 
@@ -279,6 +287,9 @@ function ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destinati
 end
 function ChatThrottleLib.Hook_SendAddonMessageLogged(prefix, text, chattype, destination, ...)
 	ChatThrottleLib.Hook_SendAddonMessage(prefix, text, chattype, destination, ...)
+end
+function ChatThrottleLib.Hook_BNSendGameData(destination, prefix, text)
+	ChatThrottleLib.Hook_SendAddonMessage(prefix, text, "WHISPER", destination)
 end
 
 
@@ -628,6 +639,34 @@ function ChatThrottleLib:SendAddonMessageLogged(prio, prefix, text, chattype, ta
 
 	local sendFunction = _G.C_ChatInfo.SendAddonMessageLogged
 	SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
+end
+
+local function BNSendGameDataReordered(prefix, text, _, gameAccountID)
+	return _G.BNSendGameData(gameAccountID, prefix, text)
+end
+
+function ChatThrottleLib:BNSendGameData(prio, prefix, text, chattype, gameAccountID, queueName, callbackFn, callbackArg)
+	-- Note that this API is intentionally limited to 255 bytes of data
+	-- for reasons of traffic fairness, which is less than the 4078 bytes
+	-- BNSendGameData natively supports. Additionally, a chat type is required
+	-- but must always be set to 'WHISPER' to match what is exposed by the
+	-- receipt event.
+	--
+	-- If splitting messages, callers must also be aware that message
+	-- delivery over BNSendGameData is unordered.
+
+	if not self or not prio or not prefix or not text or not gameAccountID or not chattype or not self.Prio[prio] then
+		error('Usage: ChatThrottleLib:BNSendGameData("{BULK||NORMAL||ALERT}", "prefix", "text", "chattype", gameAccountID)', 2)
+	elseif callbackFn and type(callbackFn)~="function" then
+		error('ChatThrottleLib:BNSendGameData(): callbackFn: expected function, got '..type(callbackFn), 2)
+	elseif #text>255 then
+		error("ChatThrottleLib:BNSendGameData(): message length cannot exceed 255 bytes", 2)
+	elseif chattype ~= "WHISPER" then
+		error("ChatThrottleLib:BNSendGameData(): chat type must be 'WHISPER'", 2)
+	end
+
+	local sendFunction = BNSendGameDataReordered
+	SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, gameAccountID, queueName, callbackFn, callbackArg)
 end
 
 
