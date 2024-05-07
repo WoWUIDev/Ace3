@@ -251,7 +251,7 @@ function ChatThrottleLib:Init()
 		end)
 	end
 
-	-- v27: Hook BNSendGameData for traffic logging
+	-- v29: Hook BNSendGameData for traffic logging
 	if not self.securelyHookedBNGameData then
 		self.securelyHookedBNGameData = true
 		hooksecurefunc("BNSendGameData", function(...)
