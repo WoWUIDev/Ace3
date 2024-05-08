@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 29
+local CTL_VERSION = 30
 
 local _G = _G
 
@@ -482,11 +482,15 @@ function ChatThrottleLib.OnUpdate(this,delay)
 	if nSendablePrios == 0 then
 		-- If we're completely out of data to send, disable queue processing.
 		if nBlockedPrios == 0 then
-			self.bQueueing = false
 			self.Frame:Hide()
 		end
 
+		-- Allow directly sending messages again. In our current state we only
+		-- consist of either fully blocked queues, or have no queues at all.
+		self.bQueueing = false
 		return
+	else
+		self.bQueueing = true
 	end
 
 	-- There's stuff queued. Hand out available bandwidth to priorities as needed and despool their queues
@@ -523,6 +527,21 @@ function ChatThrottleLib:Enqueue(prioname, pipename, msg)
 	self.bQueueing = true
 end
 
+function ChatThrottleLib:IsDirectSendAllowed(prioName, queueName, nSize)
+	if self.bQueueing then
+		-- There's data sitting in sendable queues. Don't bypass them.
+		return false
+	elseif self.Prio[prioName].ByName[queueName] then
+		-- This data belongs to an existing and blocked pipe. Append to it.
+		return false
+	elseif nSize >= self:UpdateAvail() then
+		-- This data is too large to send off right away.
+		return false
+	else
+		return true
+	end
+end
+
 function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, language, destination, queueName, callbackFn, callbackArg)
 	if not self or not prio or not prefix or not text or not self.Prio[prio] then
 		error('Usage: ChatThrottleLib:SendChatMessage("{BULK||NORMAL||ALERT}", "prefix", "text"[, "chattype"[, "language"[, "destination"]]]', 2)
@@ -538,9 +557,10 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 	end
 
 	nSize = nSize + self.MSG_OVERHEAD
+	queueName = queueName or prefix
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
-	if not self.bQueueing and nSize < self:UpdateAvail() then
+	if self:IsDirectSendAllowed(prio, queueName, nSize) then
 		local sendResult = PerformSend(_G.SendChatMessage, text, chattype, language, destination)
 
 		if not IsThrottledSendResult(sendResult) then
@@ -571,15 +591,16 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 	msg.callbackFn = callbackFn
 	msg.callbackArg = callbackArg
 
-	self:Enqueue(prio, queueName or prefix, msg)
+	self:Enqueue(prio, queueName, msg)
 end
 
 
 local function SendAddonMessageInternal(self, sendFunction, prio, prefix, text, chattype, target, queueName, callbackFn, callbackArg)
 	local nSize = #text + self.MSG_OVERHEAD
+	queueName = queueName or prefix
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
-	if not self.bQueueing and nSize < self:UpdateAvail() then
+	if self:IsDirectSendAllowed(prio, queueName, nSize) then
 		local sendResult = PerformSend(sendFunction, prefix, text, chattype, target)
 
 		if not IsThrottledSendResult(sendResult) then
@@ -610,7 +631,7 @@ local function SendAddonMessageInternal(self, sendFunction, prio, prefix, text, 
 	msg.callbackFn = callbackFn
 	msg.callbackArg = callbackArg
 
-	self:Enqueue(prio, queueName or prefix, msg)
+	self:Enqueue(prio, queueName, msg)
 end
 
 
