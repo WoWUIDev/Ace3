@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 86
+local MAJOR, MINOR = "AceConfigDialog-3.0", 87
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -544,6 +544,7 @@ local function GetFuncName(option)
 	end
 end
 do
+	local InCombatLockdown = InCombatLockdown
 	local frame = AceConfigDialog.popup
 	if not frame or oldminor < 81 then
 		frame = CreateFrame("Frame", nil, UIParent)
@@ -556,13 +557,15 @@ do
 		frame:SetFrameLevel(100) -- Lots of room to draw under it
 		frame:SetScript("OnKeyDown", function(self, key)
 			if key == "ESCAPE" then
-				self:SetPropagateKeyboardInput(false)
+				if not InCombatLockdown() then
+					self:SetPropagateKeyboardInput(false)
+				end
 				if self.cancel:IsShown() then
 					self.cancel:Click()
 				else -- Showing a validation error
 					self:Hide()
 				end
-			else
+			elseif not InCombatLockdown() then
 				self:SetPropagateKeyboardInput(true)
 			end
 		end)
