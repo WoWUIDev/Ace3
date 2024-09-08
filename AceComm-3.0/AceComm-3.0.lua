@@ -20,7 +20,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 local CallbackHandler = LibStub("CallbackHandler-1.0")
 local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
-local MAJOR, MINOR = "AceComm-3.0", 14
+local MAJOR, MINOR = "AceComm-3.0", 15
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceComm then return end
@@ -42,6 +42,9 @@ local MSG_MULTI_FIRST = "\001"
 local MSG_MULTI_NEXT  = "\002"
 local MSG_MULTI_LAST  = "\003"
 local MSG_ESCAPE = "\004"
+local MSG_MULTI_HEADER = "\005"
+local MSG_MULTI_HEADER_SEP = "\006"
+local MSG_MULTI_HEADER_END = "\007"
 
 -- remove old structures (pre WoW 4.0)
 AceComm.multipart_origprefixes = nil
@@ -116,24 +119,17 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callb
 		-- fits all in one message
 		CTL:SendAddonMessage(prio, prefix, text, distribution, target, queueName, ctlCallback, textlen)
 	else
-		maxtextlen = maxtextlen - 1	-- 1 extra byte for part indicator in prefix(4.0)/start of message(4.1)
+		local chunkCount = tostring(ceil(#text / maxtextlen))
+		-- We send the part number and chunk count as strings, so reserve place for that
+		maxtextlen = maxtextlen - 3 - 2 * #chunkCount
 
-		-- first part
-		local chunk = strsub(text, 1, maxtextlen)
-		CTL:SendAddonMessage(prio, prefix, MSG_MULTI_FIRST..chunk, distribution, target, queueName, ctlCallback, maxtextlen)
-
-		-- continuation
-		local pos = 1+maxtextlen
-
-		while pos+maxtextlen <= textlen do
-			chunk = strsub(text, pos, pos+maxtextlen-1)
-			CTL:SendAddonMessage(prio, prefix, MSG_MULTI_NEXT..chunk, distribution, target, queueName, ctlCallback, pos+maxtextlen-1)
-			pos = pos + maxtextlen
+		for i = 1, chunkCount do
+			local header = MSG_MULTI_HEADER .. tostring(i) .. MSG_MULTI_HEADER_SEP .. chunkCount .. MSG_MULTI_HEADER_END
+			local chunkStart = (i - 1) * maxtextlen + 1
+			local chunkEnd = chunkStart + maxtextlen - 1
+			print("Sending: ", i, chunkCount)
+			CTL:SendAddonMessage(prio, prefix, header .. text:sub(chunkStart, chunkEnd), distribution, target, queueName, ctlCallback, chunkEnd)
 		end
-
-		-- final part
-		chunk = strsub(text, pos)
-		CTL:SendAddonMessage(prio, prefix, MSG_MULTI_LAST..chunk, distribution, target, queueName, ctlCallback, textlen)
 	end
 end
 
@@ -218,6 +214,33 @@ do
 			AceComm.callbacks:Fire(prefix, olddata..message, distribution, sender)
 		end
 	end
+
+	function AceComm:OnReceiveMultipartHeader(prefix, message, distribution, sender)
+		local key = prefix.."\t"..distribution.."\t"..sender	-- a unique stream is defined by the prefix + distribution + sender
+		local spool = AceComm.multipart_spool
+
+		local msgNumber, msgTotal, rest = match(message, "^(%d*)" .. MSG_MULTI_HEADER_SEP .. "(%d*)" .. MSG_MULTI_HEADER_END .. "(.*)")
+		msgNumber = tonumber(msgNumber)
+		msgTotal = tonumber(msgTotal)
+
+		if not spool[key] then
+			spool[key] = new()
+			spool[key].received = 0
+			spool[key].total = msgTotal
+		end
+
+		local data = spool[key]
+		data[msgNumber] = rest
+		data.received = data.received + 1
+
+		print("Receiving: ", msgNumber, msgTotal)
+
+		if data.received == data.total then
+			AceComm.callbacks:Fire(prefix, tconcat(data, ""), distribution, sender)
+			spool[key] = nil
+			compost[data] = true
+		end
+	end
 end
 
 
@@ -250,6 +273,8 @@ local function OnEvent(self, event, prefix, message, distribution, sender)
 				AceComm:OnReceiveMultipartNext(prefix, rest, distribution, sender)
 			elseif control==MSG_MULTI_LAST then
 				AceComm:OnReceiveMultipartLast(prefix, rest, distribution, sender)
+			elseif control==MSG_MULTI_HEADER then
+				AceComm:OnReceiveMultipartHeader(prefix, rest, distribution, sender)
 			elseif control==MSG_ESCAPE then
 				AceComm.callbacks:Fire(prefix, rest, distribution, sender)
 			else
