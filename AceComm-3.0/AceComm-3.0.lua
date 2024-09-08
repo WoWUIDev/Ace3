@@ -119,14 +119,24 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callb
 		-- fits all in one message
 		CTL:SendAddonMessage(prio, prefix, text, distribution, target, queueName, ctlCallback, textlen)
 	else
-		local chunkCount = tostring(ceil(#text / maxtextlen))
-		-- We send the part number and chunk count as strings, so reserve place for that
-		maxtextlen = maxtextlen - 3 - 2 * #chunkCount
+		local chunkCount = math.ceil(#text / maxtextlen)
+		local chunklen
+		while(true) do
+			-- We send the part number and chunk count as strings, so reserve place for that
+			chunklen = maxtextlen - 3 - 2 * #tostring(chunkCount)
+			local newChunkCount = math.ceil(#text / chunklen)
+			if newChunkCount == chunkCount then
+				break
+			end
+			chunkCount = newChunkCount
+		end
+
+		print("chunkCount", chunkCount, "chunklen", chunklen)
 
 		for i = 1, chunkCount do
-			local header = MSG_MULTI_HEADER .. tostring(i) .. MSG_MULTI_HEADER_SEP .. chunkCount .. MSG_MULTI_HEADER_END
-			local chunkStart = (i - 1) * maxtextlen + 1
-			local chunkEnd = chunkStart + maxtextlen - 1
+			local header = MSG_MULTI_HEADER .. tostring(i) .. MSG_MULTI_HEADER_SEP .. tostring(chunkCount) .. MSG_MULTI_HEADER_END
+			local chunkStart = (i - 1) * chunklen + 1
+			local chunkEnd = chunkStart + chunklen - 1
 			print("Sending: ", i, chunkCount)
 			CTL:SendAddonMessage(prio, prefix, header .. text:sub(chunkStart, chunkEnd), distribution, target, queueName, ctlCallback, chunkEnd)
 		end
