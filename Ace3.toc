@@ -24,5 +24,6 @@ AceConfig-3.0\AceConfig-3.0.xml
 AceComm-3.0\AceComm-3.0.xml
 AceTab-3.0\AceTab-3.0.xml
 AceSerializer-3.0\AceSerializer-3.0.xml
+AceState-3.0\AceState-3.0.xml
 
 Ace3.lua
