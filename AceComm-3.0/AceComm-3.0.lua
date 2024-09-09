@@ -53,7 +53,7 @@ AceComm.multipart_reassemblers = nil
 -- the multipart message spool: indexed by a combination of sender+distribution+
 AceComm.multipart_spool = AceComm.multipart_spool or {}
 -- Sequence is an integer between 0 and 254 * 254
-AceComm.sequence = random(254 * 254)
+AceComm.sequence = math.random(254 * 254)
 
 --- Register for Addon Traffic on a specified prefix
 -- @param prefix A printable character (\032-\255) classification of the message (typically AddonName or AddonNameEvent), max 16 characters
@@ -136,7 +136,7 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callb
 		print("chunkCount", chunkCount, "chunklen", chunklen)
 
 		-- Convert sequence number to 2 bytes, while avoiding \0 bytes
-		local sequence = string.char(AceComm.sequence % 254 + 1) .. string.char(floor(AceComm.sequence / 254) + 1)
+		local sequence = string.char(AceComm.sequence % 254 + 1) .. string.char(math.floor(AceComm.sequence / 254) + 1)
 		AceComm.sequence = (AceComm.sequence + 1) % (254 * 254)
 
 		for i = 1, chunkCount do
