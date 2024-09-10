@@ -20,7 +20,7 @@ TODO: Time out old data rotting around from dead senders? Not a HUGE deal since 
 local CallbackHandler = LibStub("CallbackHandler-1.0")
 local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
-local MAJOR, MINOR = "AceComm-3.0", 14
+local MAJOR, MINOR = "AceComm-3.0", 15
 local AceComm,oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceComm then return end
@@ -42,6 +42,9 @@ local MSG_MULTI_FIRST = "\001"
 local MSG_MULTI_NEXT  = "\002"
 local MSG_MULTI_LAST  = "\003"
 local MSG_ESCAPE = "\004"
+local MSG_MULTI_HEADER = "\005"
+local MSG_MULTI_HEADER_SEP = "\006"
+local MSG_MULTI_HEADER_END = "\007"
 
 -- remove old structures (pre WoW 4.0)
 AceComm.multipart_origprefixes = nil
@@ -49,6 +52,8 @@ AceComm.multipart_reassemblers = nil
 
 -- the multipart message spool: indexed by a combination of sender+distribution+
 AceComm.multipart_spool = AceComm.multipart_spool or {}
+-- Sequence is an integer between 0 and 254 * 254
+AceComm.sequence = math.random(254 * 254)
 
 --- Register for Addon Traffic on a specified prefix
 -- @param prefix A printable character (\032-\255) classification of the message (typically AddonName or AddonNameEvent), max 16 characters
@@ -116,24 +121,31 @@ function AceComm:SendCommMessage(prefix, text, distribution, target, prio, callb
 		-- fits all in one message
 		CTL:SendAddonMessage(prio, prefix, text, distribution, target, queueName, ctlCallback, textlen)
 	else
-		maxtextlen = maxtextlen - 1	-- 1 extra byte for part indicator in prefix(4.0)/start of message(4.1)
-
-		-- first part
-		local chunk = strsub(text, 1, maxtextlen)
-		CTL:SendAddonMessage(prio, prefix, MSG_MULTI_FIRST..chunk, distribution, target, queueName, ctlCallback, maxtextlen)
-
-		-- continuation
-		local pos = 1+maxtextlen
-
-		while pos+maxtextlen <= textlen do
-			chunk = strsub(text, pos, pos+maxtextlen-1)
-			CTL:SendAddonMessage(prio, prefix, MSG_MULTI_NEXT..chunk, distribution, target, queueName, ctlCallback, pos+maxtextlen-1)
-			pos = pos + maxtextlen
+		local chunkCount = math.ceil(#text / maxtextlen)
+		local chunklen
+		while(true) do
+			-- We send the sequence number, part number and chunk count as strings, so reserve place for that
+			chunklen = maxtextlen - 3 - 2 - 2 * #tostring(chunkCount)
+			local newChunkCount = math.ceil(#text / chunklen)
+			if newChunkCount == chunkCount then
+				break
+			end
+			chunkCount = newChunkCount
 		end
 
-		-- final part
-		chunk = strsub(text, pos)
-		CTL:SendAddonMessage(prio, prefix, MSG_MULTI_LAST..chunk, distribution, target, queueName, ctlCallback, textlen)
+		print("chunkCount", chunkCount, "chunklen", chunklen)
+
+		-- Convert sequence number to 2 bytes, while avoiding \0 bytes
+		local sequence = string.char(AceComm.sequence % 254 + 1) .. string.char(math.floor(AceComm.sequence / 254) + 1)
+		AceComm.sequence = (AceComm.sequence + 1) % (254 * 254)
+
+		for i = 1, chunkCount do
+			local header = MSG_MULTI_HEADER .. sequence .. tostring(i) .. MSG_MULTI_HEADER_SEP .. tostring(chunkCount) .. MSG_MULTI_HEADER_END
+			local chunkStart = (i - 1) * chunklen + 1
+			local chunkEnd = chunkStart + chunklen - 1
+			print("Sending: ", AceComm.sequence, i, chunkCount)
+			CTL:SendAddonMessage(prio, prefix, header .. text:sub(chunkStart, chunkEnd), distribution, target, queueName, ctlCallback, chunkEnd)
+		end
 	end
 end
 
@@ -218,6 +230,38 @@ do
 			AceComm.callbacks:Fire(prefix, olddata..message, distribution, sender)
 		end
 	end
+
+	function AceComm:OnReceiveMultipartHeader(prefix, message, distribution, sender)
+		local key = prefix.."\t"..distribution.."\t"..sender	-- a unique stream is defined by the prefix + distribution + sender
+		local spool = AceComm.multipart_spool
+
+		local sequence = message:sub(1, 2)
+		local msgNumber, msgTotal, rest = match(message:sub(3), "^(%d*)" .. MSG_MULTI_HEADER_SEP .. "(%d*)" .. MSG_MULTI_HEADER_END .. "(.*)")
+		msgNumber = tonumber(msgNumber)
+		msgTotal = tonumber(msgTotal)
+
+		if not spool[key] then
+			spool[key] = new()
+		end
+
+		if not spool[key][sequence] then
+			spool[key][sequence] = new()
+			spool[key][sequence].received = 0
+			spool[key][sequence].total = msgTotal
+		end
+
+		local data = spool[key][sequence]
+		data[msgNumber] = rest
+		data.received = data.received + 1
+
+		print("Receiving: ", (string.byte(sequence:sub(2)) - 1) * 254 + string.byte(sequence:sub(1)) - 1, msgNumber, msgTotal)
+
+		if data.received == data.total then
+			AceComm.callbacks:Fire(prefix, tconcat(data, ""), distribution, sender)
+			spool[key][sequence] = nil
+			compost[data] = true
+		end
+	end
 end
 
 
@@ -250,6 +294,8 @@ local function OnEvent(self, event, prefix, message, distribution, sender)
 				AceComm:OnReceiveMultipartNext(prefix, rest, distribution, sender)
 			elseif control==MSG_MULTI_LAST then
 				AceComm:OnReceiveMultipartLast(prefix, rest, distribution, sender)
+			elseif control==MSG_MULTI_HEADER then
+				AceComm:OnReceiveMultipartHeader(prefix, rest, distribution, sender)
 			elseif control==MSG_ESCAPE then
 				AceComm.callbacks:Fire(prefix, rest, distribution, sender)
 			else
