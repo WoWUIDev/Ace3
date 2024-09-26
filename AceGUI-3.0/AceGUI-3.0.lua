@@ -25,7 +25,7 @@
 -- @class file
 -- @name AceGUI-3.0
 -- @release $Id$
-local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 41
+local ACEGUI_MAJOR, ACEGUI_MINOR = "AceGUI-3.0", 50
 local AceGUI, oldminor = LibStub:NewLibrary(ACEGUI_MAJOR, ACEGUI_MINOR)
 
 if not AceGUI then return end -- No upgrade needed
@@ -40,12 +40,29 @@ local math_max, math_min, math_ceil = math.max, math.min, math.ceil
 -- WoW APIs
 local UIParent = UIParent
 
+AceGUI.STYLE_CLASSIC = "classic"
+AceGUI.STYLE_MODERN = "modern"
+
 AceGUI.WidgetRegistry = AceGUI.WidgetRegistry or {}
 AceGUI.LayoutRegistry = AceGUI.LayoutRegistry or {}
 AceGUI.WidgetBase = AceGUI.WidgetBase or {}
 AceGUI.WidgetContainerBase = AceGUI.WidgetContainerBase or {}
 AceGUI.WidgetVersions = AceGUI.WidgetVersions or {}
 AceGUI.tooltip = AceGUI.tooltip or CreateFrame("GameTooltip", "AceGUITooltip", UIParent, "GameTooltipTemplate")
+AceGUI.counts = AceGUI.counts or {}
+
+-- migrate widget registry to per-style layout
+if oldminor and oldminor < 50 then
+	local Registry = AceGUI.WidgetRegistry
+	local Versions = AceGUI.WidgetVersions
+
+	AceGUI.WidgetRegistry = { [AceGUI.STYLE_CLASSIC] = Registry }
+	AceGUI.WidgetVersions = { [AceGUI.STYLE_CLASSIC] = Versions }
+
+	-- migrate widget counts
+	local counts = AceGUI.counts
+	AceGUI.counts = { [AceGUI.STYLE_CLASSIC] = counts }
+end
 
 -- local upvalues
 local WidgetRegistry = AceGUI.WidgetRegistry
@@ -88,38 +105,42 @@ do
 	AceGUI.objPools = AceGUI.objPools or {}
 	local objPools = AceGUI.objPools
 	--Returns a new instance, if none are available either returns a new table or calls the given contructor
-	function newWidget(widgetType)
-		if not WidgetRegistry[widgetType] then
+	function newWidget(widgetType, style)
+		if not WidgetRegistry[style] or not WidgetRegistry[style][widgetType] then
 			error("Attempt to instantiate unknown widget type", 2)
 		end
 
-		if not objPools[widgetType] then
-			objPools[widgetType] = {}
+		local poolKey = widgetType..style
+		if not objPools[poolKey] then
+			objPools[poolKey] = {}
 		end
 
-		local newObj = next(objPools[widgetType])
+		local newObj = next(objPools[poolKey])
 		if not newObj then
-			newObj = WidgetRegistry[widgetType]()
-			newObj.AceGUIWidgetVersion = WidgetVersions[widgetType]
+			newObj = WidgetRegistry[style][widgetType]()
+			newObj.AceGUIWidgetVersion = WidgetVersions[style][widgetType]
+			-- save the style for future recycling
+			newObj.AceGUIWidgetStyle = style
 		else
-			objPools[widgetType][newObj] = nil
+			objPools[poolKey][newObj] = nil
 			-- if the widget is older then the latest, don't even try to reuse it
 			-- just forget about it, and grab a new one.
-			if not newObj.AceGUIWidgetVersion or newObj.AceGUIWidgetVersion < WidgetVersions[widgetType] then
-				return newWidget(widgetType)
+			if not newObj.AceGUIWidgetVersion or newObj.AceGUIWidgetVersion < WidgetVersions[style][widgetType] then
+				return newWidget(widgetType, style)
 			end
 		end
 		return newObj
 	end
 	-- Releases an instance to the Pool
-	function delWidget(obj,widgetType)
-		if not objPools[widgetType] then
-			objPools[widgetType] = {}
+	function delWidget(obj,widgetType,style)
+		local poolKey = widgetType..style
+		if not objPools[poolKey] then
+			objPools[poolKey] = {}
 		end
-		if objPools[widgetType][obj] then
+		if objPools[poolKey][obj] then
 			error("Attempt to Release Widget that is already released", 2)
 		end
-		objPools[widgetType][obj] = true
+		objPools[poolKey][obj] = true
 	end
 end
 
@@ -134,10 +155,25 @@ end
 -- This function will instantiate a new widget (or use one from the widget pool), and call the
 -- OnAcquire function on it, before returning.
 -- @param type The type of the widget.
+-- @param style The widget style to use. (true for auto-selection, string for a specific style; "classic", "modern")
 -- @return The newly created widget.
-function AceGUI:Create(widgetType)
-	if WidgetRegistry[widgetType] then
-		local widget = newWidget(widgetType)
+function AceGUI:Create(widgetType, style)
+	local widgetStyle
+
+	-- style auto-selection
+	if style == true then
+		-- TODO: support modern style once implemented
+		widgetStyle = AceGUI.STYLE_CLASSIC
+	elseif type(style) == "string" then
+		-- string-type styles specify a style directly
+		widgetStyle = style:lower()
+	else
+		-- fallback to classic style (default)
+		widgetStyle = AceGUI.STYLE_CLASSIC
+	end
+
+	if WidgetRegistry[widgetStyle] and WidgetRegistry[widgetStyle][widgetType] then
+		local widget = newWidget(widgetType, widgetStyle)
 
 		if rawget(widget, "Acquire") then
 			widget.OnAcquire = widget.Acquire
@@ -203,7 +239,7 @@ function AceGUI:Release(widget)
 		widget.content.height = nil
 	end
 	widget.isQueuedForRelease = nil
-	delWidget(widget, widget.type)
+	delWidget(widget, widget.type, widget.AceGUIWidgetStyle or AceGUI.STYLE_CLASSIC)
 end
 
 --- Check if a widget is currently in the process of being released
@@ -546,15 +582,25 @@ end
 -- @param Name The name of the widget
 -- @param Constructor The widget constructor function
 -- @param Version The version of the widget
-function AceGUI:RegisterWidgetType(Name, Constructor, Version)
+function AceGUI:RegisterWidgetType(Name, Constructor, Version, Style)
 	assert(type(Constructor) == "function")
 	assert(type(Version) == "number")
+	assert(Style == nil or type(Style) == "string")
 
-	local oldVersion = WidgetVersions[Name]
+	local widgetStyle = Style and Style:lower() or AceGUI.STYLE_CLASSIC
+	if not WidgetRegistry[widgetStyle] then
+		WidgetRegistry[widgetStyle] = {}
+	end
+
+	if not WidgetVersions[widgetStyle] then
+		WidgetVersions[widgetStyle] = {}
+	end
+
+	local oldVersion = WidgetVersions[widgetStyle][Name]
 	if oldVersion and oldVersion >= Version then return end
 
-	WidgetVersions[Name] = Version
-	WidgetRegistry[Name] = Constructor
+	WidgetVersions[widgetStyle][Name] = Version
+	WidgetRegistry[widgetStyle][Name] = Constructor
 end
 
 --- Registers a Layout Function
@@ -577,31 +623,35 @@ function AceGUI:GetLayout(Name)
 	return LayoutRegistry[Name]
 end
 
-AceGUI.counts = AceGUI.counts or {}
-
 --- A type-based counter to count the number of widgets created.
 -- This is used by widgets that require a named frame, e.g. when a Blizzard
 -- Template requires it.
--- @param type The widget type
-function AceGUI:GetNextWidgetNum(widgetType)
-	if not self.counts[widgetType] then
-		self.counts[widgetType] = 0
+-- @param widgetType The widget type
+-- @param widgetStyle The widget style
+function AceGUI:GetNextWidgetNum(widgetType, widgetStyle)
+	local style = widgetStyle and widgetStyle:lower() or AceGUI.STYLE_CLASSIC
+	if not self.counts[style] then
+		self.counts[style] = {}
 	end
-	self.counts[widgetType] = self.counts[widgetType] + 1
-	return self.counts[widgetType]
+	self.counts[style][widgetType] = (self.counts[style][widgetType] or 0) + 1
+	return self.counts[style][widgetType]
 end
 
 --- Return the number of created widgets for this type.
 -- In contrast to GetNextWidgetNum, the number is not incremented.
 -- @param widgetType The widget type
-function AceGUI:GetWidgetCount(widgetType)
-	return self.counts[widgetType] or 0
+-- @param widgetStyle The widget style
+function AceGUI:GetWidgetCount(widgetType, widgetStyle)
+	local style = widgetStyle and widgetStyle:lower() or AceGUI.STYLE_CLASSIC
+	return self.counts[style] and self.counts[style][widgetType] or 0
 end
 
 --- Return the version of the currently registered widget type.
 -- @param widgetType The widget type
-function AceGUI:GetWidgetVersion(widgetType)
-	return WidgetVersions[widgetType]
+-- @param widgetStyle The widget style
+function AceGUI:GetWidgetVersion(widgetType, widgetStyle)
+	local style = widgetStyle and widgetStyle:lower() or AceGUI.STYLE_CLASSIC
+	return WidgetVersions[style] and WidgetVersions[style][widgetType] or nil
 end
 
 -------------
