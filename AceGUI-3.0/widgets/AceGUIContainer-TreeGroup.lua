@@ -465,6 +465,7 @@ local methods = {
 			end
 		end
 
+		-- We hide the buttons after updating them to avoid a blizzard bug that causes the buttons to still be interactable even when hidden.
 		for i, v in ipairs(buttons) do
 			v.shouldBeHidden = true
 		end
