@@ -2,7 +2,7 @@
 TreeGroup Container
 Container that uses a tree control to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TreeGroup", 47
+local Type, Version = "TreeGroup", 48
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -387,10 +387,6 @@ local methods = {
 	["RefreshTree"] = function(self,scrollToSelection,fromOnUpdate)
 		local buttons = self.buttons
 		local lines = self.lines
-
-		for i, v in ipairs(buttons) do
-			v:Hide()
-		end
 		while lines[1] do
 			local t = tremove(lines)
 			for k in pairs(t) do
@@ -469,6 +465,9 @@ local methods = {
 			end
 		end
 
+		for i, v in ipairs(buttons) do
+			v.shouldBeHidden = true
+		end
 		local buttonnum = 1
 		for i = first, last do
 			local line = lines[i]
@@ -496,9 +495,14 @@ local methods = {
 
 			UpdateButton(button, line, status.selected == line.uniquevalue, line.hasChildren, groupstatus[line.uniquevalue] )
 			button:Show()
+			button.shouldBeHidden = nil
 			buttonnum = buttonnum + 1
 		end
-
+		for i, v in ipairs(buttons) do
+			if v.shouldBeHidden then
+				v:Hide()
+			end
+		end
 	end,
 
 	["SetSelected"] = function(self, value)
