@@ -465,10 +465,6 @@ local methods = {
 			end
 		end
 
-		-- We hide the buttons after updating them to avoid a blizzard bug that causes the buttons to still be interactable even when hidden.
-		for i, v in ipairs(buttons) do
-			v.shouldBeHidden = true
-		end
 		local buttonnum = 1
 		for i = first, last do
 			local line = lines[i]
@@ -496,13 +492,13 @@ local methods = {
 
 			UpdateButton(button, line, status.selected == line.uniquevalue, line.hasChildren, groupstatus[line.uniquevalue] )
 			button:Show()
-			button.shouldBeHidden = nil
 			buttonnum = buttonnum + 1
 		end
-		for i, v in ipairs(buttons) do
-			if v.shouldBeHidden then
-				v:Hide()
-			end
+
+		-- We hide the remaining buttons after updating others to avoid a blizzard bug,
+		-- this used to be done for all buttons at the top of this function
+		for i = buttonnum, #buttons do
+			buttons[i]:Hide()
 		end
 	end,
 
