@@ -495,8 +495,7 @@ local methods = {
 			buttonnum = buttonnum + 1
 		end
 
-		-- We hide the remaining buttons after updating others to avoid a blizzard bug,
-		-- this used to be done for all buttons at the top of this function
+		-- We hide the remaining buttons after updating others to avoid a blizzard bug that keeps them interactable even if hidden when hidden before updating the buttons.
 		for i = buttonnum, #buttons do
 			buttons[i]:Hide()
 		end
