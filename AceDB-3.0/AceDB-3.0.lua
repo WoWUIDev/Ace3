@@ -90,6 +90,7 @@ local function copyDefaults(dest, src)
 	--if type(dest) ~= "table" then return end
 	for k, v in pairs(src) do
 		if k == "*" or k == "**" then
+			if k=='*' then v=dest['*'] or v end
 			if type(v) == "table" then
 				-- This is a metatable used for table defaults
 				local mt = {
