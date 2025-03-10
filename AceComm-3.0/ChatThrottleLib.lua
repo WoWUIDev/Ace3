@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 29
+local CTL_VERSION = 30
 
 local _G = _G
 
@@ -113,10 +113,7 @@ function Ring:Remove(obj)
 	end
 end
 
--- Note that this is local because there's no upgrade logic for existing ring
--- metatables, and this isn't present on rings created in versions older than
--- v25.
-local function Ring_Link(self, other)  -- Move and append all contents of another ring to this ring
+function Ring:Link(other)  -- Move and append all contents of another ring to this ring
 	if not self.pos then
 		-- This ring is empty, so just transfer ownership.
 		self.pos = other.pos
@@ -199,6 +196,14 @@ function ChatThrottleLib:Init()
 		for _, Prio in pairs(self.Prio) do
 			Prio.Blocked = Ring:New()
 		end
+	end
+
+	-- All versions need to upgrade existing rings as the metatable isn't
+	-- shared between library versions.
+
+	for _, Prio in pairs(self.Prio) do
+		setmetatable(Prio.Ring, RingMeta)
+		setmetatable(Prio.Blocked, RingMeta)
 	end
 
 	-- v4: total send counters per priority
@@ -448,7 +453,7 @@ function ChatThrottleLib.OnUpdate(this,delay)
 	-- Integrate blocked queues back into their rings periodically.
 	if self.BlockedQueuesDelay >= 0.35 then
 		for _, Prio in pairs(self.Prio) do
-			Ring_Link(Prio.Ring, Prio.Blocked)
+			Prio.Ring:Link(Prio.Blocked)
 		end
 
 		self.BlockedQueuesDelay = 0
