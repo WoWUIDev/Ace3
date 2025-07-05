@@ -41,7 +41,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 31
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 32
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -385,6 +385,12 @@ local function logoutHandler(frame, event)
 			local namespaces = rawget(sv, "namespaces")
 			if namespaces then
 				for name in pairs(namespaces) do
+					-- cleanout empty profiles table, if still present
+					if namespaces[name].profiles and not next(namespaces[name].profiles) then
+						namespaces[name].profiles = nil
+					end
+
+					-- remove entire namespace, if needed
 					if not next(namespaces[name]) then
 						namespaces[name] = nil
 					end
