@@ -41,7 +41,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 32
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 33
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -360,7 +360,7 @@ local function logoutHandler(frame, event)
 
 			-- cleanup sections that are empty without defaults
 			local sv = rawget(db, "sv")
-			for section in pairs(db.keys) do
+			for section in pairs(rawget(db, "keys")) do
 				if rawget(sv, section) then
 					-- global is special, all other sections have sub-entrys
 					-- also don't delete empty profiles on main dbs, only on namespaces
