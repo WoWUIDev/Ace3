@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 29
+local CTL_VERSION = 30
 
 local _G = _G
 
@@ -232,9 +232,15 @@ function ChatThrottleLib:Init()
 		-- Use secure hooks as of v16. Old regular hook support yanked out in v21.
 		self.securelyHooked = true
 		--SendChatMessage
-		hooksecurefunc("SendChatMessage", function(...)
-			return ChatThrottleLib.Hook_SendChatMessage(...)
-		end)
+		if _G.C_ChatInfo and _G.C_ChatInfo.SendChatMessage then
+			hooksecurefunc(_G.C_ChatInfo, "SendChatMessage", function(...)
+				return ChatThrottleLib.Hook_SendChatMessage(...)
+			end)
+		else
+			hooksecurefunc("SendChatMessage", function(...)
+				return ChatThrottleLib.Hook_SendChatMessage(...)
+			end)
+		end
 		--SendAddonMessage
 		hooksecurefunc(_G.C_ChatInfo, "SendAddonMessage", function(...)
 			return ChatThrottleLib.Hook_SendAddonMessage(...)
@@ -541,7 +547,7 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 
 	-- Check if there's room in the global available bandwidth gauge to send directly
 	if not self.bQueueing and nSize < self:UpdateAvail() then
-		local sendResult = PerformSend(_G.SendChatMessage, text, chattype, language, destination)
+		local sendResult = PerformSend(_G.C_ChatInfo.SendChatMessage or _G.SendChatMessage, text, chattype, language, destination)
 
 		if not IsThrottledSendResult(sendResult) then
 			local didSend = (sendResult == SendAddonMessageResult.Success)
@@ -561,7 +567,7 @@ function ChatThrottleLib:SendChatMessage(prio, prefix,   text, chattype, languag
 
 	-- Message needs to be queued
 	local msg = NewMsg()
-	msg.f = _G.SendChatMessage
+	msg.f = _G.C_ChatInfo.SendChatMessage or _G.SendChatMessage
 	msg[1] = text
 	msg[2] = chattype or "SAY"
 	msg[3] = language
