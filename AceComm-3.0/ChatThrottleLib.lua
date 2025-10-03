@@ -23,7 +23,7 @@
 -- LICENSE: ChatThrottleLib is released into the Public Domain
 --
 
-local CTL_VERSION = 30
+local CTL_VERSION = 31
 
 local _G = _G
 
@@ -258,9 +258,15 @@ function ChatThrottleLib:Init()
 	-- v29: Hook BNSendGameData for traffic logging
 	if not self.securelyHookedBNGameData then
 		self.securelyHookedBNGameData = true
-		hooksecurefunc("BNSendGameData", function(...)
-			return ChatThrottleLib.Hook_BNSendGameData(...)
-		end)
+		if _G.C_BattleNet and _G.C_BattleNet.SendGameData then
+			hooksecurefunc(_G.C_BattleNet, "SendGameData", function(...)
+				return ChatThrottleLib.Hook_BNSendGameData(...)
+			end)
+		else
+			hooksecurefunc("BNSendGameData", function(...)
+				return ChatThrottleLib.Hook_BNSendGameData(...)
+			end)
+		end
 	end
 
 	self.nBypass = 0
@@ -648,7 +654,8 @@ function ChatThrottleLib:SendAddonMessageLogged(prio, prefix, text, chattype, ta
 end
 
 local function BNSendGameDataReordered(prefix, text, _, gameAccountID)
-	return _G.BNSendGameData(gameAccountID, prefix, text)
+	local bnSendFunc = _G.C_BattleNet and _G.C_BattleNet.SendGameData or _G.BNSendGameData
+	return bnSendFunc(gameAccountID, prefix, text)
 end
 
 function ChatThrottleLib:BNSendGameData(prio, prefix, text, chattype, gameAccountID, queueName, callbackFn, callbackArg)
