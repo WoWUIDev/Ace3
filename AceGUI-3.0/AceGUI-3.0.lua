@@ -772,7 +772,7 @@ AceGUI:RegisterLayout("Flow",
 				rowoffset = child.alignoffset or (rowheight / 2)
 				rowstartoffset = rowoffset
 			elseif child.width == "relative" then
-				safelayoutcall(child, "SetWidth", width * child.relWidth)
+				safelayoutcall(child, "SetWidth", framewidth)
 
 				if child.DoLayout then
 					child:DoLayout()
