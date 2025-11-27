@@ -1436,12 +1436,15 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 				if control then
 					if control.width ~= "fill" then
 						local width = GetOptionsMemberValue("width",v,options,path,appName)
+						local relWidth = GetOptionsMemberValue("relWidth",v,options,path,appName)
 						if width == "double" then
 							control:SetWidth(width_multiplier * 2)
 						elseif width == "half" then
 							control:SetWidth(width_multiplier / 2)
 						elseif (type(width) == "number") then
 							control:SetWidth(width_multiplier * width)
+						elseif width == "relative" and relWidth then
+							control:SetRelativeWidth(relWidth)
 						elseif width == "full" then
 							control.width = "fill"
 						else
