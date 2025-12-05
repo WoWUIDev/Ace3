@@ -35,6 +35,7 @@ read_globals = {
 	-- WoW API
 	"Ambiguate",
 	"C_ChatInfo",
+	"C_SettingsUtil",
 	"C_Spell",
 	"C_Timer",
 	"ClearCursor",

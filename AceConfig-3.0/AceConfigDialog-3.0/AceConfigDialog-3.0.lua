@@ -7,7 +7,7 @@ local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 89
+local MAJOR, MINOR = "AceConfigDialog-3.0", 90
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1945,6 +1945,8 @@ else
 	AceConfigDialog.BlizOptions = AceConfigDialog.BlizOptions or {}
 end
 
+AceConfigDialog.BlizOptionsIDMap = AceConfigDialog.BlizOptionsIDMap or {}
+
 local function FeedToBlizPanel(widget, event)
 	local path = widget:GetUserData("path")
 	AceConfigDialog:Open(widget:GetUserData("appName"), widget, unpack(path or emptyTbl))
@@ -1976,6 +1978,7 @@ end
 -- @return The category ID to pass to Settings.OpenToCategory
 function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 	local BlizOptions = AceConfigDialog.BlizOptions
+	local BlizOptionsIDMap = AceConfigDialog.BlizOptionsIDMap
 
 	local key = appName
 	for n = 1, select("#", ...) do
@@ -2004,20 +2007,26 @@ function AceConfigDialog:AddToBlizOptions(appName, name, parent, ...)
 
 		local categoryName = name or appName
 		if parent then
-			local category = Settings.GetCategory(parent)
+			local parentID = BlizOptionsIDMap[parent] or parent
+			local category = Settings.GetCategory(parentID)
 			if not category then
 				error(("The parent category '%s' was not found"):format(parent), 2)
 			end
 			local subcategory = Settings.RegisterCanvasLayoutSubcategory(category, group.frame, categoryName)
-
-			-- force the generated ID to be used for subcategories, as these can have very simple names like "Profiles"
-			group:SetName(subcategory.ID, parent)
+			group:SetName(subcategory.ID, parentID)
 		else
+			if BlizOptionsIDMap[categoryName] then
+				error(("%s has already been added to the Blizzard Options Window with the given name: %s"):format(appName, categoryName), 2)
+			end
+
 			local category = Settings.RegisterCanvasLayoutCategory(group.frame, categoryName)
-			-- using appName here would be cleaner, but would not be 100% compatible
-			-- but for top-level categories it should be fine, as these are typically addon names
-			category.ID = categoryName
-			group:SetName(categoryName, parent)
+			if not (C_SettingsUtil and C_SettingsUtil.OpenSettingsPanel) then
+				-- override the ID so the name can be used in Settings.OpenToCategory
+				-- unfortunately with incoming API changes in 12.0 (and likely classic at some point) this override is no longer possible
+				category.ID = categoryName
+			end
+			group:SetName(category.ID)
+			BlizOptionsIDMap[categoryName] = category.ID
 			Settings.RegisterAddOnCategory(category)
 		end
 
