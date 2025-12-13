@@ -23,6 +23,8 @@ globals = {
 	"CloseSpecialWindows",
 	"ColorPickerFrame",
 	"SlashCmdList", "hash_SlashCmdList",
+
+	"ACEGUI_STYLE_CLASSIC",
 }
 
 read_globals = {
