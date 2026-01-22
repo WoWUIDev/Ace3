@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 9
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 10
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -23,6 +23,7 @@ local strsub = string.sub
 local strlower = string.lower
 local strformat = string.format
 local strmatch = string.match
+local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS or Constants.ChatFrameConstants.MaxChatWindows
 
 local function printf(...)
 	DEFAULT_CHAT_FRAME:AddMessage(strformat(...))

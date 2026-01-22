@@ -82,6 +82,7 @@ read_globals = {
 	"CANCEL",
 	"ChatFontNormal",
 	"CLOSE",
+	"Constants",
 	"DEFAULT_CHAT_FRAME",
 	"FONT_COLOR_CODE_CLOSE",
 	"GameFontDisableSmall",
