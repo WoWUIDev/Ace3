@@ -74,7 +74,6 @@ read_globals = {
 	"ChatFrameUtil",
 	"InterfaceOptions_AddCategory",
 	"IsSecureCmd",
-	"SetDesaturation",
 	"Settings",
 
 	-- FrameXML Frames & Constants
