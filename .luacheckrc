@@ -29,6 +29,7 @@ read_globals = {
 	"geterrorhandler",
 	"securecallfunction",
 	"table", "string",
+	"strlenutf8",
 
 	"LibStub",
 
