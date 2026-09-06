@@ -124,6 +124,13 @@ local methods = {
 		UpdateImageAnchor(self)
 	end,
 
+	["SetImageByAtlas"] = function(self, atlasString)
+		self.imageshown = true
+		local image = self.image
+		image:SetAtlas(atlasString)
+		UpdateImageAnchor(self)
+	end,
+
 	["SetFont"] = function(self, font, height, flags)
 		if not self.fontObject then
 			self.fontObject = CreateFont("AceGUI30LabelFont" .. AceGUI:GetNextWidgetNum(Type))

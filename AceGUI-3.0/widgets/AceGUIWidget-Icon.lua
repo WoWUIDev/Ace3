@@ -67,6 +67,11 @@ local methods = {
 		end
 	end,
 
+	["SetImageByAtlas"] = function(self, atlasString)
+		local image = self.image
+		image:SetAtlas(atlasString)
+	end,
+
 	["SetImageSize"] = function(self, width, height)
 		self.image:SetWidth(width)
 		self.image:SetHeight(height)
