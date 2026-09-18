@@ -41,7 +41,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 35
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 36
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -253,16 +253,36 @@ local preserve_keys = {
 }
 
 local realmKey = GetRealmName()
-local charKey = UnitName("player") .. " - " .. realmKey
-local _, classKey = UnitClass("player")
-local _, raceKey = UnitRace("player")
 local factionKey = UnitFactionGroup("player")
-local factionrealmKey = factionKey .. " - " .. realmKey
 local localeKey = GetLocale():lower()
+local charKey, classKey, raceKey, factionrealmKey, factionrealmregionKey
+do
+	local _
+	_, classKey = UnitClass("player")
+	_, raceKey = UnitRace("player")
 
-local regionTable = { "US", "KR", "EU", "TW", "CN" }
-local regionKey = regionTable[GetCurrentRegion()] or GetCurrentRegionName() or "TR"
-local factionrealmregionKey = factionrealmKey .. " - " .. regionKey
+	local _, _, _, version = GetBuildInfo()
+	if version > 16000 and version < 20000 then
+		if C_GameRules.IsGameRuleActive(Enum.GameRule.HardcoreRuleset) then
+			realmKey = "Hardcore"
+		elseif C_GameRules.IsGameRuleActive(Enum.GameRule.RPRuleset) then
+			realmKey = "RP"
+		elseif C_GameRules.IsGameRuleActive(Enum.GameRule.PvPRuleset) then
+			realmKey = "PvP"
+		else
+			realmKey = "PvE"
+		end
+	end
+	charKey = UnitName("player") .. " - " .. realmKey
+
+	local regionTable = { "US", "KR", "EU", "TW", "CN" }
+	local regionName = GetCurrentRegionName()
+	if regionName and regionName == "" then regionName = nil end -- PTR/Beta tends to be ""
+	local regionKey = regionTable[GetCurrentRegion()] or regionName or "TR"
+
+	factionrealmKey = factionKey .. " - " .. realmKey
+	factionrealmregionKey = factionrealmKey .. " - " .. regionKey
+end
 
 -- Actual database initialization function
 local function initdb(sv, defaults, defaultProfile, olddb, parent)
