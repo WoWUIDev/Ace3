@@ -41,7 +41,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 38
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 39
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -272,7 +272,11 @@ do
 			realmKey = "PvE"
 		end
 		local name, surname = UnitNameUnmodified("player")
-		charKey = name .. " " .. tostring(surname)
+		if surname then
+			charKey = name .. " " .. tostring(surname)
+		else
+			charKey = name
+		end
 	else
 		realmKey = GetRealmName()
 		charKey = UnitNameUnmodified("player") .. " - " .. realmKey
