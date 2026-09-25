@@ -260,7 +260,6 @@ do
 	_, classKey = UnitClass("player")
 	_, raceKey = UnitRace("player")
 
-	local _, _, _, version = GetBuildInfo()
 	if RegionalUniqueNamesEnabled and RegionalUniqueNamesEnabled() then
 		if C_GameRules.IsGameRuleActive(Enum.GameRule.HardcoreRuleset) then
 			realmKey = "Hardcore"
