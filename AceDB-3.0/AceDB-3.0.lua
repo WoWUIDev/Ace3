@@ -41,7 +41,7 @@
 -- @class file
 -- @name AceDB-3.0.lua
 -- @release $Id$
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 36
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 37
 local AceDB = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -252,10 +252,9 @@ local preserve_keys = {
 	["children"] = true,
 }
 
-local realmKey = GetRealmName()
 local factionKey = UnitFactionGroup("player")
 local localeKey = GetLocale():lower()
-local charKey, classKey, raceKey, factionrealmKey, factionrealmregionKey
+local charKey, realmKey, classKey, raceKey, factionrealmKey, factionrealmregionKey
 do
 	local _
 	_, classKey = UnitClass("player")
@@ -272,8 +271,12 @@ do
 		else
 			realmKey = "PvE"
 		end
+		local name, surname = UnitNameUnmodified("player")
+		charKey = name .. " " .. tostring(surname) .. " - " .. realmKey
+	else
+		realmKey = GetRealmName()
+		charKey = UnitNameUnmodified("player") .. " - " .. realmKey
 	end
-	charKey = UnitName("player") .. " - " .. realmKey
 
 	local regionTable = { "US", "KR", "EU", "TW", "CN" }
 	local regionName = GetCurrentRegionName()

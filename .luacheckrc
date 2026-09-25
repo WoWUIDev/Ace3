@@ -71,7 +71,7 @@ read_globals = {
 	"UnitFactionGroup",
 	"UnitInParty",
 	"UnitInRaid",
-	"UnitName",
+	"UnitNameUnmodified",
 	"UnitRace",
 
 	-- FrameXML API
