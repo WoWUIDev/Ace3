@@ -261,7 +261,7 @@ do
 	_, raceKey = UnitRace("player")
 
 	local _, _, _, version = GetBuildInfo()
-	if version > 16000 and version < 20000 then
+	if RegionalUniqueNamesEnabled and RegionalUniqueNamesEnabled() then
 		if C_GameRules.IsGameRuleActive(Enum.GameRule.HardcoreRuleset) then
 			realmKey = "Hardcore"
 		elseif C_GameRules.IsGameRuleActive(Enum.GameRule.RPRuleset) then

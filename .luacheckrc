@@ -65,6 +65,7 @@ read_globals = {
 	"IsLoggedIn",
 	"IsShiftKeyDown",
 	"PlaySound",
+	"RegionalUniqueNamesEnabled",
 	"RegisterAddonMessagePrefix",
 	"ReloadUI",
 	"UnitClass",
