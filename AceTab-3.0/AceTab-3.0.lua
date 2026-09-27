@@ -398,18 +398,21 @@ function AceTab:OnTabPressed(this)
 					allGCBS = gcbs(allGCBS, m)
 				end
 			else
+				-- The greatest common substring of the valid matches is what gets inserted into the
+				-- editbox below, so it is needed whether usage output is squelched (usagefunc == true)
+				-- or produced by a function. Compute it before the branch.
+				-- TODO: Make the GCBS function accept a vararg or table, after which we can just pass in the list of matches.
+				setGCBS = nil
+				for m in pairs(matches) do
+					setGCBS = gcbs(setGCBS, m)
+				end
+				allGCBS = gcbs(allGCBS, setGCBS)
+
 				-- Print a usage statement based on the corresponding registered usagefunc.
 				-- candUsage is the table passed to usagefunc to be filled with candidate = usage_statement pairs.
 				if type(usagefunc) == 'function' then
 					for i in pairs(candUsage) do candUsage[i] = nil end
 
-					-- usagefunc takes the greatest common substring of valid matches as one of its args, so let's find that now.
-					-- TODO: Make the GCBS function accept a vararg or table, after which we can just pass in the list of matches.
-					setGCBS = nil
-					for m in pairs(matches) do
-						setGCBS = gcbs(setGCBS, m)
-					end
-					allGCBS = gcbs(allGCBS, setGCBS)
 					usage = usagefunc(candUsage, matches, setGCBS, strsub(text_precursor, 1, prematchEnd))
 
 					-- If the usagefunc returns a string, then the entire usage statement has been taken care of by usagefunc, and we need only to print it...
