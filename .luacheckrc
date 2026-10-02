@@ -108,6 +108,7 @@ read_globals = {
 	"SELECTED_CHAT_FRAME",
 	"UIParent",
 	"WOW_PROJECT_ID",
+	"WOW_PROJECT_CAMELOT",
 	"WOW_PROJECT_MAINLINE",
 
 	-- Custom Globals
