@@ -271,11 +271,7 @@ do
 			realmKey = "PvE"
 		end
 		local name, surname = UnitNameUnmodified("player")
-		if surname then
-			charKey = name .. " " .. tostring(surname)
-		else
-			charKey = name
-		end
+		charKey = name .. " " .. surname
 	else
 		realmKey = GetRealmName()
 		charKey = UnitNameUnmodified("player") .. " - " .. realmKey
