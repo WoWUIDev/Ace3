@@ -9,6 +9,10 @@
 -- "/t1 set "), only the set that has matches may move the insert point. Minor 12 and
 -- earlier fail this: the line jumps back to "/t1 1". Whether it shows for a given pair of
 -- names depends on the registry's pairs order, so the test tries several.
+--
+-- Order: Tab cycles a set's matches in the order its wordlist gave them, and the list
+-- printed without a usagefunc comes out in that order. Minor 13 and earlier walk them with
+-- pairs, in whatever order that gives.
 
 dofile("wow_api.lua")
 dofile("LibStub.lua")
@@ -91,6 +95,28 @@ for i = 1, 16 do
 	end
 	for _, line in ipairs(printed) do
 		assert(line ~= "t" .. i .. ":", dump(i, "heading printed for a set with no matches"))
+	end
+end
+
+
+-----------------------------------------------------------------------
+-- Order: the printed list and the cycle follow the wordlist
+
+do
+	local words = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }
+	local box = NewBox()
+	AceTab:RegisterTabCompletion("o", "/o ", words, nil, box)
+	box:Type("/o ")
+	printed = {}
+	box:Tab() -- prints the matches and inserts their common prefix, here none
+	local listed = {}
+	for _, line in ipairs(printed) do
+		if line ~= "o:" then listed[#listed + 1] = line end
+	end
+	assert(table.concat(listed, " ") == table.concat(words, " "), dump(table.concat(listed, " ")))
+	for n = 1, #words do
+		box:Tab()
+		assert(box.text == "/o " .. words[n], dump(n, box.text))
 	end
 end
 
