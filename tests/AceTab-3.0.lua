@@ -4,6 +4,11 @@
 -- Upgrade: a set registered before a newer copy of the library loads still completes after
 -- it. AceTab-3.0 minor 11 and earlier lose it: the upgrade starts the tables that sort sets
 -- into fallback and non-fallback empty, so OnTabPressed never looks at the set again.
+--
+-- Overlapping sets: when one set's prematch is a prefix of another's ("/t1 " and
+-- "/t1 set "), only the set that has matches may move the insert point. Minor 12 and
+-- earlier fail this: the line jumps back to "/t1 1". Whether it shows for a given pair of
+-- names depends on the registry's pairs order, so the test tries several.
 
 dofile("wow_api.lua")
 dofile("LibStub.lua")
@@ -66,6 +71,27 @@ do
 	assert(listed, dump("the set registered before the upgrade printed nothing"))
 	box:Tab()
 	assert(box.text == "/early a1" or box.text == "/early a2", dump(box.text))
+end
+
+
+-----------------------------------------------------------------------
+-- Overlapping sets: the line keeps its second word through every Tab, and the set with
+-- no matches prints no heading
+
+for i = 1, 16 do
+	local box = NewBox()
+	local command = "/t" .. i
+	AceTab:RegisterTabCompletion("t" .. i, command .. " ", { "set" }, nil, box)
+	AceTab:RegisterTabCompletion("t" .. i .. " set", command .. " set ", { "1", "2", "3" }, nil, box)
+	box:Type(command .. " set ")
+	printed = {}
+	for tab = 1, 4 do
+		box:Tab()
+		assert(box.text:sub(1, #command + 5) == command .. " set ", dump(i, tab, box.text))
+	end
+	for _, line in ipairs(printed) do
+		assert(line ~= "t" .. i .. ":", dump(i, "heading printed for a set with no matches"))
+	end
 end
 
 
