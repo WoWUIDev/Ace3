@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 11
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 14
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -59,9 +59,14 @@ local function hookFrame(f)
 	end
 	f.at3curMatch = 0
 	f.at3matches = {}
+	f.at3order = {}
 end
 
 local fallbacks, notfallbacks = {}, {}  -- classifies completions into those which have preconditions and those which do not.  Those without preconditions are only considered if no other completions have matches.
+-- An upgrade starts these empty: sort the sets an older copy registered back in, from the registry.
+for descriptor, entry in pairs(registry) do
+	if #entry.prematches == 1 and entry.prematches[1] == "" then fallbacks[descriptor] = true else notfallbacks[descriptor] = true end
+end
 local pmolengths = {}  -- holds the number of characters to overwrite according to pmoverwrite and the current prematch
 -- ------------------------------------------------------------------------------
 -- RegisterTabCompletion( descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite )
@@ -203,8 +208,9 @@ local function cycleTab(this)
 	-- Check each completion group registered to this frame.
 	for desc, compgrp in pairs(this.at3matches) do
 
-		-- Loop through the valid completions for this set.
-		for m, pm in pairs(compgrp) do
+		-- Loop through the valid completions for this set, in the order the wordlist gave them.
+		for _, m in ipairs(this.at3order[desc]) do
+			local pm = compgrp[m]
 			cMatch = cMatch + 1
 			if cMatch == this.at3curMatch then  -- we're back to where we left off last time through the combined list
 				this.at3lastMatch = m
@@ -281,7 +287,9 @@ local function fillMatches(this, desc, fallback)
 					pmolengths[desc] = entry.pmoverwrite == true and #text_prematch or entry.pmoverwrite or 0
 
 					-- This is where we will insert completions, taking the prematch overwrite into account.
-					this.at3matchStart = prematchEnd + 1 - (pmolengths[desc] or 0)
+					-- Set below, only by a set that has matches: a set whose prematch is a prefix of
+					-- another's ("/x " inside "/x set ") would otherwise move it with nothing to insert.
+					local matchStart = prematchEnd + 1 - (pmolengths[desc] or 0)
 
 					-- We're either a non-fallback set or all completions thus far have been fallback sets, and the precondition matches.
 					-- Create cands from the registered wordlist, filling it with all potential (unfiltered) completion strings.
@@ -291,8 +299,7 @@ local function fillMatches(this, desc, fallback)
 						wordlist(cands, text_all, prematchEnd + 1, text_pmendToCursor)
 					end
 					if cands ~= false then
-						local matches = this.at3matches[desc] or {}
-						for i in pairs(matches) do matches[i] = nil end
+						local matches, order = {}, {}
 
 						-- Check each of the entries in cands to see if it completes the word before the cursor.
 						-- Finally, increment our match count and set firstMatch, if appropriate.
@@ -300,13 +307,17 @@ local function fillMatches(this, desc, fallback)
 							if strfind(strlower(m), strlower(text_pmendToCursor), 1, 1) == 1 then  -- we have a matching completion!
 								hasNonFallback = hasNonFallback or (not fallback)
 								matches[m] = entry.postfunc and entry.postfunc(m, prematchEnd + 1, text_all) or m
+								order[#order + 1] = m
 								numMatches = numMatches + 1
 								if numMatches == 1 then
 									firstMatch = matches[m]
 								end
 							end
 						end
-						this.at3matches[desc] = numMatches > 0 and matches or nil
+						if #order > 0 then
+							this.at3matches[desc], this.at3order[desc] = matches, order
+							this.at3matchStart = matchStart
+						end
 					end
 				end
 			end
@@ -342,6 +353,8 @@ function AceTab:OnTabPressed(this)
 		return cycleTab(this)
 	else
 		for i in pairs(this.at3matches) do this.at3matches[i] = nil end
+		this.at3order = this.at3order or {}  -- a box hooked by an older AceTab has none
+		for i in pairs(this.at3order) do this.at3order[i] = nil end
 		this.at3curMatch = 0
 		this.at3origWord = nil
 		this.at3origMatch = nil
@@ -393,7 +406,8 @@ function AceTab:OnTabPressed(this)
 			local usagefunc = registry[desc].usagefunc
 			if not usagefunc then
 				-- No special usage processing; just print a list of the (formatted) matches.
-				for m, fm in pairs(matches) do
+				for _, m in ipairs(this.at3order[desc]) do
+					local fm = matches[m]
 					DEFAULT_CHAT_FRAME:AddMessage(fm)
 					allGCBS = gcbs(allGCBS, m)
 				end
@@ -421,7 +435,8 @@ function AceTab:OnTabPressed(this)
 
 					-- ...otherwise, it should have filled candUsage with candidate-usage statement pairs, and we need to print the matching ones.
 					elseif next(candUsage) and numMatches > 0 then
-						for m, fm in pairs(matches) do
+						for _, m in ipairs(this.at3order[desc]) do
+							local fm = matches[m]
 							if candUsage[m] then DEFAULT_CHAT_FRAME:AddMessage(strformat("%s - %s", fm, candUsage[m])) end
 						end
 					end
