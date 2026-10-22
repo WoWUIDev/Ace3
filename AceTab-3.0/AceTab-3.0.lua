@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 11
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 12
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -62,6 +62,10 @@ local function hookFrame(f)
 end
 
 local fallbacks, notfallbacks = {}, {}  -- classifies completions into those which have preconditions and those which do not.  Those without preconditions are only considered if no other completions have matches.
+-- An upgrade starts these empty: sort the sets an older copy registered back in, from the registry.
+for descriptor, entry in pairs(registry) do
+	if #entry.prematches == 1 and entry.prematches[1] == "" then fallbacks[descriptor] = true else notfallbacks[descriptor] = true end
+end
 local pmolengths = {}  -- holds the number of characters to overwrite according to pmoverwrite and the current prematch
 -- ------------------------------------------------------------------------------
 -- RegisterTabCompletion( descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite )
