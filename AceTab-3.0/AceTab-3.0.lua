@@ -4,7 +4,7 @@
 -- @name AceTab-3.0
 -- @release $Id$
 
-local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 11
+local ACETAB_MAJOR, ACETAB_MINOR = 'AceTab-3.0', 13
 local AceTab, oldminor = LibStub:NewLibrary(ACETAB_MAJOR, ACETAB_MINOR)
 
 if not AceTab then return end -- No upgrade needed
@@ -62,6 +62,10 @@ local function hookFrame(f)
 end
 
 local fallbacks, notfallbacks = {}, {}  -- classifies completions into those which have preconditions and those which do not.  Those without preconditions are only considered if no other completions have matches.
+-- An upgrade starts these empty: sort the sets an older copy registered back in, from the registry.
+for descriptor, entry in pairs(registry) do
+	if #entry.prematches == 1 and entry.prematches[1] == "" then fallbacks[descriptor] = true else notfallbacks[descriptor] = true end
+end
 local pmolengths = {}  -- holds the number of characters to overwrite according to pmoverwrite and the current prematch
 -- ------------------------------------------------------------------------------
 -- RegisterTabCompletion( descriptor, prematches, wordlist, usagefunc, listenframes, postfunc, pmoverwrite )
@@ -281,7 +285,9 @@ local function fillMatches(this, desc, fallback)
 					pmolengths[desc] = entry.pmoverwrite == true and #text_prematch or entry.pmoverwrite or 0
 
 					-- This is where we will insert completions, taking the prematch overwrite into account.
-					this.at3matchStart = prematchEnd + 1 - (pmolengths[desc] or 0)
+					-- Set below, only by a set that has matches: a set whose prematch is a prefix of
+					-- another's ("/x " inside "/x set ") would otherwise move it with nothing to insert.
+					local matchStart = prematchEnd + 1 - (pmolengths[desc] or 0)
 
 					-- We're either a non-fallback set or all completions thus far have been fallback sets, and the precondition matches.
 					-- Create cands from the registered wordlist, filling it with all potential (unfiltered) completion strings.
@@ -291,8 +297,7 @@ local function fillMatches(this, desc, fallback)
 						wordlist(cands, text_all, prematchEnd + 1, text_pmendToCursor)
 					end
 					if cands ~= false then
-						local matches = this.at3matches[desc] or {}
-						for i in pairs(matches) do matches[i] = nil end
+						local matches, found = {}, 0
 
 						-- Check each of the entries in cands to see if it completes the word before the cursor.
 						-- Finally, increment our match count and set firstMatch, if appropriate.
@@ -300,13 +305,17 @@ local function fillMatches(this, desc, fallback)
 							if strfind(strlower(m), strlower(text_pmendToCursor), 1, 1) == 1 then  -- we have a matching completion!
 								hasNonFallback = hasNonFallback or (not fallback)
 								matches[m] = entry.postfunc and entry.postfunc(m, prematchEnd + 1, text_all) or m
+								found = found + 1
 								numMatches = numMatches + 1
 								if numMatches == 1 then
 									firstMatch = matches[m]
 								end
 							end
 						end
-						this.at3matches[desc] = numMatches > 0 and matches or nil
+						if found > 0 then
+							this.at3matches[desc] = matches
+							this.at3matchStart = matchStart
+						end
 					end
 				end
 			end
