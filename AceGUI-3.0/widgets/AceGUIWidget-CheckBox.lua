@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Checkbox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "CheckBox", 27
+local Type, Version = "CheckBox", 28
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -199,7 +199,6 @@ local methods = {
 				f:ClearAllPoints()
 				f:SetPoint("TOPLEFT", self.checkbg, "TOPRIGHT", 5, -21)
 				f:SetWidth(self.frame.width - 30)
-				f:SetPoint("RIGHT", self.frame, "RIGHT", -30, 0)
 				f:SetJustifyH("LEFT")
 				f:SetJustifyV("TOP")
 				self.desc = f
