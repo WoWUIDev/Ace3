@@ -2,7 +2,7 @@
 TabGroup Container
 Container that uses tabs on top to switch between groups.
 -------------------------------------------------------------------------------]]
-local Type, Version = "TabGroup", 38
+local Type, Version = "TabGroup", 39
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -452,7 +452,7 @@ local methods = {
 
 	["OnWidthSet"] = function(self, width)
 		local content = self.content
-		local contentwidth = width - 60
+		local contentwidth = width - 22
 		if contentwidth < 0 then
 			contentwidth = 0
 		end

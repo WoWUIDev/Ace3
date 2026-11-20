@@ -2,7 +2,7 @@
 InlineGroup Container
 Simple container widget that creates a visible "box" with an optional title.
 -------------------------------------------------------------------------------]]
-local Type, Version = "InlineGroup", 22
+local Type, Version = "InlineGroup", 23
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -36,7 +36,7 @@ local methods = {
 
 	["OnWidthSet"] = function(self, width)
 		local content = self.content
-		local contentwidth = width - 20
+		local contentwidth = width - 21
 		if contentwidth < 0 then
 			contentwidth = 0
 		end
